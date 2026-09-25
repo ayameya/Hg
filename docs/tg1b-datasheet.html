@@ -157,7 +157,7 @@ tr.sub td:first-child { padding-left: 26px; }
 
 figure { margin: 0 0 2em; min-width: 0; }
 .chart { position: relative; }
-.chart svg { display: block; width: 100%; height: auto; }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
 .chart svg text { font-family: var(--f-sans); }
 .tip {
   position: absolute;
@@ -177,7 +177,7 @@ figure { margin: 0 0 2em; min-width: 0; }
 .tip .r i { width: 12px; height: 3px; border-radius: 2px; display: inline-block; flex: none; }
 .tip .r span:first-child { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; font: 13px/1.5 var(--f-sans); color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend > span { display: inline-flex; align-items: center; gap: 6px; }
 .legend i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
 .legend i.band { height: 12px; border-radius: 3px; background: var(--accent-band); border: 1.5px solid var(--iris); }
 details.data { margin-top: 8px; font-family: var(--f-sans); }
@@ -463,7 +463,7 @@ footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: 
 <p class="note"><span class="t"><span lang="ja">「—」は ЩА3.340.056 ТУ1 の資料に記載がない項目。同資料には、その他のデータは ЧТУ 10.306-57 と同じと注記されている。</span><span lang="en">A dash means the ЩА3.340.056 ТУ1 sheet does not list the item; that sheet notes that all other data are the same as for ЧТУ 10.306-57.</span><span lang="ru">Прочерк означает, что в листе ЩА3.340.056 ТУ1 параметр не указан; там отмечено: «Остальные данные такие же, как у ТГ1Б по ЧТУ 10.306-57».</span></span></p>
 
 <h2 id="s6"><span class="t"><span lang="ja">6　特性図</span><span lang="en">6　Characteristic curves</span><span lang="ru">6　Характеристики</span></span></h2>
-<div class="p"><span class="t"><span lang="ja">グラフにカーソルを当てる（スマートフォンではタップする）と、その位置の読み取り値が表示される。各図の下に数値表がある。</span><span lang="en">Hover a chart (tap on a phone) to read values at that point. Each figure has a data table below it.</span><span lang="ru">Наведите курсор на график (на телефоне — коснитесь), чтобы увидеть значения. Под каждым рисунком есть таблица данных.</span></span></div>
+<div class="p"><span class="t"><span lang="ja">グラフにカーソルを当てると、その位置の読み取り値が表示される。スマートフォンではグラフをタップすると表示され、指で左右になぞると位置を動かせる。表示はグラフの外をタップするまで残る。各図の下に数値表がある。</span><span lang="en">Hover a chart to read values at that point. On a phone, tap the chart to show them and slide your finger sideways to move the reading; it stays until you tap outside the chart. Each figure has a data table below it.</span><span lang="ru">Наведите курсор на график, чтобы увидеть значения. На телефоне коснитесь графика, а чтобы сместить отсчёт, проведите пальцем по горизонтали; подсказка остаётся, пока вы не коснётесь области вне графика. Под каждым рисунком есть таблица данных.</span></span></div>
 
 <figure>
   <p class="cap"><span class="t"><span lang="ja">図 1　平均的な点弧特性の範囲</span><span lang="en">Fig. 1　Averaged firing characteristic region</span><span lang="ru">Рис. 1　Усреднённая область пусковых характеристик</span></span></p>
@@ -887,7 +887,7 @@ footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: 
       dotsG.innerHTML = dots;
       var html = "<div class=\"h\">" + info.head.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</div>";
       info.rows.forEach(function (r) {
-        html += "<div class=\"r\"><span><i style=\"background:var(" + r.color + ")\"></i>" + r.label.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</span><span>" + r.value + "</span></div>";
+        html += "<div class=\"r\"><span><i style=\"background:var(" + r.color + ")\"></i><span>" + r.label.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</span></span><span>" + r.value + "</span></div>";
       });
       tip.innerHTML = html;
       tip.hidden = false;
@@ -900,14 +900,17 @@ footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: 
     function leave() { g.style.display = "none"; tip.hidden = true; }
     hit.addEventListener("pointermove", move);
     hit.addEventListener("pointerdown", move);
-    hit.addEventListener("pointerleave", leave);
+    hit.addEventListener("pointerleave", function (ev) { if (ev.pointerType === "mouse") leave(); });
+    if (host._outside) document.removeEventListener("pointerdown", host._outside);
+    host._outside = function (ev) { if (!host.contains(ev.target)) leave(); };
+    document.addEventListener("pointerdown", host._outside);
   }
 
   function legend(c) {
     if (!c.legend) return;
     var host = document.getElementById(c.legend);
     host.innerHTML = c.series.map(function (s) {
-      return "<span><i style=\"background:var(" + s.color + ")\"></i>" + s.name.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</span>";
+      return "<span><i style=\"background:var(" + s.color + ")\"></i><span>" + s.name.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</span></span>";
     }).join("");
   }
 
