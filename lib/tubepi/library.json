@@ -1,0 +1,7 @@
+{
+  "name": "tubepi",
+  "version": "1.0.0",
+  "description": "Entropy conditioning, health tests and Monte Carlo pi estimation for a thyratron noise source",
+  "frameworks": "*",
+  "platforms": "*"
+}

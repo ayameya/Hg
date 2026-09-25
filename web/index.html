@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>ТГ1Б π</title>
+<style>
+:root {
+  --bg: #0d0b14;
+  --surface: #17141f;
+  --surface-2: #211d2c;
+  --line: #2e293b;
+  --text: #ece8f5;
+  --muted: #9a93ad;
+  --faint: #5e5770;
+  --glow: #a78bfa;
+  --glow-soft: rgba(167, 139, 250, 0.16);
+  --heat: #f5b453;
+  --heat-soft: rgba(245, 180, 83, 0.14);
+  --ok: #5fd39a;
+  --warn: #f5b453;
+  --bad: #ff6b7d;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f4fa;
+    --surface: #ffffff;
+    --surface-2: #f0edf6;
+    --line: #e1dcea;
+    --text: #1d1a26;
+    --muted: #625b73;
+    --faint: #a49db3;
+    --glow: #6a4bd6;
+    --glow-soft: rgba(106, 75, 214, 0.12);
+    --heat: #b5731a;
+    --heat-soft: rgba(181, 115, 26, 0.12);
+    --ok: #1c8f5a;
+    --warn: #b5731a;
+    --bad: #d23a50;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body {
+  font: 15px/1.55 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 32px max(16px, env(safe-area-inset-left));
+  -webkit-text-size-adjust: 100%;
+}
+main { max-width: 1040px; margin: 0 auto; }
+header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; margin-bottom: 16px; }
+h1 { font-size: 22px; line-height: 1.2; margin: 0; letter-spacing: 0.02em; }
+h1 .tube { color: var(--glow); text-shadow: 0 0 18px var(--glow-soft); }
+.sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.pill.ok .dot { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+.pill.warn .dot { background: var(--warn); }
+.pill.bad .dot { background: var(--bad); }
+.pill.sim { color: var(--bad); border-color: var(--bad); }
+.grid { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .span2 { grid-column: 1 / -1; }
+}
+section.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 16px; min-width: 0; }
+.card h2 { font-size: 13px; font-weight: 600; margin: 0 0 10px; color: var(--muted); letter-spacing: 0.04em; }
+.hero { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); align-items: center; }
+@media (min-width: 760px) { .hero { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+.pi-value { font-family: var(--mono); font-size: clamp(34px, 9vw, 60px); line-height: 1.05; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.pi-value .hit { color: var(--glow); text-shadow: 0 0 22px var(--glow-soft); }
+.pi-value .miss { color: var(--faint); }
+.pi-ref { font-family: var(--mono); color: var(--muted); font-size: 13px; margin-top: 6px; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin: 0; }
+.stats div { min-width: 0; }
+.stats dt { font-size: 12px; color: var(--muted); }
+.stats dd { margin: 0; font-family: var(--mono); font-size: 16px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.stats.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 420px) { .stats.three { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+canvas { display: block; width: 100%; border-radius: 10px; background: var(--surface-2); }
+.square { aspect-ratio: 1 / 1; }
+.wide { aspect-ratio: 16 / 9; }
+.strip { aspect-ratio: 4 / 1; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.legend i.line { height: 2px; border-radius: 0; vertical-align: 3px; width: 14px; }
+.note { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button, .button { font: inherit; font-size: 14px; color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; cursor: pointer; text-decoration: none; }
+button:hover, .button:hover { border-color: var(--glow); }
+button:focus-visible, .button:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+.health-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.health-row:first-of-type { border-top: 0; }
+.health-row span:last-child { font-family: var(--mono); text-align: right; }
+.bad-text { color: var(--bad); }
+.ok-text { color: var(--ok); }
+.warn-text { color: var(--warn); }
+footer { margin-top: 16px; font-size: 12px; color: var(--faint); display: flex; flex-wrap: wrap; gap: 4px 16px; }
+#banner { display: none; margin-bottom: 12px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--bad); color: var(--bad); background: var(--surface); font-size: 13px; }
+#banner.show { display: block; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1><span class="tube">ТГ1Б</span> π 計算機</h1>
+      <p class="sub">サイラトロンの放電ノイズを乱数源にしたモンテカルロ法</p>
+    </div>
+    <div class="pills">
+      <span class="pill" id="pill-state"><span class="dot"></span><span>接続中…</span></span>
+      <span class="pill" id="pill-source">—</span>
+    </div>
+  </header>
+
+  <div id="banner" role="status"></div>
+
+  <div class="grid">
+    <section class="card span2" aria-labelledby="h-est">
+      <h2 id="h-est">π の推定値（1/4 円に落ちたダーツの割合 × 4）</h2>
+      <div class="hero">
+        <div>
+          <div class="pi-value" id="pi-value" aria-live="polite"><span class="miss">—</span></div>
+          <div class="pi-ref">π = 3.14159265358979…</div>
+        </div>
+        <dl class="stats">
+          <div><dt>ダーツ数 N</dt><dd id="s-darts">0</dd></div>
+          <div><dt>円内 k</dt><dd id="s-inside">0</dd></div>
+          <div><dt>標準誤差 ±1σ</dt><dd id="s-sigma">—</dd></div>
+          <div><dt>真値との差</dt><dd id="s-error">—</dd></div>
+          <div><dt>一致桁数</dt><dd id="s-digits">0</dd></div>
+          <div><dt>ダーツ / 秒</dt><dd id="s-dps">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-darts">
+      <h2 id="h-darts">ダーツの着弾（最新 30,000 本）</h2>
+      <canvas id="c-darts" class="square" role="img" aria-label="単位正方形に投げたダーツの散布図"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--glow)"></i>円内</span>
+        <span><i style="background:var(--heat)"></i>円外</span>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-conv">
+      <h2 id="h-conv">収束の様子（両対数）</h2>
+      <canvas id="c-conv" class="square" role="img" aria-label="ダーツ数に対する誤差の推移"></canvas>
+      <div class="legend">
+        <span><i class="line" style="background:var(--glow)"></i>|円による推定 − π|</span>
+        <span><i class="line" style="background:var(--heat)"></i>|互いに素による推定 − π|</span>
+        <span><i class="line" style="background:var(--faint)"></i>理論 1σ</span>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-cop">
+      <h2 id="h-cop">もう一つの推定：2 数が互いに素になる確率 = 6/π²</h2>
+      <dl class="stats three">
+        <div><dt>推定値</dt><dd id="c-est">—</dd></div>
+        <div><dt>±1σ</dt><dd id="c-sigma">—</dd></div>
+        <div><dt>ペア数</dt><dd id="c-pairs">0</dd></div>
+      </dl>
+      <p class="note">乱数語を交互に振り分け、偶数番目は (x, y) のダーツ、奇数番目は 1〜65536 の整数ペアとして使います。二つの推定は互いに独立なビットから計算されます。</p>
+    </section>
+
+    <section class="card" aria-labelledby="h-bits">
+      <h2 id="h-bits">エントロピー抽出</h2>
+      <dl class="stats three">
+        <div><dt>生ビット/秒</dt><dd id="b-raw">—</dd></div>
+        <div><dt>出力ビット/秒</dt><dd id="b-out">—</dd></div>
+        <div><dt>抽出効率</dt><dd id="b-eff">—</dd></div>
+        <div><dt>1 の比率</dt><dd id="b-ones">—</dd></div>
+        <div><dt>系列相関 (lag 1)</dt><dd id="b-corr">—</dd></div>
+        <div><dt>出力バイト</dt><dd id="b-bytes">0</dd></div>
+      </dl>
+    </section>
+
+    <section class="card span2" aria-labelledby="h-noise" id="noise-card">
+      <h2 id="h-noise">ノイズ源（生サンプル）</h2>
+      <div class="grid">
+        <div>
+          <canvas id="c-wave" class="strip" role="img" aria-label="直近の生サンプル波形"></canvas>
+          <div class="legend"><span id="wave-label">直近 256 サンプル</span></div>
+        </div>
+        <div>
+          <canvas id="c-hist" class="strip" role="img" aria-label="生サンプルのヒストグラム"></canvas>
+          <div class="legend"><span id="hist-label">ヒストグラム</span></div>
+        </div>
+      </div>
+      <dl class="stats three" style="margin-top:12px">
+        <div><dt>サンプル/秒</dt><dd id="n-rate">—</dd></div>
+        <div><dt>平均</dt><dd id="n-mean">—</dd></div>
+        <div><dt>標準偏差 σ</dt><dd id="n-sd">—</dd></div>
+        <div><dt>最小エントロピー</dt><dd id="n-hmin">—</dd></div>
+        <div><dt>最小 / 最大</dt><dd id="n-range">—</dd></div>
+        <div><dt>破棄率</dt><dd id="n-disc">—</dd></div>
+      </dl>
+    </section>
+
+    <section class="card" aria-labelledby="h-health">
+      <h2 id="h-health">健全性テスト（NIST SP 800-90B 4.4）</h2>
+      <div class="health-row"><span>想定エントロピー H</span><span id="h-h">—</span></div>
+      <div class="health-row"><span>反復回数テスト（閾値 / 失敗）</span><span id="h-rct">—</span></div>
+      <div class="health-row"><span>適応比率テスト（窓 / 閾値 / 失敗）</span><span id="h-apt">—</span></div>
+      <div class="health-row"><span>静穏判定 σ 閾値</span><span id="h-quiet">—</span></div>
+      <div class="health-row"><span>パルス取りこぼし</span><span id="h-over">—</span></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-ctl">
+      <h2 id="h-ctl">操作</h2>
+      <div class="controls">
+        <button type="button" id="btn-reset">推定をリセット</button>
+        <button type="button" id="btn-pause" aria-pressed="false">一時停止</button>
+        <a class="button" href="/random.bin" download="tg1b-random.bin">乱数 4 KiB を保存</a>
+      </div>
+      <p class="note">保存したバイト列は ent や NIST SP 800-22 などのテストツールで検定できます。</p>
+    </section>
+  </div>
+
+  <footer>
+    <span id="f-board">—</span>
+    <span id="f-clients">—</span>
+    <span id="f-uptime">—</span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var PI_TEXT = "3.14159265358979323846";
+  var MAX_POINTS = 30000;
+  var POLL_MS = 400;
+
+  var state = {
+    epoch: -1,
+    nextDart: 0,
+    history: [],
+    points: new Uint32Array(MAX_POINTS),
+    pointCount: 0,
+    pointHead: 0,
+    last: null,
+    prev: null,
+    rates: {},
+    paused: false,
+    failures: 0,
+    waveVisible: true,
+    dartsDirty: true
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function css(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function fmtInt(n) {
+    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  function fmtRate(n) {
+    if (!isFinite(n)) return "—";
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + " M";
+    if (n >= 1e4) return (n / 1e3).toFixed(1) + " k";
+    if (n >= 100) return n.toFixed(0);
+    return n.toFixed(1);
+  }
+
+  function fmtUptime(ms) {
+    var s = Math.floor(ms / 1000);
+    var h = Math.floor(s / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    return "稼働 " + h + ":" + String(m).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+  }
+
+  function matchingDigits(text) {
+    var n = 0;
+    for (var i = 0; i < text.length && i < PI_TEXT.length; i++) {
+      if (text[i] !== PI_TEXT[i]) break;
+      n = i + 1;
+    }
+    return n;
+  }
+
+  function setupCanvas(canvas) {
+    var dpr = window.devicePixelRatio || 1;
+    var w = Math.max(1, Math.round(canvas.clientWidth * dpr));
+    var h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    return { ctx: ctx, w: w, h: h, dpr: dpr };
+  }
+
+  function drawDarts() {
+    var c = setupCanvas($("c-darts"));
+    var ctx = c.ctx, w = c.w, h = c.h, pad = 6 * c.dpr;
+    var size = Math.min(w, h) - pad * 2;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = css("--line");
+    ctx.lineWidth = c.dpr;
+    ctx.strokeRect(pad, pad, size, size);
+
+    var glow = css("--glow"), heat = css("--heat");
+    var r = Math.max(1, 1.1 * c.dpr);
+    var n = state.pointCount;
+    var start = (state.pointHead - n + MAX_POINTS) % MAX_POINTS;
+    ctx.globalAlpha = n > 8000 ? 0.55 : 0.85;
+    for (var pass = 0; pass < 2; pass++) {
+      ctx.fillStyle = pass === 0 ? heat : glow;
+      ctx.beginPath();
+      for (var i = 0; i < n; i++) {
+        var word = state.points[(start + i) % MAX_POINTS];
+        var x = (word >>> 16), y = (word & 0xffff);
+        var X = 2 * x + 1, Y = 2 * y + 1;
+        var inside = X * X + Y * Y < 17179869184;
+        if (inside !== (pass === 1)) continue;
+        var px = pad + (x + 0.5) / 65536 * size;
+        var py = pad + size - (y + 0.5) / 65536 * size;
+        ctx.rect(px - r / 2, py - r / 2, r, r);
+      }
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = glow;
+    ctx.lineWidth = 2 * c.dpr;
+    ctx.beginPath();
+    ctx.arc(pad, pad + size, size, -Math.PI / 2, 0);
+    ctx.stroke();
+    state.dartsDirty = false;
+  }
+
+  function drawConvergence() {
+    var c = setupCanvas($("c-conv"));
+    var ctx = c.ctx, w = c.w, h = c.h, d = c.dpr;
+    ctx.clearRect(0, 0, w, h);
+    var left = 44 * d, right = 10 * d, top = 10 * d, bottom = 28 * d;
+    var pw = w - left - right, ph = h - top - bottom;
+
+    var rows = state.history.slice();
+    if (state.last && state.last.pi.darts > 0) {
+      rows.push([state.last.pi.darts, state.last.pi.est, state.last.pi.cest]);
+    }
+    var maxN = 1e3;
+    rows.forEach(function (r) { if (r[0] > maxN) maxN = r[0]; });
+    var xMin = 1, xMax = Math.pow(10, Math.ceil(Math.log10(maxN)));
+    var yMin = 1e-5, yMax = 10;
+
+    function sx(n) { return left + (Math.log10(n) - Math.log10(xMin)) / (Math.log10(xMax) - Math.log10(xMin)) * pw; }
+    function sy(e) {
+      var v = Math.min(yMax, Math.max(yMin, e));
+      return top + (Math.log10(yMax) - Math.log10(v)) / (Math.log10(yMax) - Math.log10(yMin)) * ph;
+    }
+
+    ctx.font = (10 * d) + "px " + css("--mono");
+    ctx.fillStyle = css("--muted");
+    ctx.strokeStyle = css("--line");
+    ctx.lineWidth = d;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (var ey = Math.log10(yMin); ey <= Math.log10(yMax); ey++) {
+      var y = sy(Math.pow(10, ey));
+      ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(left + pw, y); ctx.stroke();
+      ctx.fillText("1e" + ey, left - 6 * d, y);
+    }
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for (var ex = 0; ex <= Math.log10(xMax); ex++) {
+      var x = sx(Math.pow(10, ex));
+      ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, top + ph); ctx.stroke();
+      ctx.fillText(ex === 0 ? "1" : "1e" + ex, x, top + ph + 6 * d);
+    }
+
+    ctx.strokeStyle = css("--faint");
+    ctx.setLineDash([4 * d, 4 * d]);
+    ctx.beginPath();
+    for (var k = 0; k <= 60; k++) {
+      var n = Math.pow(10, Math.log10(xMin) + k / 60 * (Math.log10(xMax) - Math.log10(xMin)));
+      var yy = sy(1.642 / Math.sqrt(n));
+      if (k === 0) ctx.moveTo(sx(n), yy); else ctx.lineTo(sx(n), yy);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    function series(index, color) {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 1.6 * d;
+      ctx.beginPath();
+      var started = false;
+      rows.forEach(function (r) {
+        if (!(r[index] > 0)) return;
+        var px = sx(r[0]), py = sy(Math.abs(r[index] - Math.PI));
+        if (!started) { ctx.moveTo(px, py); started = true; } else { ctx.lineTo(px, py); }
+      });
+      ctx.stroke();
+      var lastRow = rows[rows.length - 1];
+      if (lastRow && lastRow[index] > 0) {
+        ctx.beginPath();
+        ctx.arc(sx(lastRow[0]), sy(Math.abs(lastRow[index] - Math.PI)), 3 * d, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    series(2, css("--heat"));
+    series(1, css("--glow"));
+  }
+
+  function drawWave(data) {
+    var c = setupCanvas($("c-wave"));
+    var ctx = c.ctx, w = c.w, h = c.h, d = c.dpr;
+    ctx.clearRect(0, 0, w, h);
+    if (!data || data.length < 2) return;
+    var min = Infinity, max = -Infinity;
+    data.forEach(function (v) { if (v < min) min = v; if (v > max) max = v; });
+    if (max === min) { max += 1; min -= 1; }
+    var pad = 4 * d;
+    ctx.strokeStyle = css("--glow");
+    ctx.lineWidth = 1.2 * d;
+    ctx.beginPath();
+    data.forEach(function (v, i) {
+      var x = pad + i / (data.length - 1) * (w - 2 * pad);
+      var y = h - pad - (v - min) / (max - min) * (h - 2 * pad);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    $("wave-label").textContent = "直近 " + data.length + " サンプル（" + min + "〜" + max + "）";
+  }
+
+  function drawHistogram(noise) {
+    var c = setupCanvas($("c-hist"));
+    var ctx = c.ctx, w = c.w, h = c.h, d = c.dpr;
+    ctx.clearRect(0, 0, w, h);
+    if (!noise || !noise.valid) return;
+    var bins = noise.bins;
+    var peak = Math.max.apply(null, bins) || 1;
+    var pad = 4 * d;
+    var bw = (w - 2 * pad) / bins.length;
+    ctx.fillStyle = css("--heat");
+    bins.forEach(function (b, i) {
+      var bh = b / peak * (h - 2 * pad);
+      ctx.fillRect(pad + i * bw + 0.5 * d, h - pad - bh, Math.max(1, bw - d), bh);
+    });
+    $("hist-label").textContent = "ヒストグラム " + noise.lo + "〜" + noise.hi + "（範囲外 " + fmtInt(noise.oor) + "）";
+  }
+
+  function updateRates(s) {
+    var p = state.prev;
+    state.prev = { ms: s.ms, samples: s.bits.samples, raw: s.bits.raw, out: s.bits.out, darts: s.pi.darts, epoch: s.pi.epoch };
+    if (!p || s.ms <= p.ms) return;
+    var dt = (s.ms - p.ms) / 1000;
+    function blend(key, value) {
+      var old = state.rates[key];
+      state.rates[key] = (old === undefined || !isFinite(old)) ? value : old * 0.7 + value * 0.3;
+    }
+    blend("samples", (s.bits.samples - p.samples) / dt);
+    blend("raw", (s.bits.raw - p.raw) / dt);
+    blend("out", (s.bits.out - p.out) / dt);
+    if (s.pi.epoch === p.epoch) blend("darts", (s.pi.darts - p.darts) / dt);
+  }
+
+  function renderStatus(s) {
+    var pill = $("pill-state");
+    var labels = { healthy: ["正常", "ok"], warming: ["ウォームアップ中", "warn"], quiet: ["ノイズ不足", "bad"], recovering: ["健全性テスト失敗・回復待ち", "bad"] };
+    var info = labels[s.state] || [s.state, "warn"];
+    if (s.idle > 3000) info = ["信号なし", "bad"];
+    if (s.warmup > 0) info = ["ヒーター予熱中", "warn"];
+    pill.className = "pill " + info[1];
+    pill.lastChild.textContent = info[0];
+
+    var src = $("pill-source");
+    var names = { analog: "アナログ入力", pulse: "パルス間隔", simulated: "シミュレーション" };
+    src.textContent = (names[s.source] || s.source) + " · " + s.tube;
+    src.className = "pill" + (s.source === "simulated" ? " sim" : "");
+
+    var banner = $("banner");
+    var msg = "";
+    if (s.source === "simulated") msg = "シミュレーションモードです。真空管ではなくマイコン内蔵の乱数を使っています。";
+    else if (s.warmup > 0) msg = "ヒーター予熱中です。残り " + Math.ceil(s.warmup / 1000) + " 秒で陽極電源を投入します。";
+    else if (s.idle > 3000) msg = "入力信号が " + (s.idle / 1000).toFixed(0) + " 秒間届いていません。配線と真空管の点火を確認してください。";
+    else if (s.state === "quiet") msg = "ノイズの振幅が小さすぎます（σ < " + s.noise.quiet + "）。ヒーターの予熱、バイアス、増幅度を確認してください。この間のビットは捨てています。";
+    else if (s.state === "recovering") msg = "健全性テストが失敗したため、しばらくの間ビットを捨てています。";
+    banner.textContent = msg;
+    banner.className = msg ? "show" : "";
+  }
+
+  function renderEstimate(s) {
+    var pi = s.pi;
+    var el = $("pi-value");
+    if (pi.darts === 0) {
+      el.innerHTML = '<span class="miss">—</span>';
+    } else {
+      var text = pi.est.toFixed(8);
+      var hit = matchingDigits(text);
+      el.innerHTML = "";
+      var a = document.createElement("span"); a.className = "hit"; a.textContent = text.slice(0, hit);
+      var b = document.createElement("span"); b.className = "miss"; b.textContent = text.slice(hit);
+      el.appendChild(a); el.appendChild(b);
+      var decimals = Math.max(0, hit - 2);
+      $("s-digits").textContent = hit === 0 ? "0" : "小数 " + decimals + " 桁";
+    }
+    $("s-darts").textContent = fmtInt(pi.darts);
+    $("s-inside").textContent = fmtInt(pi.inside);
+    $("s-sigma").textContent = pi.darts > 1 ? "±" + pi.sd.toFixed(6) : "—";
+    $("s-error").textContent = pi.darts > 0 ? (pi.est - Math.PI >= 0 ? "+" : "") + (pi.est - Math.PI).toFixed(6) +
+      (pi.sd > 0 ? "（" + (Math.abs(pi.est - Math.PI) / pi.sd).toFixed(2) + "σ）" : "") : "—";
+    $("s-dps").textContent = fmtRate(state.rates.darts);
+
+    $("c-est").textContent = pi.coprime > 0 ? pi.cest.toFixed(6) : "—";
+    $("c-sigma").textContent = pi.coprime > 1 ? "±" + pi.csd.toFixed(6) : "—";
+    $("c-pairs").textContent = fmtInt(pi.pairs);
+  }
+
+  function renderBits(s) {
+    var b = s.bits;
+    $("b-raw").textContent = fmtRate(state.rates.raw);
+    $("b-out").textContent = fmtRate(state.rates.out);
+    $("b-eff").textContent = b.raw > 0 ? (100 * b.out / b.raw).toFixed(1) + " %" + (b.vn ? "（VN）" : "") : "—";
+    $("b-ones").textContent = b.out > 0 ? (b.ones / b.out).toFixed(5) : "—";
+    $("b-corr").textContent = b.out > 1 ? (2 * b.agree / (b.out - 1) - 1).toFixed(5) : "—";
+    $("b-bytes").textContent = fmtInt(b.bytes);
+  }
+
+  function renderNoise(s) {
+    var n = s.noise;
+    $("n-rate").textContent = fmtRate(state.rates.samples);
+    $("n-mean").textContent = n.valid ? n.mean.toFixed(1) : "—";
+    $("n-sd").textContent = n.valid ? n.sd.toFixed(2) : "—";
+    $("n-hmin").textContent = n.valid ? n.hmin.toFixed(2) + " bit" : "—";
+    $("n-range").textContent = n.valid ? n.min + " / " + n.max : "—";
+    $("n-disc").textContent = s.bits.samples > 0 ? (100 * s.bits.discarded / s.bits.samples).toFixed(1) + " %" : "—";
+    if (state.waveVisible) {
+      if (s.wave) drawWave(s.wave);
+      drawHistogram(n);
+    }
+    var hl = s.health;
+    $("h-h").textContent = hl.h.toFixed(2) + " bit/サンプル";
+    $("h-rct").innerHTML = "";
+    $("h-rct").appendChild(statusText(hl.rctCut + " / " + hl.rct, hl.rct > 0));
+    $("h-apt").innerHTML = "";
+    $("h-apt").appendChild(statusText(hl.aptWin + " / " + hl.aptCut + " / " + hl.apt, hl.apt > 0));
+    $("h-quiet").textContent = n.quiet.toFixed(2);
+    $("h-over").textContent = s.source === "pulse" ? fmtInt(hl.overruns) : "—";
+  }
+
+  function statusText(text, bad) {
+    var span = document.createElement("span");
+    span.className = bad ? "warn-text" : "ok-text";
+    span.textContent = text;
+    return span;
+  }
+
+  function ingest(s) {
+    if (s.pi.epoch !== state.epoch) {
+      state.epoch = s.pi.epoch;
+      state.history = [];
+      state.pointCount = 0;
+      state.pointHead = 0;
+      state.nextDart = 0;
+      state.prev = null;
+      state.rates = {};
+      state.dartsDirty = true;
+    }
+    if (s.hist.from === state.history.length) {
+      state.history = state.history.concat(s.hist.rows);
+    } else if (s.hist.from === 0) {
+      state.history = s.hist.rows.slice();
+    }
+    var hex = s.pts.hex;
+    var count = hex.length / 8;
+    for (var i = 0; i < count; i++) {
+      state.points[state.pointHead] = parseInt(hex.substr(i * 8, 8), 16) >>> 0;
+      state.pointHead = (state.pointHead + 1) % MAX_POINTS;
+      if (state.pointCount < MAX_POINTS) state.pointCount++;
+    }
+    if (count > 0) state.dartsDirty = true;
+    state.nextDart = s.pts.from + count;
+    updateRates(s);
+    state.last = s;
+  }
+
+  function render() {
+    var s = state.last;
+    if (!s) return;
+    renderStatus(s);
+    renderEstimate(s);
+    renderBits(s);
+    renderNoise(s);
+    if (state.dartsDirty) drawDarts();
+    drawConvergence();
+    $("f-board").textContent = s.board;
+    $("f-clients").textContent = "接続端末 " + s.clients;
+    $("f-uptime").textContent = fmtUptime(s.ms);
+  }
+
+  function poll() {
+    if (state.paused) { setTimeout(poll, POLL_MS); return; }
+    var url = "/api/state?s=" + state.nextDart + "&h=" + state.history.length +
+      "&w=" + (state.waveVisible ? 1 : 0) + "&m=512" + (state.epoch < 0 ? "" : "&e=" + state.epoch);
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 4000);
+    fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (s) {
+        clearTimeout(timer);
+        state.failures = 0;
+        ingest(s);
+        render();
+        setTimeout(poll, POLL_MS);
+      })
+      .catch(function () {
+        clearTimeout(timer);
+        state.failures++;
+        var pill = $("pill-state");
+        pill.className = "pill bad";
+        pill.lastChild.textContent = "通信エラー（再試行中）";
+        setTimeout(poll, Math.min(5000, POLL_MS * Math.pow(2, state.failures)));
+      });
+  }
+
+  $("btn-reset").addEventListener("click", function () {
+    fetch("/api/reset", { method: "POST" }).catch(function () {});
+  });
+
+  $("btn-pause").addEventListener("click", function () {
+    state.paused = !state.paused;
+    this.textContent = state.paused ? "再開" : "一時停止";
+    this.setAttribute("aria-pressed", String(state.paused));
+  });
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      state.waveVisible = entries[0].isIntersecting;
+    }).observe($("noise-card"));
+  }
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () { state.dartsDirty = true; render(); if (state.last && state.last.wave) drawWave(state.last.wave); }, 150);
+  });
+
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: light)");
+    var onScheme = function () { state.dartsDirty = true; render(); };
+    if (mq.addEventListener) mq.addEventListener("change", onScheme); else if (mq.addListener) mq.addListener(onScheme);
+  }
+
+  poll();
+})();
+</script>
+</body>
+</html>
