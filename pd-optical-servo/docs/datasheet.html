@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>PDOS-01 データシート</title>
+<style>
+@page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+:root { --ink:#1a1a1a; --sub:#555; --rule:#999; --head:#e9eef5; --accent:#2a4d7a; --warn:#8a1c1c; }
+html { font-family: "IPAPGothic", "IPAGothic", sans-serif; color: var(--ink); font-size: 9.4pt; line-height: 1.55; }
+body { margin: 0; background: #fff; }
+h1 { font-size: 17pt; margin: 0 0 2mm; letter-spacing: .04em; }
+h2 { font-size: 12pt; margin: 6mm 0 2mm; padding: 1mm 2mm; border-left: 4px solid var(--accent); background: var(--head); break-after: avoid; }
+h3 { font-size: 10.2pt; margin: 4mm 0 1.5mm; color: var(--accent); break-after: avoid; }
+p { margin: 1.2mm 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.5mm 0 2.5mm; break-inside: avoid; font-size: 8.6pt; }
+th, td { border: 1px solid var(--rule); padding: 1mm 1.6mm; vertical-align: top; }
+th { background: var(--head); font-weight: bold; text-align: center; white-space: nowrap; }
+td.c { text-align: center; }
+td.r { text-align: right; white-space: nowrap; }
+.mono { font-family: "IPAGothic", monospace; }
+.cover { border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule); padding: 3mm 0 3mm; margin-bottom: 3mm; }
+.cover .kind { font-size: 10pt; color: var(--sub); }
+.cover .model { font-size: 11pt; margin-top: 1mm; }
+.meta { display: flex; justify-content: space-between; font-size: 8.4pt; color: var(--sub); }
+.note { font-size: 8.2pt; color: var(--sub); }
+.warn { border: 1px solid var(--warn); color: var(--warn); padding: 1.5mm 2.5mm; margin: 2mm 0; break-inside: avoid; }
+.warn b { color: var(--warn); }
+figure { margin: 2mm 0 3mm; text-align: center; break-inside: avoid; }
+figure img { max-width: 100%; }
+figcaption { font-size: 8.4pt; color: var(--sub); margin-top: 1mm; }
+.pb { break-before: page; }
+ul, ol { margin: 1mm 0 1.5mm 5mm; padding-left: 3mm; }
+li { margin: .4mm 0; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+.bytes td { text-align: center; }
+.bytes td.l { text-align: left; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="kind">製品データシート（試作設計版）</div>
+  <h1>USB PD 給電・光 CAN 入力 DC サーボ制御基板</h1>
+  <div class="model">型式（仮）：<b>PDOS-01</b>　　版：0.1　　発行日：2026 年 9 月 25 日</div>
+</div>
+<div class="meta"><span>本書は試作前の設計値に基づいています。数値は評価後に改訂されることがあります。</span><span>発行者：（記入）</span></div>
+
+<h2>1. 概要</h2>
+<p>PDOS-01 は、USB Type-C の USB Power Delivery（PD）から受電し、<b>専用のモータドライバ IC を使わずに</b>、ディスクリート H ブリッジでブラシ付き DC モータを位置制御（サーボ制御）する基板です。</p>
+<p>指令の入出力には、<b>CAN（ISO 11898-1）のプロトコルを赤外光で伝送する「光 CAN」</b>を採用しています。上位機器とは電気的に絶縁され、ノイズの影響も受けにくくなります。光 I/O は、890 nm 赤外 LED と PIN フォトダイオードで構成します。</p>
+
+<h2>2. 特長</h2>
+<ul>
+  <li>USB PD 3.0/2.0 で受電（CH224K で 9/12/15/20 V を MCU から選択。CH221K の固定電圧版を組立オプションで用意）</li>
+  <li>PD 交渉の成立を確認してからモータ電源を投入する、ソフトスタート付きのロードスイッチ（突入電流 1.8 A 以下）</li>
+  <li>Nch/Pch コンプリメンタリ MOSFET と汎用トランジスタによるディスクリート H ブリッジ。デューティ 100 % に対応し、連続 3 A（既定の電流制限 2.5 A）で駆動</li>
+  <li>MCU 内蔵のコンパレータによるハードウェア過電流遮断（1 µs 以内）、過電圧・低電圧・過熱・センサ異常の各保護</li>
+  <li>位置センサ：ポテンショメータ（12 bit）またはインクリメンタルエンコーダ</li>
+  <li>光 CAN：125/250/500 kbps、自局ループバック付き。光スターハブで最大 8 ノードまで接続可能</li>
+  <li>CANopen 風の ID を割り付けた、簡潔なアプリケーションプロトコル（位置指令・状態・パラメータ・異常通知・ハートビート）</li>
+</ul>
+
+<h2>3. ブロック図</h2>
+<figure><img src="../figures/block.svg" style="width:100%"><figcaption>図 1　ブロック図</figcaption></figure>
+
+<h2 class="pb">4. 絶対最大定格</h2>
+<p class="note">以下の値を一瞬でも超えると、永久的な損傷を生じるおそれがあります。条件の記載がない場合、Ta = 25 ℃ です。</p>
+<table>
+<tr><th>項目</th><th>記号</th><th>定格</th><th>単位</th><th>備考</th></tr>
+<tr><td>VBUS 入力電圧</td><td class="c">V<sub>BUS</sub></td><td class="r">−0.3 〜 24</td><td class="c">V</td><td>D1 SMBJ22A でクランプ</td></tr>
+<tr><td>モータ電源ノード電圧</td><td class="c">V<sub>M</sub></td><td class="r">−0.3 〜 26</td><td class="c">V</td><td>回生を含む。D4 SMBJ24A でクランプ</td></tr>
+<tr><td>モータ出力電流（連続）</td><td class="c">I<sub>OUT</sub></td><td class="r">3.0</td><td class="c">A</td><td>Ta = 25 ℃、§11 の実装条件</td></tr>
+<tr><td>モータ出力電流（ピーク）</td><td class="c">I<sub>OUT(pk)</sub></td><td class="r">9.0</td><td class="c">A</td><td>10 ms 以下、デューティ 10 % 以下</td></tr>
+<tr><td>J3 WIPER 入力電圧</td><td class="c">V<sub>POT</sub></td><td class="r">−0.3 〜 3.6</td><td class="c">V</td><td>アナログ入力（5 V トレラントではありません）</td></tr>
+<tr><td>J4 A/B 入力電圧</td><td class="c">V<sub>ENC</sub></td><td class="r">−0.3 〜 5.5</td><td class="c">V</td><td>5 V トレラント入力</td></tr>
+<tr><td>+3V3 外部取出し電流（J3 ＋ J4）</td><td class="c">I<sub>3V3X</sub></td><td class="r">50</td><td class="c">mA</td><td></td></tr>
+<tr><td>動作周囲温度</td><td class="c">T<sub>a</sub></td><td class="r">−10 〜 +60</td><td class="c">℃</td><td>結露なきこと</td></tr>
+<tr><td>保存温度</td><td class="c">T<sub>stg</sub></td><td class="r">−20 〜 +70</td><td class="c">℃</td><td>電解コンデンサの定格による</td></tr>
+</table>
+
+<h2>5. 推奨動作条件</h2>
+<table>
+<tr><th>項目</th><th>最小</th><th>標準</th><th>最大</th><th>単位</th><th>備考</th></tr>
+<tr><td>USB PD ソース出力</td><td class="r">27</td><td class="r">45</td><td class="r">100</td><td class="c">W</td><td>PD 3.0/2.0。27 W 未満の場合、15 V は供給されないことがある</td></tr>
+<tr><td>受電電圧（交渉値）</td><td class="r">9</td><td class="r">15</td><td class="r">20</td><td class="c">V</td><td>既定値 15 V。交渉に失敗した場合は 20 → 12 → 9 V の順に試す</td></tr>
+<tr><td>モータ定格電圧</td><td class="r">6</td><td class="r">12</td><td class="r">V<sub>M</sub></td><td class="c">V</td><td>デューティの上限でモータ定格に合わせる</td></tr>
+<tr><td>モータ連続電流</td><td class="r">—</td><td class="r">—</td><td class="r">2.5</td><td class="c">A</td><td>既定の電流制限値。3.0 A までは Ta ≦ 25 ℃ で可</td></tr>
+<tr><td>ポテンショメータ抵抗値</td><td class="r">1</td><td class="r">5</td><td class="r">10</td><td class="c">kΩ</td><td></td></tr>
+<tr><td>エンコーダ入力周波数（各相）</td><td class="r">—</td><td class="r">—</td><td class="r">500</td><td class="c">kHz</td><td></td></tr>
+<tr><td>帯域内の外乱光照度（受光面）</td><td class="r">—</td><td class="r">—</td><td class="r">0.25</td><td class="c">mW/cm²</td><td>790〜1050 nm、R62 = 10 kΩ の場合（§7.2）</td></tr>
+</table>
+
+<h2 class="pb">6. 電気的特性</h2>
+<p class="note">条件の記載がない場合、Ta = 25 ℃、V<sub>M</sub> = 15 V、標準実装（CH224K、R62 = 10 kΩ、R59 未実装）です。「設計値」は計算値であり、試作評価で確認します。</p>
+<table>
+<tr><th>項目</th><th>条件</th><th>最小</th><th>標準</th><th>最大</th><th>単位</th></tr>
+<tr><td>待機時消費電流（VBUS）</td><td>READY、LED 消灯</td><td class="r">—</td><td class="r">25</td><td class="r">40</td><td class="c">mA</td></tr>
+<tr><td>+3V3 出力電圧</td><td>負荷 0〜300 mA</td><td class="r">3.23</td><td class="r">3.30</td><td class="r">3.37</td><td class="c">V</td></tr>
+<tr><td>VM 立上り時間（ソフトスタート）</td><td>V<sub>BUS</sub> = 9〜20 V</td><td class="r">5</td><td class="r">6</td><td class="r">8</td><td class="c">ms</td></tr>
+<tr><td>VM 投入時の突入電流</td><td>V<sub>BUS</sub> = 20 V</td><td class="r">—</td><td class="r">1.8</td><td class="r">2.5</td><td class="c">A</td></tr>
+<tr><td>PWM 周波数</td><td></td><td class="r">19.8</td><td class="r">20.0</td><td class="r">20.2</td><td class="c">kHz</td></tr>
+<tr><td>デューティ範囲 / 分解能</td><td></td><td class="r">0</td><td class="r">1/4250</td><td class="r">100</td><td class="c">%</td></tr>
+<tr><td>デッドタイム</td><td>設定範囲 0.5〜2.0 µs</td><td class="r">—</td><td class="r">1.0</td><td class="r">—</td><td class="c">µs</td></tr>
+<tr><td>Pch ゲート電圧 V<sub>GS(H)</sub></td><td>V<sub>M</sub> ≧ 15 V</td><td class="r">−13</td><td class="r">−11.5</td><td class="r">−10</td><td class="c">V</td></tr>
+<tr><td>Nch ゲート電圧 V<sub>GS(L)</sub></td><td>V<sub>M</sub> ≧ 12.5 V</td><td class="r">10.5</td><td class="r">11.3</td><td class="r">12</td><td class="c">V</td></tr>
+<tr><td>電流検出範囲 / 分解能</td><td>R42 = 20 mΩ、PGA ×16</td><td class="r">0</td><td class="r">2.5 mA</td><td class="r">10</td><td class="c">A</td></tr>
+<tr><td>電流検出誤差（校正後）</td><td>0.2〜5 A</td><td class="r">—</td><td class="r">±2 %</td><td class="r">±3 % ±30 mA</td><td class="c">—</td></tr>
+<tr><td>過電流遮断レベル</td><td>既定値（1〜9 A で設定可）</td><td class="r">5.1</td><td class="r">6.0</td><td class="r">6.9</td><td class="c">A</td></tr>
+<tr><td>過電流遮断の応答時間</td><td>設定値の 150 % の過電流</td><td class="r">—</td><td class="r">0.3</td><td class="r">1.0</td><td class="c">µs</td></tr>
+<tr><td>VM 電圧測定分解能</td><td></td><td class="r">—</td><td class="r">8.9</td><td class="r">—</td><td class="c">mV</td></tr>
+<tr><td>電流制御周期 / 位置制御周期</td><td></td><td class="r">—</td><td class="r">50 / 1000</td><td class="r">—</td><td class="c">µs</td></tr>
+</table>
+
+<h2 class="pb">7. 光 I/O 仕様（光 CAN）</h2>
+<p>本基板の指令入力と状態出力は、<b>クラシック CAN のフレームを赤外光で伝送</b>します。CAN トランシーバの代わりに、図 2 の光フロントエンドを使います。</p>
+
+<h3>7.1 論理定義</h3>
+<table>
+<tr><th>CAN の状態</th><th>CAN_TX / CAN_RX（ロジック）</th><th>光</th><th>RX_OPT_N</th></tr>
+<tr><td class="c">ドミナント</td><td class="c">0（L）</td><td class="c"><b>発光</b></td><td class="c">0（L）</td></tr>
+<tr><td class="c">レセッシブ・アイドル</td><td class="c">1（H）</td><td class="c"><b>消光</b></td><td class="c">1（H）</td></tr>
+</table>
+<ul>
+  <li><b>自局ループバック（必須）</b>：CAN_RX = CAN_TX ∧ RX_OPT_N。CAN コントローラが自分の送信ビットを遅れなしで読み返すために必要です（ビットモニタリング・調停・ACK 検出）。</li>
+  <li>リセット中や未初期化の状態では CAN_TX が R56 でプルアップされるので、<b>消光（レセッシブ）</b>になります。光路が遮断されたり LED が故障したりしても、バスがドミナントに固着することはありません。</li>
+</ul>
+
+<h3>7.2 物理層の光学的・電気的特性</h3>
+<div class="two">
+<table>
+<tr><th colspan="3">送信部（TX）</th></tr>
+<tr><td>発光素子</td><td colspan="2">TSHF5210（Vishay）GaAlAs</td></tr>
+<tr><td>ピーク波長</td><td class="r">890</td><td>nm（半値幅 40 nm）</td></tr>
+<tr><td>半値角</td><td class="r">±10</td><td>°</td></tr>
+<tr><td>順電流 I<sub>F</sub></td><td class="r">53 / 100</td><td>mA（R59 未実装 / 実装）</td></tr>
+<tr><td>軸上放射強度 I<sub>e</sub></td><td class="r">≧ 45（標準 90）</td><td>mW/sr（I<sub>F</sub> = 53 mA、設計値）</td></tr>
+<tr><td>光出力の立上り・立下り</td><td class="r">30</td><td>ns 標準</td></tr>
+<tr><td>送信遅延 t<sub>TX</sub></td><td class="r">≦ 50</td><td>ns（CAN_TX → 光 50 %）</td></tr>
+<tr><td>消光時の順電流</td><td class="r">&lt; 1</td><td>µA</td></tr>
+</table>
+<table>
+<tr><th colspan="3">受信部（RX）</th></tr>
+<tr><td>受光素子</td><td colspan="2">BPV10NF（Vishay）PIN・昼光カット</td></tr>
+<tr><td>感度波長域</td><td class="r">790〜1050</td><td>nm</td></tr>
+<tr><td>受光半値角</td><td class="r">±20</td><td>°</td></tr>
+<tr><td>受光感度</td><td class="r">≧ 30（標準 55）</td><td>µA/(mW/cm²)（870 nm）</td></tr>
+<tr><td>判定閾値（光電流）</td><td class="r">33 / 30</td><td>µA（ON 判定 / OFF 判定、R62 = 10 kΩ）</td></tr>
+<tr><td>ドミナント判定に必要な照度</td><td class="r">≧ 2.2</td><td>mW/cm²（最悪値、閾値の 2 倍）</td></tr>
+<tr><td>レセッシブを保てる外乱照度</td><td class="r">≦ 0.25</td><td>mW/cm²（帯域内）</td></tr>
+<tr><td>受信遅延 t<sub>RX</sub></td><td class="r">≦ 0.26</td><td>µs（光 50 % → RX_OPT_N）</td></tr>
+</table>
+</div>
+
+<h3>7.3 受光負荷 R62 の選択と通信距離</h3>
+<p>光軸を合わせた空間伝送での値です（Ee = Ie / d²、閾値の 2 倍の光電流を確保できる距離）。最悪値は、放射強度と受光感度がともに最小の場合です。</p>
+<table>
+<tr><th rowspan="2">R62</th><th rowspan="2">判定閾値<br>（光電流）</th><th rowspan="2">t<sub>link</sub> 最大</th><th rowspan="2">最大ビットレート</th><th colspan="2">通信距離 I<sub>F</sub> = 53 mA</th><th colspan="2">通信距離 I<sub>F</sub> = 100 mA</th></tr>
+<tr><th>最悪値</th><th>標準</th><th>最悪値</th><th>標準</th></tr>
+<tr><td class="c"><b>10 kΩ（標準）</b></td><td class="r">30 µA</td><td class="r">0.35 µs</td><td class="r">500 kbps</td><td class="r">45 mm</td><td class="r">87 mm</td><td class="r">64 mm</td><td class="r">123 mm</td></tr>
+<tr><td class="c">22 kΩ</td><td class="r">14 µA</td><td class="r">0.6 µs</td><td class="r">250 kbps</td><td class="r">67 mm</td><td class="r">128 mm</td><td class="r">95 mm</td><td class="r">181 mm</td></tr>
+<tr><td class="c">47 kΩ</td><td class="r">6.4 µA</td><td class="r">1.2 µs</td><td class="r">125 kbps</td><td class="r">98 mm</td><td class="r">190 mm</td><td class="r">138 mm</td><td class="r">268 mm</td></tr>
+</table>
+<ul>
+  <li>最小距離は 5 mm です（機械的な制約。受光側は D11 でクランプするので、近距離でも飽和しません）。</li>
+  <li>光軸のずれの許容範囲は ±5° が目安です（照度の低下は約 25 % 以内）。</li>
+  <li>さらに距離が必要な場合や外乱光が強い場合は、φ1 mm のプラスチック光ファイバ（POF）をスリーブで LED と PD に結合して使用します。</li>
+  <li>外乱光の許容値は、R62 の値に反比例して小さくなります（22 kΩ で 0.11、47 kΩ で 0.05 mW/cm²）。</li>
+</ul>
+
+<figure><img src="../figures/optical_io.svg" style="width:82%"><figcaption>図 2　光フロントエンド回路（送信部・受信部・自局ループバック）</figcaption></figure>
+
+<h3 class="pb">7.4 タイミング</h3>
+<figure><img src="../figures/optical_timing.svg" style="width:78%"><figcaption>図 3　光 CAN の信号タイミング（遅延は誇張して描いています）</figcaption></figure>
+<table>
+<tr><th>記号</th><th>項目</th><th>条件</th><th>最小</th><th>標準</th><th>最大</th><th>単位</th></tr>
+<tr><td class="c">t<sub>TX</sub></td><td>CAN_TX 変化 → 光出力 50 %</td><td></td><td class="r">—</td><td class="r">35</td><td class="r">50</td><td class="c">ns</td></tr>
+<tr><td class="c">t<sub>RX</sub></td><td>光入力 50 % → RX_OPT_N 変化</td><td>R62 = 10 kΩ、閾値の 2 倍以上の光</td><td class="r">—</td><td class="r">0.15</td><td class="r">0.26</td><td class="c">µs</td></tr>
+<tr><td class="c">t<sub>loop</sub></td><td>CAN_TX → 自局 CAN_RX</td><td>U6 経由</td><td class="r">—</td><td class="r">4</td><td class="r">10</td><td class="c">ns</td></tr>
+<tr><td class="c">t<sub>link</sub></td><td>局 A CAN_TX → 局 B CAN_RX</td><td>R62 = 10 kΩ</td><td class="r">—</td><td class="r">0.2</td><td class="r">0.35</td><td class="c">µs</td></tr>
+<tr><td class="c">Δt<sub>dom</sub></td><td>受信側でのドミナント幅の伸縮</td><td>R62 = 10 kΩ</td><td class="r">−0.05</td><td class="r">—</td><td class="r">+0.2</td><td class="c">µs</td></tr>
+</table>
+<p><b>ビットタイミングの条件</b>：往復遅延 2 × t<sub>link</sub>（ハブを使う場合はハブの遅延を加える）が、同期セグメントからサンプル点までの時間より十分短いこと。</p>
+
+<h3>7.5 データリンク層</h3>
+<table>
+<tr><th>項目</th><th>仕様</th></tr>
+<tr><td>プロトコル</td><td>ISO 11898-1 クラシック CAN（CAN 2.0A）。CAN FD には対応しません</td></tr>
+<tr><td>識別子</td><td>11 ビット標準 ID（29 ビット拡張 ID のフレームは無視します）</td></tr>
+<tr><td>ビットレート</td><td>125 / <b>250（既定）</b> / 500 kbps（パラメータ 0x02、再起動後に有効）</td></tr>
+<tr><td>ビットタイミング（FDCAN カーネルクロック = 8 MHz）</td><td>500 kbps：16 tq（TSEG1 13、TSEG2 2、SJW 2）／250 kbps：32 tq（TSEG1 27、TSEG2 4、SJW 4）／125 kbps：分周 2・32 tq。いずれもサンプル点 87.5 %</td></tr>
+<tr><td>発振器の精度</td><td>水晶 8 MHz ±20 ppm（CAN の要求 ±0.5 % 以内）</td></tr>
+<tr><td>ACK</td><td>ほかに受信ノード（上位機器など）が少なくとも 1 局必要です</td></tr>
+<tr><td>エラー処理</td><td>ISO 11898-1 に準拠（エラーパッシブ、バスオフ、自動復帰）</td></tr>
+<tr><td>推奨バス負荷</td><td>50 % 以下（250 kbps・8 バイトのフレームで 1 フレーム約 0.54 ms）</td></tr>
+</table>
+
+<h3>7.6 トポロジと対向機器の要件</h3>
+<ul>
+  <li><b>1 対 1</b>：上位機器と本基板を、互いの LED が相手の PD を向くように対向させます。同じ基板同士を向かい合わせると、TX と RX がそのまま向き合います。</li>
+  <li><b>多ノード（最大 8）</b>：光スターハブを使います。ハブは、全ポートの受信信号の AND（どれか 1 局がドミナントならドミナント）を全ポートへ送り返します。</li>
+  <li><b>対向機器（上位機器）の要件</b>：
+    <ol>
+      <li>CAN コントローラの TX/RX ロジック信号に、図 2 と同じ光フロントエンドを接続すること（CAN トランシーバは使いません）。例：STM32 の bxCAN/FDCAN、ESP32 の TWAI、RP2040 の can2040 など。</li>
+      <li>自局ループバック（CAN_RX = CAN_TX ∧ RX_OPT_N）を必ず実装すること。</li>
+      <li>ドミナント時に、本基板の受光面で 2.2 mW/cm² 以上（890 ± 30 nm）の照度を与えること。レセッシブ時には発光しないこと。</li>
+      <li>§7.5 と同じビットレート、およびサンプル点 75〜87.5 % で動作すること。</li>
+    </ol>
+  </li>
+</ul>
+
+<div class="warn"><b>注意：</b>赤外光は目に見えません。発光中の LED を至近距離から直視しないでください。製品化の際には、IEC 62471（ランプ及びランプシステムの光生物学的安全性）に基づく評価を行ってください。</div>
+
+<h2 class="pb">8. アプリケーション層（メッセージ仕様）</h2>
+<p>ID の割付は CANopen に似せていますが、<b>CANopen には準拠しません</b>。n はノード ID（1〜8、DIP スイッチ値 + 1）です。多バイト値は<b>リトルエンディアン</b>です。</p>
+<table>
+<tr><th>ID</th><th>名称</th><th>方向</th><th>DLC</th><th>送信タイミング</th></tr>
+<tr><td class="c mono">0x000</td><td>NMT（全局制御）</td><td>上位 → 全局</td><td class="c">2</td><td>随時</td></tr>
+<tr><td class="c mono">0x080</td><td>SYNC</td><td>上位 → 全局</td><td class="c">0</td><td>任意（同時適用モードのとき）</td></tr>
+<tr><td class="c mono">0x080+n</td><td>EMCY（異常通知）</td><td>局 → 上位</td><td class="c">4</td><td>異常が発生したとき</td></tr>
+<tr><td class="c mono">0x180+n</td><td>STATUS（状態）</td><td>局 → 上位</td><td class="c">8</td><td>CMD を受信してから 1 ms 以内、または周期送信</td></tr>
+<tr><td class="c mono">0x200+n</td><td>CMD（動作指令）</td><td>上位 → 局</td><td class="c">8</td><td>推奨 10 ms 周期（タイムアウト既定 200 ms）</td></tr>
+<tr><td class="c mono">0x580+n</td><td>PARAM 応答</td><td>局 → 上位</td><td class="c">8</td><td>要求への応答</td></tr>
+<tr><td class="c mono">0x600+n</td><td>PARAM 要求</td><td>上位 → 局</td><td class="c">8</td><td>随時</td></tr>
+<tr><td class="c mono">0x700+n</td><td>HEARTBEAT</td><td>局 → 上位</td><td class="c">4</td><td>既定 1 s 周期</td></tr>
+</table>
+
+<h3>8.1 CMD（0x200+n）</h3>
+<table class="bytes">
+<tr><th>バイト</th><th>0</th><th>1</th><th>2–3</th><th>4–5</th><th>6–7</th></tr>
+<tr><td>内容</td><td>mode</td><td>seq</td><td>target（int16）</td><td>vel_limit（uint16）</td><td>cur_limit（uint16）</td></tr>
+<tr><td>単位</td><td>—</td><td>0–255</td><td>mode 2：0.01°<br>mode 3：0.01 %</td><td>0.1 °/s（0 = 既定）</td><td>mA（0 = 既定）</td></tr>
+</table>
+<p>mode：<span class="mono">0x00</span> 惰性（全 FET OFF）、<span class="mono">0x01</span> ブレーキ（両ローサイド ON）、<span class="mono">0x02</span> 位置制御、<span class="mono">0x03</span> デューティ直接指令（−10000〜+10000）。seq は STATUS でそのまま返されます。</p>
+
+<h3>8.2 STATUS（0x180+n）</h3>
+<table class="bytes">
+<tr><th>バイト</th><th>0</th><th>1</th><th>2–3</th><th>4–5</th><th>6</th><th>7</th></tr>
+<tr><td>内容</td><td>state</td><td>seq</td><td>position（int16）</td><td>current（int16）</td><td>VM（uint8）</td><td>fault flags</td></tr>
+<tr><td>単位</td><td>下表</td><td>エコー</td><td>0.01°</td><td>mA（符号は回転方向）</td><td>0.1 V</td><td>下表</td></tr>
+</table>
+<div class="two">
+<table>
+<tr><th>state</th><th>意味</th></tr>
+<tr><td class="c">0</td><td>BOOT（初期化中）</td></tr>
+<tr><td class="c">1</td><td>PD_WAIT（PD 交渉中）</td></tr>
+<tr><td class="c">2</td><td>READY（待機。ブリッジ OFF）</td></tr>
+<tr><td class="c">3</td><td>RUN（運転中）</td></tr>
+<tr><td class="c">4</td><td>FAULT（異常ラッチ）</td></tr>
+</table>
+<table>
+<tr><th>bit</th><th>fault flags</th></tr>
+<tr><td class="c">0</td><td>OCP 過電流</td></tr>
+<tr><td class="c">1</td><td>OVP 過電圧</td></tr>
+<tr><td class="c">2</td><td>UVP 低電圧</td></tr>
+<tr><td class="c">3</td><td>OTP 過熱</td></tr>
+<tr><td class="c">4</td><td>SENSOR 位置センサ異常</td></tr>
+<tr><td class="c">5</td><td>TIMEOUT 指令途絶</td></tr>
+<tr><td class="c">6</td><td>PD_FAIL 受電失敗</td></tr>
+<tr><td class="c">7</td><td>CAN_ERR エラーパッシブ以上</td></tr>
+</table>
+</div>
+
+<h3>8.3 NMT（0x000）、EMCY（0x080+n）、HEARTBEAT（0x700+n）</h3>
+<table>
+<tr><th>メッセージ</th><th>バイト配置</th></tr>
+<tr><td>NMT</td><td>B0：<span class="mono">0x01</span> 運転許可／<span class="mono">0x02</span> 停止（惰性）／<span class="mono">0x03</span> 非常停止（ブレーキ）／<span class="mono">0x80</span> 異常リセット／<span class="mono">0x81</span> 再起動。B1：対象ノード（0 = 全局）</td></tr>
+<tr><td>EMCY</td><td>B0：異常コード（<span class="mono">0x01</span> OCP、<span class="mono">0x02</span> OVP、<span class="mono">0x03</span> UVP、<span class="mono">0x04</span> OTP、<span class="mono">0x05</span> 位置センサ、<span class="mono">0x06</span> 指令途絶、<span class="mono">0x07</span> PD 失敗、<span class="mono">0x08</span> バスオフから復帰）。B1：state。B2–3：詳細値（電流 mA、電圧 10 mV 単位、温度 ℃ など）</td></tr>
+<tr><td>HEARTBEAT</td><td>B0：state。B1：交渉した PD 電圧 [V]。B2：基板温度（int8、℃）。B3：ファームウェア版数</td></tr>
+</table>
+
+<h3>8.4 PARAM 要求（0x600+n）・応答（0x580+n）</h3>
+<table class="bytes">
+<tr><th>バイト</th><th>0</th><th>1</th><th>2–5</th><th>6</th><th>7</th></tr>
+<tr><td>要求</td><td>op：<span class="mono">0x40</span> 読出し／<span class="mono">0x23</span> 書込み／<span class="mono">0x10</span> フラッシュ保存／<span class="mono">0x11</span> 初期値に戻す</td><td>index</td><td>value（int32）</td><td>0</td><td>0</td></tr>
+<tr><td>応答</td><td>op のエコー（異常時は <span class="mono">0x80</span>）</td><td>index</td><td>value（int32）</td><td>err：0 正常、1 index なし、2 範囲外、3 読出し専用、4 RUN 中は変更不可</td><td>0</td></tr>
+</table>
+
+<table>
+<tr><th>index</th><th>名称</th><th>単位</th><th>既定値</th><th>範囲・備考</th></tr>
+<tr><td class="c mono">0x01</td><td>NODE_ID_OVERRIDE</td><td>—</td><td class="r">0</td><td>0 = DIP の値を使う、1〜8</td></tr>
+<tr><td class="c mono">0x02</td><td>CAN_BITRATE</td><td>kbps</td><td class="r">250</td><td>125 / 250 / 500（保存後、再起動で有効）</td></tr>
+<tr><td class="c mono">0x03</td><td>PD_REQUEST_V</td><td>V</td><td class="r">15</td><td>9 / 12 / 15 / 20（CH224K 実装時のみ）</td></tr>
+<tr><td class="c mono">0x04</td><td>PD_FALLBACK</td><td>bit</td><td class="r">0x0F</td><td>bit0 9 V、bit1 12 V、bit2 15 V、bit3 20 V</td></tr>
+<tr><td class="c mono">0x05</td><td>MOTOR_RATED_mV</td><td>mV</td><td class="r">12000</td><td>デューティ上限 = 定格 / VM</td></tr>
+<tr><td class="c mono">0x10</td><td>CUR_LIMIT_mA</td><td>mA</td><td class="r">2500</td><td>0〜5000</td></tr>
+<tr><td class="c mono">0x11</td><td>OCP_TRIP_mA</td><td>mA</td><td class="r">6000</td><td>1000〜9000（ハードウェア遮断）</td></tr>
+<tr><td class="c mono">0x12</td><td>VEL_LIMIT</td><td>0.1 °/s</td><td class="r">3000</td><td>1〜30000</td></tr>
+<tr><td class="c mono">0x13</td><td>ACC_LIMIT</td><td>°/s²</td><td class="r">3000</td><td>1〜100000</td></tr>
+<tr><td class="c mono">0x20–0x22</td><td>POS_KP / KI / KD</td><td>×0.001</td><td class="r">—</td><td>位置 PID ゲイン</td></tr>
+<tr><td class="c mono">0x23–0x24</td><td>CUR_KP / KI</td><td>×0.001</td><td class="r">—</td><td>電流 PI ゲイン</td></tr>
+<tr><td class="c mono">0x30</td><td>POS_SOURCE</td><td>—</td><td class="r">0</td><td>0 ポテンショメータ、1 エンコーダ</td></tr>
+<tr><td class="c mono">0x31 / 0x32</td><td>POT_RAW_MIN / MAX</td><td>LSB</td><td class="r">200 / 3895</td><td>校正値</td></tr>
+<tr><td class="c mono">0x33 / 0x34</td><td>ANGLE_AT_MIN / MAX</td><td>0.01°</td><td class="r">−13500 / 13500</td><td>校正値</td></tr>
+<tr><td class="c mono">0x35 / 0x36</td><td>SOFT_LIMIT_MIN / MAX</td><td>0.01°</td><td class="r">−13000 / 13000</td><td>指令値の制限</td></tr>
+<tr><td class="c mono">0x37</td><td>ENC_CPR</td><td>count/rev</td><td class="r">4096</td><td>4 逓倍後の値</td></tr>
+<tr><td class="c mono">0x40</td><td>CMD_TIMEOUT_ms</td><td>ms</td><td class="r">200</td><td>0 = 無効</td></tr>
+<tr><td class="c mono">0x41</td><td>TIMEOUT_ACTION</td><td>—</td><td class="r">1</td><td>0 惰性、1 ブレーキ、2 位置保持</td></tr>
+<tr><td class="c mono">0x42</td><td>STATUS_PERIOD_ms</td><td>ms</td><td class="r">0</td><td>0 = CMD への応答のみ</td></tr>
+<tr><td class="c mono">0x43</td><td>HEARTBEAT_ms</td><td>ms</td><td class="r">1000</td><td>0 = 送信しない</td></tr>
+<tr><td class="c mono">0x44</td><td>SYNC_MODE</td><td>—</td><td class="r">0</td><td>1 = CMD を保留し、SYNC 受信時に適用する</td></tr>
+<tr><td class="c mono">0x50 / 0x51</td><td>OVP_mV / UVP_mV</td><td>mV</td><td class="r">0 / 0</td><td>0 = 自動（交渉した電圧の ×1.2 / ×0.8）</td></tr>
+<tr><td class="c mono">0x52</td><td>OTP_C</td><td>℃</td><td class="r">85</td><td>60〜100</td></tr>
+<tr><td class="c mono">0x60</td><td>DEAD_TIME_ns</td><td>ns</td><td class="r">1000</td><td>500〜2000</td></tr>
+</table>
+
+<h2 class="pb">9. その他の I/O とコネクタ</h2>
+<table>
+<tr><th>コネクタ</th><th>形状</th><th>ピン配置</th><th>仕様</th></tr>
+<tr><td>J1</td><td>USB Type-C レセプタクル</td><td>VBUS / GND / CC1 / CC2 / D+ / D−</td><td>受電専用（USB データ通信はしない）</td></tr>
+<tr><td>J2</td><td>端子台 2P 5.0 mm</td><td>1：MOT_A　2：MOT_B</td><td>モータ出力。正転時は MOT_A が＋</td></tr>
+<tr><td>J3</td><td>JST XH 3P</td><td>1：+3V3　2：WIPER　3：GND</td><td>ポテンショメータ 1〜10 kΩ。入力 RC 1 kΩ / 100 nF</td></tr>
+<tr><td>J4</td><td>JST XH 4P</td><td>1：+3V3　2：GND　3：A　4：B</td><td>エンコーダ。4.7 kΩ でプルアップ、100 Ω / 100 pF</td></tr>
+<tr><td>J5</td><td>ピンヘッダ 1×5 2.54 mm</td><td>1：+3V3　2：SWDIO　3：SWCLK　4：NRST　5：GND</td><td>書込み・デバッグ</td></tr>
+<tr><td>SW1</td><td>DIP 3P</td><td>bit0〜bit2</td><td>ノード ID = 値 + 1</td></tr>
+<tr><td>光ポート</td><td>D9（TX）・D10（RX）</td><td>基板の同じ辺、10 mm ピッチ、光軸は基板上面から約 4 mm</td><td>§7</td></tr>
+<tr><td>LED</td><td>D2 橙 / D8 緑</td><td>D2：PD 交渉成立　D8：状態表示</td><td>D8：READY はゆっくり点滅、RUN は点灯、FAULT は速い点滅</td></tr>
+</table>
+
+<h2>10. USB PD 受電</h2>
+<h3>10.1 CH224K（標準実装）</h3>
+<table>
+<tr><th>要求電圧</th><th>CFG1</th><th>CFG2</th><th>CFG3</th></tr>
+<tr><td class="c">5 V</td><td class="c">1</td><td class="c">—</td><td class="c">—</td></tr>
+<tr><td class="c">9 V</td><td class="c">0</td><td class="c">0</td><td class="c">0</td></tr>
+<tr><td class="c">12 V</td><td class="c">0</td><td class="c">0</td><td class="c">1</td></tr>
+<tr><td class="c"><b>15 V（既定）</b></td><td class="c">0</td><td class="c">1</td><td class="c">1</td></tr>
+<tr><td class="c">20 V</td><td class="c">0</td><td class="c">1</td><td class="c">0</td></tr>
+</table>
+<p>CFG1〜3 は MCU（PB5 / PB7 / PA6）から 100 Ω を介して駆動します。CFG2/CFG3 に 3.7 V を超える電圧を加えてはいけません。PG（オープンドレイン、交渉成立で L）は PB4 で読みます。</p>
+
+<h3>10.2 CH221K（組立オプション B）</h3>
+<table>
+<tr><th>R8（CFG–VDD 間）</th><td class="c">10 kΩ</td><td class="c">20 kΩ</td><td class="c">47 kΩ</td><td class="c"><b>100 kΩ</b></td><td class="c">200 kΩ</td></tr>
+<tr><th>要求電圧</th><td class="c">5 V</td><td class="c">9 V</td><td class="c">12 V</td><td class="c"><b>15 V</b></td><td class="c">20 V</td></tr>
+</table>
+<div class="warn"><b>CH221K の注意：</b>CFG ピンの耐圧は 6.5 V です。CFG を High 側へつなぐときは、<b>VBUS ではなく VDD（または MCU の IO）</b>に接続してください。VBUS に接続すると、IC 自身が要求した電圧で破損します。また、CH221K は抵抗でしか電圧を設定できないので、動作中に要求電圧を変えることはできません（参考：Qiita「CH221Kを使う際の注意点」）。抵抗値の表は、最新のメーカーデータシートで必ず確認してください。</div>
+
+<h3>10.3 動作シーケンス</h3>
+<ol>
+  <li>USB-C を接続すると VBUS = 5 V が供給され、+3V3 が立ち上がって MCU が起動します（BOOT）。</li>
+  <li>MCU が CFG を設定し、CH224K が PD 交渉を行います（PD_WAIT）。PG が 1 s 以内に L にならない場合は、次の電圧候補を試します。</li>
+  <li>PG = L を確認したら LOAD_EN = 1 にし、VM をソフトスタートで投入します。10 ms 後に VM が要求電圧の ±10 % 以内にあれば READY、外れていれば FAULT（PD_FAIL）になります。</li>
+  <li>NMT 運転許可を受け、CMD の mode が 2 または 3 のときに RUN になります。</li>
+</ol>
+
+<h2>11. 保護動作</h2>
+<table>
+<tr><th>異常</th><th>検出条件</th><th>動作</th><th>復帰</th></tr>
+<tr><td>過電流</td><td>電流 ＞ OCP_TRIP_mA（ハードウェアコンパレータ）</td><td>全 FET OFF（1 µs 以内）</td><td rowspan="5">NMT 0x80（異常リセット）</td></tr>
+<tr><td>過電圧</td><td>VM ＞ OVP（既定：交渉電圧 × 1.2、上限 24 V）</td><td>ショートブレーキで回生を止める</td></tr>
+<tr><td>低電圧</td><td>VM ＜ UVP が 10 ms 継続</td><td>惰性、ロードスイッチ OFF</td></tr>
+<tr><td>過熱</td><td>基板温度 ＞ OTP_C（既定 85 ℃）</td><td>惰性</td></tr>
+<tr><td>位置センサ異常</td><td>POT の生値が 1 % 未満または 99 % 超</td><td>惰性</td></tr>
+<tr><td>指令途絶</td><td>CMD の間隔 ＞ CMD_TIMEOUT_ms</td><td>TIMEOUT_ACTION</td><td>CMD を受信すると自動で復帰</td></tr>
+<tr><td>CAN バスオフ</td><td>送信エラーカウンタ ＞ 255</td><td>惰性</td><td>ISO 11898-1 の手順で自動復帰</td></tr>
+</table>
+<p class="note">設計上の実装条件：2 層基板、銅箔 2 oz、MOSFET 1 個あたり 4 cm² 以上のベタ。</p>
+
+<h2>12. 使用上の注意</h2>
+<ul>
+  <li>USB PD ソースの定格電力を超える負荷（モータの拘束など）がかかると、ソース側の保護で VBUS が遮断されることがあります。CUR_LIMIT_mA は、ソースの定格電流以下に設定してください。</li>
+  <li>モータの回生エネルギーは USB ソースへ戻せません。大きな慣性負荷を急減速させると VM が上昇し、OVP でブレーキ停止します。ACC_LIMIT を適切に設定してください。</li>
+  <li>光ポートの前に遮蔽物・反射物・強い外乱光（直射日光、ハロゲン灯、白熱灯）がないことを確認してください。</li>
+  <li>本基板は USB のデータ通信を行いません。ファームウェアの書込みは J5（SWD）から行います。</li>
+</ul>
+
+<h2>13. 改訂履歴</h2>
+<table>
+<tr><th>版</th><th>日付</th><th>内容</th></tr>
+<tr><td class="c">0.1</td><td class="c">2026-09-25</td><td>初版（試作前の設計値）</td></tr>
+</table>
+
+</body>
+</html>
