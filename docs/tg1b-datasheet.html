@@ -1,0 +1,1151 @@
+<title>ТГ1Б Datasheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Unbounded:wght@500;700&display=swap">
+<style>
+:root {
+  --ground: #f3f4f7;
+  --surface: #ffffff;
+  --surface-2: #f7f8fb;
+  --ink: #151821;
+  --ink-2: #4a5163;
+  --ink-3: #737a8d;
+  --rule: #dde0e8;
+  --grid: #e8eaf0;
+  --accent: #4f46c8;
+  --accent-soft: rgba(79, 70, 200, 0.09);
+  --accent-band: rgba(79, 70, 200, 0.13);
+  --caution: #a44a12;
+  --caution-soft: rgba(196, 98, 34, 0.09);
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --s5: #e87ba4;
+  --f-display: "Unbounded", "IBM Plex Sans", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "IBM Plex Sans JP", "Hiragino Sans", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #0f1116;
+    --surface: #1b1d24;
+    --surface-2: #20232b;
+    --ink: #e9ebf2;
+    --ink-2: #b4b9c8;
+    --ink-3: #8a90a1;
+    --rule: #2e313c;
+    --grid: #272a34;
+    --accent: #a59eff;
+    --accent-soft: rgba(165, 158, 255, 0.10);
+    --accent-band: rgba(165, 158, 255, 0.16);
+    --caution: #f0a070;
+    --caution-soft: rgba(240, 160, 112, 0.10);
+    --s1: #3987e5;
+    --s2: #d95926;
+    --s3: #199e70;
+    --s4: #c98500;
+    --s5: #d55181;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0f1116;
+  --surface: #1b1d24;
+  --surface-2: #20232b;
+  --ink: #e9ebf2;
+  --ink-2: #b4b9c8;
+  --ink-3: #8a90a1;
+  --rule: #2e313c;
+  --grid: #272a34;
+  --accent: #a59eff;
+  --accent-soft: rgba(165, 158, 255, 0.10);
+  --accent-band: rgba(165, 158, 255, 0.16);
+  --caution: #f0a070;
+  --caution-soft: rgba(240, 160, 112, 0.10);
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s3: #199e70;
+  --s4: #c98500;
+  --s5: #d55181;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font: 15px/1.6 var(--f-body);
+  padding-inline: 16px;
+  padding-block: 0 48px;
+  -webkit-text-size-adjust: 100%;
+}
+.sheet { max-width: 1120px; margin: 0 auto; }
+
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 10px;
+}
+.bar-id { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.04em; }
+.bar-id b { color: var(--ink); font-weight: 500; }
+.langs { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.langs button {
+  font: 500 13px/1 var(--f-body);
+  color: var(--ink-2);
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--rule);
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.langs button:first-child { border-left: 0; }
+.langs button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.langs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.masthead {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: 32px 28px;
+  border-bottom: 2px solid var(--ink);
+}
+@media (min-width: 820px) { .masthead { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: end; } }
+.part {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(64px, 16vw, 132px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.part small { display: block; font: 500 13px/1.4 var(--f-mono); letter-spacing: 0.12em; color: var(--ink-3); margin-top: 12px; }
+.kind { margin: 14px 0 0; font-size: 20px; line-height: 1.35; font-weight: 600; text-wrap: balance; }
+.meta { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; font-size: 13px; }
+.meta dt { color: var(--ink-3); font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.04em; padding-top: 2px; }
+.meta dd { margin: 0; color: var(--ink-2); }
+.meta dd .mono { color: var(--ink); }
+
+.notice {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--caution);
+  background: var(--caution-soft);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin-top: 24px;
+}
+@media (min-width: 720px) { .keys { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .keys { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.key { background: var(--surface); padding: 14px 14px 12px; display: grid; gap: 6px; align-content: start; }
+.key .v { font-family: var(--f-mono); font-size: 24px; line-height: 1.1; font-weight: 500; font-variant-numeric: tabular-nums; }
+.key .v span { font-size: 14px; color: var(--ink-3); margin-left: 3px; }
+.key .l { font-size: 12px; line-height: 1.4; color: var(--ink-2); }
+
+section.sec {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px 32px;
+  padding-block: 36px 8px;
+  border-top: 1px solid var(--rule);
+  margin-top: 36px;
+}
+@media (min-width: 960px) { section.sec { grid-template-columns: 220px minmax(0, 1fr); } }
+.sec-head { display: grid; gap: 6px; align-content: start; }
+@media (min-width: 960px) { .sec-head { position: sticky; top: 72px; } }
+.sec-no { font: 500 12px/1 var(--f-mono); color: var(--accent); letter-spacing: 0.1em; }
+.sec-head h2 { margin: 0; font-size: 20px; line-height: 1.3; font-weight: 600; text-wrap: balance; }
+.sec-body { display: grid; gap: 24px; min-width: 0; }
+h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.35; font-weight: 600; text-wrap: balance; }
+
+.t > [lang] { display: block; }
+.t > [lang="en"], .t > [lang="ru"] { color: var(--ink-2); font-size: 0.86em; font-weight: 400; }
+h2 .t > [lang="en"], h2 .t > [lang="ru"], h3 .t > [lang="en"], h3 .t > [lang="ru"] { font-weight: 500; }
+.sheet[data-lang="ja"] .t > :not([lang="ja"]),
+.sheet[data-lang="en"] .t > :not([lang="en"]),
+.sheet[data-lang="ru"] .t > :not([lang="ru"]) { display: none; }
+.sheet:not([data-lang="all"]) .t > [lang] { color: inherit; font-size: inherit; font-weight: inherit; }
+
+.p { max-width: 68ch; display: grid; gap: 8px; }
+.p .t > [lang] + [lang] { margin-top: 6px; }
+.sheet[data-lang="all"] .p .t > [lang="en"]::before,
+.sheet[data-lang="all"] .p .t > [lang="ru"]::before {
+  content: attr(lang);
+  display: inline-block;
+  font: 500 10px/1 var(--f-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin-right: 8px;
+  vertical-align: 1px;
+}
+
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+sub { font-size: 0.72em; line-height: 0; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-top: 1px solid var(--rule); }
+thead th { border-top: 0; background: var(--surface-2); font-size: 12px; font-weight: 500; color: var(--ink-2); white-space: nowrap; }
+thead th .t > [lang] { font-size: 12px; }
+td.sym { font-family: var(--f-mono); white-space: nowrap; color: var(--ink-2); }
+td.val { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; font-weight: 500; }
+td.unit { font-family: var(--f-mono); white-space: nowrap; color: var(--ink-2); }
+td.cond { color: var(--ink-2); font-size: 13px; }
+th.num, td.num { text-align: right; }
+tr.sub td:first-child { padding-left: 28px; }
+td .ru-orig { display: block; font-size: 11px; color: var(--ink-3); font-family: var(--f-mono); margin-top: 2px; }
+.sheet[data-lang="ru"] td .ru-orig { display: none; }
+
+.duo { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) { .duo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); padding: 16px; min-width: 0; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { margin-top: 12px; font-size: 13px; color: var(--ink-2); display: grid; gap: 6px; }
+.fig-no { font: 500 11px/1 var(--f-mono); letter-spacing: 0.1em; color: var(--accent); }
+.fig-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+.fig-cond { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); }
+
+.pins { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.pins li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: baseline; }
+.pins b { font-family: var(--f-mono); font-weight: 500; color: var(--accent); }
+
+.chart { position: relative; }
+.chart svg text { font-family: var(--f-mono); }
+.tip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  box-shadow: 0 4px 16px rgba(10, 12, 20, 0.12);
+  padding: 8px 10px;
+  font: 12px/1.45 var(--f-mono);
+  color: var(--ink);
+  min-width: 132px;
+  z-index: 2;
+}
+.tip .h { color: var(--ink-3); margin-bottom: 4px; }
+.tip .r { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.tip .r i { width: 12px; height: 2px; display: inline-block; flex: none; }
+.tip .r span:first-child { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 10px; font: 12px/1.4 var(--f-mono); color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 16px; height: 2px; display: inline-block; }
+.legend i.band { height: 10px; background: var(--accent-band); border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); }
+details.data { margin-top: 10px; font-size: 13px; }
+details.data summary { cursor: pointer; color: var(--ink-2); font-size: 12px; }
+.inline.t > [lang], details.data summary .t > [lang] { display: inline; font-size: inherit; color: inherit; }
+.sheet[data-lang="all"] .inline.t > [lang] + [lang]::before, .sheet[data-lang="all"] details.data summary .t > [lang] + [lang]::before { content: " · "; }
+details.data summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+details.data .table-wrap { margin-top: 8px; }
+details.data table { font-size: 12px; }
+details.data td, details.data th { padding: 6px 10px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+.multi { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .multi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.multi .sm-title { font: 500 12px/1.3 var(--f-mono); color: var(--ink-2); margin-bottom: 4px; }
+
+.drive { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 820px) { .drive { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.card { background: var(--surface); padding: 18px 18px 16px; display: grid; gap: 10px; align-content: start; }
+.card .tag { font: 500 11px/1 var(--f-mono); letter-spacing: 0.1em; color: var(--accent); }
+.card .p { gap: 6px; font-size: 14px; }
+.parts { display: grid; gap: 4px; margin: 0; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--rule); font-size: 13px; }
+.parts dt { font: 500 11px/1.4 var(--f-mono); letter-spacing: 0.06em; color: var(--ink-3); }
+.parts dd { margin: 0 0 4px; font-family: var(--f-mono); font-size: 12.5px; color: var(--ink); }
+.diagram { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); padding: 12px; }
+.diagram svg { display: block; min-width: 760px; width: 100%; height: auto; }
+.diagram text { font-family: var(--f-mono); }
+
+.foot { margin-top: 48px; padding-top: 16px; border-top: 2px solid var(--ink); display: grid; gap: 10px; font-size: 12px; color: var(--ink-3); }
+.foot .mono { word-break: break-all; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .langs button { transition: background-color 0.15s, color 0.15s; }
+}
+</style>
+
+<div class="sheet" id="sheet" data-lang="all">
+
+<div class="bar">
+  <div class="bar-id"><b>ТГ1Б</b> · TG1B · <span class="t"><span lang="ja">ガス入りサイラトロン</span><span lang="en">Gas-filled thyratron</span><span lang="ru">Тиратрон с газовым наполнением</span></span></div>
+  <div class="langs" role="group" aria-label="Language / 言語 / Язык">
+    <button type="button" id="lang-all" data-lang="all" aria-pressed="true">併記 · All</button>
+    <button type="button" id="lang-ja" data-lang="ja" aria-pressed="false">日本語</button>
+    <button type="button" id="lang-en" data-lang="en" aria-pressed="false">English</button>
+    <button type="button" id="lang-ru" data-lang="ru" aria-pressed="false">Русский</button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div>
+    <h1 class="part">ТГ1Б<small>TG1B · TG-1B</small></h1>
+    <p class="kind"><span class="t"><span lang="ja">ガス入りサイラトロン（熱陰極・二陽極・クリプトン／キセノン封入）</span><span lang="en">Gas-filled thyratron, hot cathode, twin anode, krypton–xenon fill</span><span lang="ru">Тиратрон с газовым наполнением, подогревный катод, два анода, криптоно-ксеноновая смесь</span></span></p>
+  </div>
+  <dl class="meta">
+    <dt>SPEC</dt><dd><span class="mono">ЧТУ 10.306-57</span> · <span class="mono">ЩА3.340.056 ТУ1</span></dd>
+    <dt>SOURCE</dt><dd><span class="t"><span lang="ja">技術指示書 No. 36（1975 年 8 月）、特性図は 1967 年 11 月付</span><span lang="en">Instruction No. 36 (August 1975); curves dated November 1967</span><span lang="ru">Инструкция № 36 (август 1975); характеристики — ноябрь 1967</span></span></dd>
+    <dt>EDITION</dt><dd><span class="t"><span lang="ja">三か国語による再構成版（2026 年 9 月）</span><span lang="en">Trilingual reconstruction, September 2026</span><span lang="ru">Трёхъязычная реконструкция, сентябрь 2026</span></span></dd>
+  </dl>
+</header>
+
+<div class="notice">
+  <span class="t"><span lang="ja">これは原本のスキャンをもとに再構成した非公式の資料です。表の値は原本どおりに転記し、グラフはスキャン画像から読み取った近似値で描き直しています（読み取り誤差の目安：各軸フルスケールの ±2%）。設計の最終確認は原本と実測で行ってください。</span><span lang="en">This is an unofficial reconstruction based on a scan of the original. Table values are transcribed as printed; the curves were digitized from the scan and are approximate (reading error about ±2 % of full scale per axis). Confirm critical values against the original and by measurement.</span><span lang="ru">Это неофициальная реконструкция по скану оригинала. Значения в таблицах перенесены без изменений; кривые оцифрованы со скана и приблизительны (погрешность считывания около ±2 % от полной шкалы). Критичные значения проверяйте по оригиналу и измерениями.</span></span>
+</div>
+
+<div class="keys" aria-label="Key ratings">
+  <div class="key"><div class="v">6.3<span>V</span></div><div class="l t"><span lang="ja">ヒーター電圧（225 mA）</span><span lang="en">Heater voltage (225 mA)</span><span lang="ru">Напряжение накала (225 мА)</span></div></div>
+  <div class="key"><div class="v">≤ 30<span>V</span></div><div class="l t"><span lang="ja">点弧電圧</span><span lang="en">Firing voltage</span><span lang="ru">Напряжение зажигания</span></div></div>
+  <div class="key"><div class="v">≤ 20<span>V</span></div><div class="l t"><span lang="ja">放電中の電圧降下</span><span lang="en">Arc drop</span><span lang="ru">Падение напряжения</span></div></div>
+  <div class="key"><div class="v">20<span>mA</span></div><div class="l t"><span lang="ja">平均陽極電流（最大）</span><span lang="en">Average anode current, max</span><span lang="ru">Средний ток анода, наиб.</span></div></div>
+  <div class="key"><div class="v">120<span>mA</span></div><div class="l t"><span lang="ja">陽極電流波高値（最大）</span><span lang="en">Peak anode current, max</span><span lang="ru">Амплитуда тока анода, наиб.</span></div></div>
+  <div class="key"><div class="v">240<span>V</span></div><div class="l t"><span lang="ja">陽極電圧波高値（順・逆）</span><span lang="en">Peak anode voltage, fwd/inv</span><span lang="ru">Амплитуда напряжения анода</span></div></div>
+</div>
+
+<section class="sec" id="general">
+  <div class="sec-head">
+    <div class="sec-no">01</div>
+    <h2><span class="t"><span lang="ja">概要</span><span lang="en">General description</span><span lang="ru">Общие данные</span></span></h2>
+  </div>
+  <div class="sec-body">
+    <div class="p">
+      <span class="t"><span lang="ja">整流およびリレー動作用のサブミニチュア・サイラトロン。ЧТУ 10.306-57 版は特殊用途機器向け、ЩА3.340.056 ТУ1 版は一般用途の無線機器向けで、耐環境性以外のデータは共通です。</span><span lang="en">Subminiature thyratron for rectifier and relay service. The ЧТУ 10.306-57 version targets special-purpose equipment and the ЩА3.340.056 ТУ1 version general-purpose radio equipment; apart from environmental ratings the data are identical.</span><span lang="ru">Основное назначение — работа в выпрямительном и релейном режимах. Исполнение по ЧТУ 10.306-57 — для радиотехнических устройств специального назначения, по ЩА3.340.056 ТУ1 — для аппаратуры широкого применения; остальные данные одинаковы.</span></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr><td><span class="t"><span lang="ja">陰極</span><span lang="en">Cathode</span><span lang="ru">Катод</span></span></td><td><span class="t"><span lang="ja">酸化物陰極、傍熱型</span><span lang="en">Oxide-coated, indirectly heated</span><span lang="ru">Оксидный, косвенного накала</span></span></td></tr>
+          <tr><td><span class="t"><span lang="ja">封入ガス</span><span lang="en">Gas fill</span><span lang="ru">Наполнение</span></span></td><td><span class="t"><span lang="ja">クリプトン・キセノン混合ガス</span><span lang="en">Krypton–xenon mixture</span><span lang="ru">Криптоно-ксеноновая смесь</span></span></td></tr>
+          <tr><td><span class="t"><span lang="ja">外囲器</span><span lang="en">Envelope</span><span lang="ru">Оформление</span></span></td><td><span class="t"><span lang="ja">ガラス製サブミニチュア、錫めっきリード線</span><span lang="en">Glass subminiature, tinned wire leads</span><span lang="ru">Стеклянное сверхминиатюрное, выводы лужёные</span></span></td></tr>
+          <tr><td><span class="t"><span lang="ja">質量</span><span lang="en">Mass</span><span lang="ru">Масса</span></span></td><td class="mono">≤ 5 g</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="pinout">
+  <div class="sec-head">
+    <div class="sec-no">02</div>
+    <h2><span class="t"><span lang="ja">ピン配置と外形</span><span lang="en">Pinout and outline</span><span lang="ru">Схема выводов и габариты</span></span></h2>
+  </div>
+  <div class="sec-body">
+    <div class="duo">
+      <figure>
+        <svg viewBox="0 0 280 250" role="img" aria-label="ТГ1Б electrode connection diagram">
+          <g style="stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round">
+            <circle cx="140" cy="128" r="74"></circle>
+            <line x1="118" y1="18" x2="118" y2="82"></line>
+            <line x1="162" y1="18" x2="162" y2="82"></line>
+            <line x1="104" y1="82" x2="130" y2="82" style="stroke-width:3"></line>
+            <line x1="150" y1="82" x2="176" y2="82" style="stroke-width:3"></line>
+            <line x1="92" y1="110" x2="240" y2="110" style="stroke-dasharray:12 7"></line>
+            <path d="M112 156 Q140 134 168 156"></path>
+            <line x1="112" y1="156" x2="40" y2="156"></line>
+            <path d="M130 238 L130 170 Q140 158 150 170 L150 238"></path>
+          </g>
+          <circle cx="178" cy="136" r="6" style="fill:var(--ink)"></circle>
+          <g style="fill:var(--accent);font:500 15px var(--f-mono)" text-anchor="middle">
+            <text x="118" y="14">6</text>
+            <text x="162" y="14">1</text>
+            <text x="254" y="115">3</text>
+            <text x="28" y="161">4</text>
+            <text x="116" y="246">5</text>
+            <text x="164" y="246">2</text>
+          </g>
+          <g style="fill:var(--ink-3);font:11px var(--f-mono)">
+            <text x="186" y="104">G</text>
+            <text x="60" y="150">K</text>
+            <text x="186" y="152">gas</text>
+            <text x="170" y="40">A1</text>
+            <text x="92" y="40">A2</text>
+            <text x="156" y="210">H</text>
+          </g>
+        </svg>
+        <figcaption>
+          <ol class="pins">
+            <li><b>1</b><span class="t"><span lang="ja">第 1 陽極</span><span lang="en">Anode 1</span><span lang="ru">Анод первый</span></span></li>
+            <li><b>2</b><span class="t"><span lang="ja">ヒーター</span><span lang="en">Heater</span><span lang="ru">Подогреватель</span></span></li>
+            <li><b>3</b><span class="t"><span lang="ja">グリッド</span><span lang="en">Grid</span><span lang="ru">Сетка</span></span></li>
+            <li><b>4</b><span class="t"><span lang="ja">陰極</span><span lang="en">Cathode</span><span lang="ru">Катод</span></span></li>
+            <li><b>5</b><span class="t"><span lang="ja">ヒーター</span><span lang="en">Heater</span><span lang="ru">Подогреватель</span></span></li>
+            <li><b>6</b><span class="t"><span lang="ja">第 2 陽極</span><span lang="en">Anode 2</span><span lang="ru">Анод второй</span></span></li>
+          </ol>
+        </figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 300 360" role="img" aria-label="ТГ1Б outline drawing, dimensions in millimetres">
+          <defs>
+            <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" style="fill:var(--ink-2)"></path></marker>
+          </defs>
+          <path d="M100 172 L100 40 Q100 24 114 22 L116 22 Q118 12 120 12 Q122 12 124 22 L126 22 Q140 24 140 40 L140 172 Z" style="fill:var(--accent-soft);stroke:var(--ink);stroke-width:1.6"></path>
+          <line x1="100" y1="152" x2="140" y2="152" style="stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3"></line>
+          <path d="M112 162 L126 162 M122 158 L127 162 L122 166" style="stroke:var(--ink);stroke-width:1.2;fill:none"></path>
+          <g style="stroke:var(--ink);stroke-width:1.6">
+            <line x1="100" y1="172" x2="100" y2="332"></line>
+            <line x1="108" y1="172" x2="108" y2="332"></line>
+            <line x1="116" y1="172" x2="116" y2="332"></line>
+            <line x1="124" y1="172" x2="124" y2="332"></line>
+            <line x1="132" y1="172" x2="132" y2="332"></line>
+            <line x1="140" y1="172" x2="140" y2="332"></line>
+          </g>
+          <g style="stroke:var(--ink-2);stroke-width:1;fill:none">
+            <line x1="96" y1="12" x2="56" y2="12"></line>
+            <line x1="96" y1="172" x2="56" y2="172"></line>
+            <line x1="96" y1="332" x2="56" y2="332"></line>
+            <line x1="62" y1="12" x2="62" y2="172" marker-start="url(#arr)" marker-end="url(#arr)"></line>
+            <line x1="62" y1="172" x2="62" y2="332" marker-start="url(#arr)" marker-end="url(#arr)"></line>
+            <line x1="86" y1="152" x2="80" y2="152"></line>
+            <line x1="82" y1="152" x2="82" y2="172" marker-start="url(#arr)" marker-end="url(#arr)"></line>
+            <line x1="100" y1="80" x2="140" y2="80" marker-start="url(#arr)" marker-end="url(#arr)"></line>
+            <line x1="132" y1="336" x2="132" y2="350"></line>
+            <line x1="140" y1="336" x2="140" y2="350"></line>
+            <line x1="120" y1="346" x2="132" y2="346" marker-end="url(#arr)"></line>
+            <line x1="152" y1="346" x2="140" y2="346" marker-end="url(#arr)"></line>
+          </g>
+          <g style="fill:var(--ink);font:12px var(--f-mono)">
+            <text x="50" y="96" text-anchor="middle" transform="rotate(-90 50 96)">38 max</text>
+            <text x="50" y="256" text-anchor="middle" transform="rotate(-90 50 256)">40 min</text>
+            <text x="76" y="166" text-anchor="end">5 max</text>
+            <text x="150" y="84">⌀10.2 −1.5</text>
+            <text x="158" y="350">2 ± 1</text>
+            <text x="150" y="262">⌀0.4 +0.1</text>
+          </g>
+          <line x1="146" y1="258" x2="141" y2="258" style="stroke:var(--ink-2);stroke-width:1"></line>
+          <g style="fill:var(--ink-3);font:11px var(--f-mono)">
+            <text x="150" y="160">⌀ ≤ 10.2</text>
+            <text x="150" y="176">↑ index</text>
+          </g>
+        </svg>
+        <figcaption>
+          <span class="fig-cond">mm</span>
+          <span class="t"><span lang="ja">リード番号はガラス根元の指標矢印から数えます。リードの軸間ピッチは 2 ± 1 mm。</span><span lang="en">Leads are counted from the index arrow on the stem. Lead pitch 2 ± 1 mm.</span><span lang="ru">Счёт выводов ведётся по индикаторной стрелке. Шаг расположения осей выводов 2 ± 1 мм.</span></span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="electrical">
+  <div class="sec-head">
+    <div class="sec-no">03</div>
+    <h2><span class="t"><span lang="ja">電気的特性</span><span lang="en">Electrical characteristics</span><span lang="ru">Электрические данные</span></span></h2>
+  </div>
+  <div class="sec-body">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th><span class="t"><span lang="ja">項目</span><span lang="en">Parameter</span><span lang="ru">Параметр</span></span></th>
+          <th>Sym.</th>
+          <th class="num"><span class="t"><span lang="ja">値</span><span lang="en">Value</span><span lang="ru">Значение</span></span></th>
+          <th><span class="t"><span lang="ja">単位</span><span lang="en">Unit</span><span lang="ru">Ед.</span></span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="t"><span lang="ja">ヒーター電圧</span><span lang="en">Heater voltage</span><span lang="ru">Напряжение накала</span></span></td><td class="sym">U<sub>f</sub></td><td class="val">6.3</td><td class="unit">V</td></tr>
+          <tr><td><span class="t"><span lang="ja">ヒーター電流</span><span lang="en">Heater current</span><span lang="ru">Ток накала</span></span></td><td class="sym">I<sub>f</sub></td><td class="val">225 ± 25</td><td class="unit">mA</td></tr>
+          <tr><td><span class="t"><span lang="ja">点弧電圧</span><span lang="en">Firing (ignition) voltage</span><span lang="ru">Напряжение зажигания</span></span></td><td class="sym">U<sub>ign</sub></td><td class="val">≤ 30</td><td class="unit">V</td></tr>
+          <tr><td><span class="t"><span lang="ja">陽極・陰極間電圧降下（導通時）</span><span lang="en">Anode–cathode voltage drop, conducting</span><span lang="ru">Падение напряжения между анодом и катодом</span></span></td><td class="sym">ΔU<sub>a</sub></td><td class="val">≤ 20</td><td class="unit">V</td></tr>
+          <tr><td><span class="t"><span lang="ja">グリッド電圧</span><span lang="en">Grid voltage</span><span lang="ru">Сеточное напряжение</span></span></td><td class="sym">U<sub>g</sub></td><td class="val">−6 … −3</td><td class="unit">V</td></tr>
+          <tr><td><span class="t"><span lang="ja">陰極・ヒーター間リーク電流</span><span lang="en">Cathode–heater leakage current</span><span lang="ru">Ток утечки катод — подогреватель</span></span></td><td class="sym">I<sub>kf</sub></td><td class="val">≤ 20</td><td class="unit">µA</td></tr>
+          <tr><td><span class="t"><span lang="ja">グリッドと他の全電極（一括）間の絶縁抵抗</span><span lang="en">Insulation resistance, grid to all other electrodes tied together</span><span lang="ru">Сопротивление изоляции между сеткой и остальными электродами, соединёнными вместе</span></span></td><td class="sym">R<sub>ins</sub></td><td class="val">≥ 50</td><td class="unit">MΩ</td></tr>
+          <tr><td><span class="t"><span lang="ja">寿命</span><span lang="en">Service life</span><span lang="ru">Долговечность</span></span></td><td class="sym">—</td><td class="val">500</td><td class="unit">h</td></tr>
+          <tr class="sub"><td><span class="t"><span lang="ja">寿命判定基準：陽極・陰極間電圧降下</span><span lang="en">End-of-life criterion: anode–cathode drop</span><span lang="ru">Критерий долговечности: падение напряжения между анодом и катодом</span></span></td><td class="sym">ΔU<sub>a</sub></td><td class="val">≤ 25</td><td class="unit">V</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="limits">
+  <div class="sec-head">
+    <div class="sec-no">04</div>
+    <h2><span class="t"><span lang="ja">最大定格</span><span lang="en">Limiting values</span><span lang="ru">Предельно допустимые эксплуатационные данные</span></span></h2>
+  </div>
+  <div class="sec-body">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th><span class="t"><span lang="ja">項目</span><span lang="en">Parameter</span><span lang="ru">Параметр</span></span></th>
+          <th class="num">Min</th>
+          <th class="num">Max</th>
+          <th><span class="t"><span lang="ja">単位</span><span lang="en">Unit</span><span lang="ru">Ед.</span></span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="t"><span lang="ja">ヒーター電圧</span><span lang="en">Heater voltage</span><span lang="ru">Напряжение накала</span></span></td><td class="val">5.7</td><td class="val">6.9</td><td class="unit">V</td></tr>
+          <tr><td><span class="t"><span lang="ja">陽極電圧の波高値（順方向・逆方向）</span><span lang="en">Peak anode voltage, forward and inverse</span><span lang="ru">Наибольшая амплитуда прямого и обратного напряжения анода</span></span></td><td class="val">—</td><td class="val">240</td><td class="unit">V</td></tr>
+          <tr><td><span class="t"><span lang="ja">陰極・ヒーター間電圧</span><span lang="en">Cathode-to-heater voltage</span><span lang="ru">Наименьшее напряжение между катодом и подогревателем</span></span></td><td class="val">−100</td><td class="val">—</td><td class="unit">V</td></tr>
+          <tr><td><span class="t"><span lang="ja">点弧ごとのグリッド電圧の変動</span><span lang="en">Grid voltage variation from firing to firing</span><span lang="ru">Наибольшее изменение сеточного напряжения от включения к включению</span></span></td><td class="val">—</td><td class="val">± 2</td><td class="unit">V</td></tr>
+          <tr><td><span class="t"><span lang="ja">陽極電流の波高値</span><span lang="en">Peak anode current</span><span lang="ru">Наибольшая амплитуда тока анода</span></span></td><td class="val">—</td><td class="val">120</td><td class="unit">mA</td></tr>
+          <tr><td><span class="t"><span lang="ja">陽極電流の平均値</span><span lang="en">Average anode current</span><span lang="ru">Наибольший средний ток анода</span></span></td><td class="val">—</td><td class="val">20</td><td class="unit">mA</td></tr>
+          <tr><td><span class="t"><span lang="ja">陰極の予熱時間</span><span lang="en">Cathode warm-up time</span><span lang="ru">Наименьшее время разогрева катода</span></span></td><td class="val">10</td><td class="val">—</td><td class="unit">s</td></tr>
+          <tr><td><span class="t"><span lang="ja">グリッド回路の抵抗</span><span lang="en">Grid circuit resistance</span><span lang="ru">Сопротивление в цепи сетки</span></span></td><td class="val">0.01</td><td class="val">1</td><td class="unit">MΩ</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="environment">
+  <div class="sec-head">
+    <div class="sec-no">05</div>
+    <h2><span class="t"><span lang="ja">耐環境性</span><span lang="en">Environmental ratings</span><span lang="ru">Устойчивость против внешних воздействий</span></span></h2>
+  </div>
+  <div class="sec-body">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th><span class="t"><span lang="ja">項目</span><span lang="en">Parameter</span><span lang="ru">Параметр</span></span></th>
+          <th class="num">ЧТУ 10.306-57</th>
+          <th class="num">ЩА3.340.056 ТУ1</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="t"><span lang="ja">周囲温度</span><span lang="en">Ambient temperature</span><span lang="ru">Температура окружающей среды</span></span></td><td class="val">−70 … +90 °C</td><td class="val">−70 … +90 °C</td></tr>
+          <tr><td><span class="t"><span lang="ja">相対湿度（+15〜25 °C）</span><span lang="en">Relative humidity at +15 … 25 °C</span><span lang="ru">Относительная влажность при +15 … 25 °C</span></span></td><td class="val">95 … 98 %</td><td class="val">—</td></tr>
+          <tr><td><span class="t"><span lang="ja">周囲気圧の下限</span><span lang="en">Minimum ambient pressure</span><span lang="ru">Наименьшее давление окружающей среды</span></span></td><td class="val">5 mmHg</td><td class="val">—</td></tr>
+          <tr><td><span class="t"><span lang="ja">振動（周波数）</span><span lang="en">Vibration, frequency</span><span lang="ru">Виброустойчивость / вибропрочность, частота</span></span></td><td class="val">50 Hz</td><td class="val">50 Hz</td></tr>
+          <tr><td><span class="t"><span lang="ja">振動（加速度）</span><span lang="en">Vibration, acceleration</span><span lang="ru">Ускорение</span></span></td><td class="val">10 … 12 g</td><td class="val">10 g</td></tr>
+          <tr><td><span class="t"><span lang="ja">定常加速度</span><span lang="en">Constant acceleration</span><span lang="ru">Линейные нагрузки</span></span></td><td class="val">100 g</td><td class="val">—</td></tr>
+          <tr><td><span class="t"><span lang="ja">単発衝撃</span><span lang="en">Single shock</span><span lang="ru">Одиночные ударные нагрузки</span></span></td><td class="val">500 g</td><td class="val">—</td></tr>
+          <tr><td><span class="t"><span lang="ja">倉庫保管での保証期間</span><span lang="en">Guaranteed shelf life, warehouse storage</span><span lang="ru">Гарантийный срок хранения в складских условиях</span></span></td><td class="val">5.5 y</td><td class="val">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="p">
+      <span class="t"><span lang="ja">「—」は ЩА3.340.056 ТУ1 の資料に記載がない項目です。同資料には「その他のデータは ЧТУ 10.306-57 と同じ」と注記されています。</span><span lang="en">A dash means the ЩА3.340.056 ТУ1 sheet does not list the item; that sheet notes that all other data are the same as for ЧТУ 10.306-57.</span><span lang="ru">Прочерк означает, что в листе ЩА3.340.056 ТУ1 параметр не указан; там отмечено: «Остальные данные такие же, как у ТГ1Б по ЧТУ 10.306-57».</span></span>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="curves">
+  <div class="sec-head">
+    <div class="sec-no">06</div>
+    <h2><span class="t"><span lang="ja">特性図</span><span lang="en">Characteristic curves</span><span lang="ru">Характеристики</span></span></h2>
+  </div>
+  <div class="sec-body">
+    <div class="p">
+      <span class="t"><span lang="ja">グラフにカーソルを当てると、その位置の読み取り値が表示されます。各図の下に数値表があります。</span><span lang="en">Hover a chart to read values at that point. Each figure has a data table below it.</span><span lang="ru">Наведите курсор на график, чтобы увидеть значения. Под каждым рисунком есть таблица данных.</span></span>
+    </div>
+
+    <figure>
+      <div class="chart" id="fig-firing"></div>
+      <div class="legend"><span><i class="band"></i><span class="t inline"><span lang="ja">点弧範囲（管ごとのばらつき）</span><span lang="en">Firing region (tube-to-tube spread)</span><span lang="ru">Область зажигания (разброс)</span></span></span></div>
+      <figcaption>
+        <span class="fig-no">FIG. 1</span>
+        <span class="fig-title t"><span lang="ja">平均的な点弧特性の範囲</span><span lang="en">Averaged firing characteristic region</span><span lang="ru">Усреднённая область пусковых характеристик</span></span>
+        <span class="fig-cond">U<sub>f</sub> = 6.3 V · R<sub>g</sub> = 100 kΩ</span>
+        <span class="t"><span lang="ja">グリッド電圧 U<sub>g</sub> を固定したとき、陽極電圧 U<sub>a</sub> が帯の中のどこかに達すると点弧します。グリッドが 0 V なら 20〜30 V で点弧します。</span><span lang="en">With the grid held at U<sub>g</sub>, the tube fires when the anode voltage U<sub>a</sub> reaches a point inside the band. At U<sub>g</sub> = 0 V it fires at 20 … 30 V.</span><span lang="ru">При заданном U<sub>g</sub> тиратрон зажигается, когда напряжение анода U<sub>a</sub> достигает значения внутри области. При U<sub>g</sub> = 0 В зажигание происходит при 20 … 30 В.</span></span>
+      </figcaption>
+      <details class="data"><summary><span class="t"><span lang="ja">数値表</span><span lang="en">Data table</span><span lang="ru">Таблица данных</span></span></summary><div class="table-wrap" id="tbl-firing"></div></details>
+    </figure>
+
+    <div class="duo">
+      <figure>
+        <div class="chart" id="fig-gridcur"></div>
+        <div class="legend" id="lg-gridcur"></div>
+        <figcaption>
+          <span class="fig-no">FIG. 2</span>
+          <span class="fig-title t"><span lang="ja">導通中のグリッド電流（陽極電流別）</span><span lang="en">Grid current during conduction at various anode currents</span><span lang="ru">Усреднённые характеристики тока сетки в период проводимости при различных токах анода</span></span>
+          <span class="fig-cond">U<sub>f</sub> = 6.3 V · R<sub>g</sub> = 0</span>
+          <span class="t"><span lang="ja">グリッドが負のとき、放電中はイオン電流がグリッドから流れ出ます（負の値）。U<sub>g</sub> が正になると電子電流が急増し、約 +0.5 V で +2 mA を超えます。</span><span lang="en">With a negative grid, ion current flows out of the grid while the tube conducts (negative values). Above U<sub>g</sub> = 0 the electron current rises steeply, passing +2 mA at about +0.5 V.</span><span lang="ru">При отрицательной сетке в период проводимости протекает ионный ток сетки (отрицательные значения). При U<sub>g</sub> &gt; 0 электронный ток резко растёт и превышает +2 мА примерно при +0,5 В.</span></span>
+        </figcaption>
+        <details class="data"><summary><span class="t"><span lang="ja">数値表</span><span lang="en">Data table</span><span lang="ru">Таблица данных</span></span></summary><div class="table-wrap" id="tbl-gridcur"></div></details>
+      </figure>
+      <figure>
+        <div class="chart" id="fig-ion"></div>
+        <figcaption>
+          <span class="fig-no">FIG. 3</span>
+          <span class="fig-title t"><span lang="ja">初期グリッドイオン電流とパルス陽極電流振幅</span><span lang="en">Initial grid ion current vs peak pulse anode current</span><span lang="ru">Характеристика начального ионного тока сетки в зависимости от амплитуды тока анода в импульсе</span></span>
+          <span class="fig-cond">t<sub>deion</sub> = 8 µs</span>
+          <span class="t"><span lang="ja">パルス動作（消イオン時間 8 µs）で、陽極電流の振幅が大きいほど消弧直後にグリッドへ流れるイオン電流が増えます。</span><span lang="en">In pulse service (deionization time 8 µs), a larger anode current pulse leaves more ion current flowing to the grid just after extinction.</span><span lang="ru">В импульсном режиме (время деионизации 8 мкс) с ростом амплитуды тока анода растёт начальный ионный ток сетки после погасания.</span></span>
+        </figcaption>
+        <details class="data"><summary><span class="t"><span lang="ja">数値表</span><span lang="en">Data table</span><span lang="ru">Таблица данных</span></span></summary><div class="table-wrap" id="tbl-ion"></div></details>
+      </figure>
+    </div>
+
+    <figure>
+      <div class="chart" id="fig-recov"></div>
+      <div class="legend" id="lg-recov"></div>
+      <figcaption>
+        <span class="fig-no">FIG. 4</span>
+        <span class="fig-title t"><span lang="ja">所定の耐電圧が回復するときのグリッドイオン電流</span><span lang="en">Grid ion current at which the specified hold-off strength recovers</span><span lang="ru">Характеристики ионного тока сетки, при котором восстанавливается заданная пробивная прочность, в зависимости от напряжения сетки</span></span>
+        <span class="t"><span lang="ja">消弧後、グリッドのイオン電流がこの値まで下がると、陽極に 20 / 40 / 100 V をかけても再点弧しなくなります。原図は縦横が逆で、ここでは U<sub>g</sub> を横軸にしています。</span><span lang="en">After extinction, once the grid ion current has decayed to this value the tube again holds off 20 / 40 / 100 V on the anode. The original plots U<sub>g</sub> vertically; here it is on the horizontal axis.</span><span lang="ru">После погасания, когда ионный ток сетки спадает до этого значения, восстанавливается пробивная прочность 20 / 40 / 100 В. В оригинале U<sub>g</sub> отложено по вертикали; здесь — по горизонтали.</span></span>
+      </figcaption>
+      <details class="data"><summary><span class="t"><span lang="ja">数値表</span><span lang="en">Data table</span><span lang="ru">Таблица данных</span></span></summary><div class="table-wrap" id="tbl-recov"></div></details>
+    </figure>
+
+    <figure>
+      <div class="multi">
+        <div><div class="sm-title">R<sub>g</sub> = 0</div><div class="chart" id="fig-dvdt0"></div></div>
+        <div><div class="sm-title">R<sub>g</sub> = 50 kΩ</div><div class="chart" id="fig-dvdt50"></div></div>
+        <div><div class="sm-title">R<sub>g</sub> = 200 kΩ</div><div class="chart" id="fig-dvdt200"></div></div>
+      </div>
+      <div class="legend" id="lg-dvdt"></div>
+      <figcaption>
+        <span class="fig-no">FIG. 5 – 7</span>
+        <span class="fig-title t"><span lang="ja">臨界上昇率 dU/dt とグリッド電圧</span><span lang="en">Critical rate of rise of anode voltage vs grid voltage</span><span lang="ru">Характеристики критической крутизны фронта нарастания в зависимости от напряжения сетки</span></span>
+        <span class="fig-cond">U<sub>f</sub> = 6.3 V</span>
+        <span class="t"><span lang="ja">C はパルス形成線路の容量です。陽極電圧の立ち上がりがこれより速いと、グリッドで止めていても誤点弧します。グリッド回路の抵抗が小さく、負バイアスが深く、形成線路の容量が小さいほど、速い立ち上がりに耐えます。3 枚は縦軸をそろえています。</span><span lang="en">C is the pulse-forming line capacitance. If the anode voltage rises faster than this, the tube fires even though the grid is holding it off. Lower grid-circuit resistance, deeper negative bias and smaller line capacitance all raise the limit. The three panels share one vertical scale.</span><span lang="ru">C — ёмкость формирующей линии. Если напряжение анода нарастает быстрее, тиратрон зажигается несмотря на запирающее смещение. Меньшее сопротивление в цепи сетки, большее отрицательное смещение и меньшая ёмкость линии повышают допустимую крутизну. Все три графика в одном масштабе.</span></span>
+      </figcaption>
+      <details class="data"><summary><span class="t"><span lang="ja">数値表</span><span lang="en">Data table</span><span lang="ru">Таблица данных</span></span></summary><div class="table-wrap" id="tbl-dvdt"></div></details>
+    </figure>
+  </div>
+</section>
+
+<section class="sec" id="handling">
+  <div class="sec-head">
+    <div class="sec-no">07</div>
+    <h2><span class="t"><span lang="ja">取り扱い</span><span lang="en">Operating notes</span><span lang="ru">Указания по эксплуатации</span></span></h2>
+  </div>
+  <div class="sec-body">
+    <div class="p">
+      <span class="t"><span lang="ja">電極間のリーク電流を防ぐため、リード間のガラス（ステム）を水とアルコールで清掃してください。</span><span lang="en">To avoid leakage currents between electrodes, clean the glass stem between the leads with water and alcohol.</span><span lang="ru">Во избежание токов утечки между электродами необходимо очищать водой и спиртом стекло «лопаточки» между выводами.</span></span>
+      <span class="t"><span lang="ja">陽極電圧はヒーター点灯から 10 秒以上たってから加えてください。点弧後はグリッドで電流を止められないため、陽極電流は必ず外部回路で制限します。</span><span lang="en">Apply anode voltage no sooner than 10 s after the heater is switched on. Once fired, the grid cannot stop the current, so the anode current must always be limited by the external circuit.</span><span lang="ru">Анодное напряжение подавайте не ранее чем через 10 с после включения накала. После зажигания сетка не может прервать ток, поэтому анодный ток всегда ограничивайте внешней цепью.</span></span>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="drive">
+  <div class="sec-head">
+    <div class="sec-no">08</div>
+    <h2><span class="t"><span lang="ja">現代の半導体による安定駆動</span><span lang="en">Stable drive with modern semiconductors</span><span lang="ru">Стабильное питание на современной элементной базе</span></span></h2>
+  </div>
+  <div class="sec-body">
+    <div class="p">
+      <span class="t"><span lang="ja">ここで抑えるのは、電源リップル、商用電源のハム、無線モジュールからの飛び込みといった外から入る雑音です。放電そのものが生む雑音は乱数源なので残します。外来雑音は周期性があるため、乱数の偏りや相関の原因になります。</span><span lang="en">The aim is to suppress interference that enters from outside: supply ripple, mains hum and pickup from the radio module. The discharge's own noise is the entropy source, so it stays. External interference is periodic and shows up as bias and correlation in the random bits.</span><span lang="ru">Задача — подавить помехи извне: пульсации питания, сетевой фон и наводки от радиомодуля. Собственный шум разряда служит источником энтропии и сохраняется. Внешние помехи периодичны и проявляются как смещение и корреляция случайных битов.</span></span>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Recommended drive block diagram">
+      <svg viewBox="0 0 1060 470" id="blockdiag">
+        <defs>
+          <marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" style="fill:var(--ink-2)"></path></marker>
+          <marker id="ahc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" style="fill:var(--accent)"></path></marker>
+        </defs>
+        <g style="stroke:var(--ink-2);stroke-width:1.5;fill:none">
+          <line x1="190" y1="65" x2="218" y2="65" marker-end="url(#ah)"></line>
+          <line x1="390" y1="65" x2="428" y2="65" marker-end="url(#ah)"></line>
+          <line x1="500" y1="100" x2="500" y2="148" marker-end="url(#ah)"></line>
+          <path d="M105 100 L105 305 L218 305" marker-end="url(#ah)"></path>
+          <line x1="390" y1="305" x2="428" y2="305" marker-end="url(#ah)"></line>
+          <line x1="390" y1="185" x2="428" y2="185" marker-end="url(#ah)"></line>
+          <path d="M500 124 L590 124 L590 65 L608 65" marker-end="url(#ah)"></path>
+          <line x1="570" y1="305" x2="608" y2="305" marker-end="url(#ah)"></line>
+          <line x1="780" y1="65" x2="808" y2="65" marker-end="url(#ah)"></line>
+          <line x1="780" y1="305" x2="808" y2="305" marker-end="url(#ah)"></line>
+          <line x1="868" y1="185" x2="888" y2="185" marker-end="url(#ah)"></line>
+        </g>
+        <g style="stroke:var(--accent);stroke-width:1.5;fill:none;stroke-dasharray:5 4">
+          <path d="M965 150 L965 14 L520 14 L520 28" marker-end="url(#ahc)"></path>
+          <path d="M965 220 L965 440 L205 440 L205 185 L218 185" marker-end="url(#ahc)"></path>
+          <path d="M930 220 L930 420 L305 420 L305 342" marker-end="url(#ahc)"></path>
+        </g>
+        <line x1="798" y1="24" x2="798" y2="400" style="stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 4"></line>
+        <g id="blocks"></g>
+        <rect x="430" y="150" width="140" height="190" rx="6" style="fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5"></rect>
+        <text x="500" y="238" text-anchor="middle" style="fill:var(--ink);font:700 22px var(--f-display)">ТГ1Б</text>
+        <g style="fill:var(--ink-2);font:11px var(--f-mono)">
+          <text x="508" y="140">A1 (1)</text>
+          <text x="436" y="178">G (3)</text>
+          <text x="436" y="298">H (2, 5)</text>
+          <text x="512" y="298">K (4)</text>
+          <text x="532" y="116">U<tspan baseline-shift="sub" font-size="8">a</tspan> node</text>
+          <text x="760" y="460" id="lbl-ctrl"></text>
+          <text x="806" y="416" id="lbl-iso"></text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="drive">
+      <article class="card">
+        <div class="tag">A · HEATER</div>
+        <h3><span class="t"><span lang="ja">ヒーター：直流・低雑音・ソフトスタート</span><span lang="en">Heater: DC, low noise, soft start</span><span lang="ru">Накал: постоянный ток, малый шум, плавный пуск</span></span></h3>
+        <div class="p"><span class="t"><span lang="ja">低雑音 LDO で直流 6.3 V を作ります。交流点火は 50/60 Hz のハムを放電に混ぜ、電圧の揺れは陰極温度と点弧の統計を変えます。冷えたヒーターは抵抗が低く突入電流が流れるので、電流制限とソフトスタートのある LDO を使います。ヒーター電源の片側を陰極につなげば、陰極・ヒーター間の定格（−100 V まで）も守れます。</span><span lang="en">Run the heater from a low-noise LDO at 6.3 V DC. An AC heater mixes 50/60 Hz hum into the discharge, and voltage drift changes cathode temperature and firing statistics. A cold heater has low resistance and draws inrush current, so use an LDO with current limit and soft start. Returning one heater lead to the cathode also keeps the cathode-to-heater rating (down to −100 V).</span><span lang="ru">Питайте накал постоянным напряжением 6,3 В от малошумящего LDO. Переменный накал вносит фон 50/60 Гц в разряд, а колебания напряжения меняют температуру катода и статистику зажигания. Холодный подогреватель имеет малое сопротивление и даёт бросок тока, поэтому нужен LDO с ограничением тока и плавным пуском. Соединение одного вывода накала с катодом обеспечивает норму напряжения катод — подогреватель (не ниже −100 В).</span></span></div>
+        <dl class="parts">
+          <dt>EXAMPLE</dt>
+          <dd>12 V → buck 7.5 V → LT3045 (R<sub>SET</sub> = 63.4 kΩ → 6.34 V)</dd>
+          <dd>P<sub>LDO</sub> ≈ (7.5 − 6.34) V × 0.225 A ≈ 0.26 W</dd>
+        </dl>
+      </article>
+
+      <article class="card">
+        <div class="tag">B · ANODE SUPPLY</div>
+        <h3><span class="t"><span lang="ja">陽極電源：絶縁して、リップルを落とす</span><span lang="en">Anode supply: isolate it and clean it up</span><span lang="ru">Анодное питание: развязка и фильтрация</span></span></h3>
+        <div class="p"><span class="t"><span lang="ja">点弧電圧が 30 V 以下なので、陽極電源は 36〜48 V で足ります。絶縁型 DC-DC で作るとマイコンや Wi-Fi 側とのグラウンドループが切れます。スイッチング周波数のリップルは乱数に周期成分として残るため、π 形 LC フィルタと高耐圧リニアレギュレータ（または容量マルチプライヤ）で落とします。</span><span lang="en">Because the tube fires below 30 V, a 36–48 V anode supply is enough. Generating it with an isolated DC-DC converter breaks ground loops with the MCU and Wi-Fi side. Switching ripple would remain as a periodic component in the random bits, so remove it with a π LC filter and a high-voltage linear regulator or a capacitance multiplier.</span><span lang="ru">Поскольку напряжение зажигания не более 30 В, достаточно анодного питания 36–48 В. Изолированный DC-DC разрывает контуры заземления с микроконтроллером и Wi-Fi. Пульсации частоты преобразования остались бы в случайных битах как периодическая составляющая, поэтому их подавляют П-образным LC-фильтром и высоковольтным линейным стабилизатором или умножителем ёмкости.</span></span></div>
+        <dl class="parts">
+          <dt>EXAMPLE</dt>
+          <dd>2 × isolated DC-DC ±24 V in series → π-LC → TL783 (≈ 40 V)</dd>
+        </dl>
+      </article>
+
+      <article class="card">
+        <div class="tag">C · ANODE CURRENT</div>
+        <h3><span class="t"><span lang="ja">陽極電流：抵抗の代わりに定電流源</span><span lang="en">Anode current: a current source instead of a resistor</span><span lang="ru">Анодный ток: источник тока вместо резистора</span></span></h3>
+        <div class="p"><span class="t"><span lang="ja">デプレッション型 MOSFET の定電流回路は出力インピーダンスが高く、電源の揺れが放電電流に伝わりにくくなります。電流は I ≈ |U<sub>GS</sub>| / R<sub>S</sub> で決まり、U<sub>GS</sub> は個体差が大きいので R<sub>S</sub> を実測で合わせます。パルス方式では充電が直線ランプになり、間隔には点弧のばらつきだけが残ります。電流値は、連続放電では維持電流より大きく、弛張発振では消弧できるよう維持電流より小さくします。</span><span lang="en">A depletion-mode MOSFET current source has a high output impedance, so supply variation barely reaches the discharge current. The current is I ≈ |U<sub>GS</sub>| / R<sub>S</sub>; U<sub>GS</sub> varies widely between parts, so trim R<sub>S</sub> by measurement. In pulse mode the capacitor charges on a linear ramp and only the firing scatter remains in the intervals. Set the current above the holding current for a continuous discharge, and below it for a relaxation oscillator so the tube can extinguish.</span><span lang="ru">Источник тока на МОП-транзисторе обеднённого типа имеет высокое выходное сопротивление, и колебания питания почти не влияют на ток разряда. Ток I ≈ |U<sub>GS</sub>| / R<sub>S</sub>; разброс U<sub>GS</sub> велик, поэтому R<sub>S</sub> подбирают по измерениям. В импульсном режиме конденсатор заряжается линейно, и в интервалах остаётся только разброс зажигания. Для непрерывного разряда ток задают больше тока поддержания, для релаксационного генератора — меньше, чтобы тиратрон гас.</span></span></div>
+        <dl class="parts">
+          <dt>EXAMPLE</dt>
+          <dd>DN2540 + R<sub>S</sub> 330 … 680 Ω → ≈ 5 mA</dd>
+          <dd>P<sub>MOSFET</sub> ≈ (48 − 20) V × 5 mA ≈ 0.14 W</dd>
+        </dl>
+      </article>
+
+      <article class="card">
+        <div class="tag">D · GRID BIAS</div>
+        <h3><span class="t"><span lang="ja">グリッド：可変バイアスと低インピーダンス化</span><span lang="en">Grid: adjustable bias, low impedance</span><span lang="ru">Сетка: регулируемое смещение, низкий импеданс</span></span></h3>
+        <div class="p"><span class="t"><span lang="ja">マイコンの DAC（または PWM と 2 次 RC）から反転アンプで 0〜−6 V を作り、100 kΩ（定格 10 kΩ〜1 MΩ）を通してグリッドへ加えます。負電源は反転チャージポンプで作れます。グリッド・陰極間に 1〜10 nF を入れると飛び込みが減り、図 5〜7 のとおり誤点弧にも強くなります。点弧間隔の平均が一定になるようファームウェアでバイアスを自動調整すれば、温度や経年による点弧電圧の変化を吸収できます。点弧ごとのグリッド電圧の揺らぎ（最大 ±2 V）は、乱数源として使う量そのものです。</span><span lang="en">Derive 0 to −6 V from the MCU's DAC (or PWM plus a second-order RC) through an inverting amplifier, and feed the grid through 100 kΩ (rated 10 kΩ to 1 MΩ). An inverting charge pump provides the negative rail. A 1–10 nF grid-to-cathode capacitor reduces pickup and, as Figs. 5–7 show, raises immunity to false firing. If the firmware trims the bias to hold the mean firing interval constant, it absorbs drift from temperature and ageing. The firing-to-firing grid variation (up to ±2 V) is exactly the quantity used as the entropy source.</span><span lang="ru">Смещение 0 … −6 В получают от ЦАП микроконтроллера (или ШИМ с RC-фильтром второго порядка) через инвертирующий усилитель и подают на сетку через 100 кОм (допустимо 10 кОм … 1 МОм). Отрицательное напряжение даёт инвертирующий накачивающий преобразователь. Конденсатор 1–10 нФ между сеткой и катодом снижает наводки и, как видно из рис. 5–7, повышает устойчивость к ложным зажиганиям. Если прошивка подстраивает смещение, удерживая средний интервал постоянным, компенсируется дрейф от температуры и старения. Изменение сеточного напряжения от включения к включению (до ±2 В) — это и есть используемый источник энтропии.</span></span></div>
+        <dl class="parts">
+          <dt>EXAMPLE</dt>
+          <dd>DAC → OPA365 inverter → 100 kΩ + 4.7 nF (G–K)</dd>
+          <dd>−5 V: TPS60403 inverting charge pump</dd>
+        </dl>
+      </article>
+
+      <article class="card">
+        <div class="tag">E · ANALOG FRONT END</div>
+        <h3><span class="t"><span lang="ja">アナログ信号系：外付け ADC を真空管側に</span><span lang="en">Analog front end: external ADC on the tube side</span><span lang="ru">Аналоговый тракт: внешний АЦП на стороне лампы</span></span></h3>
+        <div class="p"><span class="t"><span lang="ja">陽極ノードの雑音を耐圧 100 V 以上のフィルムコンデンサで AC 結合し、直列抵抗と低リークのクランプダイオードで保護してから、低雑音のレール・ツー・レールオペアンプで増幅します。ADC の前には、サンプリング周波数の半分より下で落ちるアンチエイリアスフィルタを入れます。マイコン内蔵 ADC の代わりに、真空管側に置いた外付け ADC をタイマーで一定間隔に読み、デジタルアイソレータ越しにマイコンへ送ると、Wi-Fi の雑音とサンプリング時刻の揺れを避けられます。</span><span lang="en">AC-couple the anode-node noise through a film capacitor rated 100 V or more, protect it with a series resistor and low-leakage clamp diodes, then amplify with a low-noise rail-to-rail op-amp. Put an anti-alias filter that rolls off below half the sampling rate in front of the ADC. Instead of the MCU's internal ADC, place an external ADC on the tube side, clock it from a timer, and pass the data to the MCU through a digital isolator; this keeps out Wi-Fi noise and sampling-time jitter.</span><span lang="ru">Шум анодного узла подают через плёночный конденсатор на 100 В и более, защищают последовательным резистором и диодами с малой утечкой и усиливают малошумящим rail-to-rail ОУ. Перед АЦП ставят антиалиасинговый фильтр со срезом ниже половины частоты дискретизации. Вместо встроенного АЦП лучше внешний АЦП на стороне лампы с тактированием от таймера и передачей данных через цифровой изолятор: так исключаются помехи Wi-Fi и дрожание момента выборки.</span></span></div>
+        <dl class="parts">
+          <dt>EXAMPLE</dt>
+          <dd>film 0.1 µF / 250 V → 1 kΩ + BAV199 → OPA365 → RC AAF</dd>
+          <dd>ADS7042 (12 bit, 1 MSPS, SPI) → ISO7741 → MCU</dd>
+        </dl>
+      </article>
+
+      <article class="card">
+        <div class="tag">F · PULSE TIMING</div>
+        <h3><span class="t"><span lang="ja">パルス検出：高速に絶縁し、時刻はハードウェアで記録</span><span lang="en">Pulse timing: fast isolation, hardware timestamps</span><span lang="ru">Регистрация импульсов: быстрая развязка и аппаратные метки времени</span></span></h3>
+        <div class="p"><span class="t"><span lang="ja">陰極側の検出抵抗の電圧をヒステリシス付き高速コンパレータで整形し、高速フォトカプラかデジタルアイソレータで絶縁します。汎用フォトカプラ（PC817 など）は応答が数 µs と遅く温度でも変わるため、間隔の測定に余計な揺れを加えます。時刻はソフトウェア割り込みではなくハードウェアで記録します。</span><span lang="en">Square up the voltage on a cathode-side sense resistor with a fast comparator with hysteresis, then isolate it with a high-speed optocoupler or a digital isolator. General-purpose optocouplers such as the PC817 respond in microseconds and drift with temperature, which adds spurious jitter to the intervals. Timestamp the edges in hardware rather than in a software interrupt.</span><span lang="ru">Напряжение на датчике тока в цепи катода формируют быстрым компаратором с гистерезисом и передают через быстродействующую оптопару или цифровой изолятор. Оптопары общего применения (например, PC817) имеют задержку в единицы микросекунд, зависящую от температуры, и добавляют лишнее дрожание. Метки времени фиксируйте аппаратно, а не в программном прерывании.</span></span></div>
+        <dl class="parts">
+          <dt>EXAMPLE</dt>
+          <dd>TLV3201 → 6N137 / TLP2361</dd>
+          <dd>Pico 2 W: PIO @ 150 MHz (≈ 6.7 ns) · ESP32-C3: RMT RX</dd>
+        </dl>
+      </article>
+
+      <article class="card">
+        <div class="tag">G · LAYOUT</div>
+        <h3><span class="t"><span lang="ja">実装とシールド</span><span lang="en">Layout and shielding</span><span lang="ru">Монтаж и экранирование</span></span></h3>
+        <div class="p"><span class="t"><span lang="ja">陽極電流のループを小さくし、グラウンドは一点で接続します。真空管とアナログ部は接地した金属ケースで囲み、Wi-Fi アンテナは離し、電源線にはフェライトビーズを入れます。グリッドは 50 MΩ 以上の絶縁を前提にした高インピーダンス節点なので、基板のフラックスを洗浄し、必要ならガードリングで囲みます。</span><span lang="en">Keep the anode current loop small and join grounds at a single point. Enclose the tube and analog section in a grounded metal can, keep the Wi-Fi antenna away, and add ferrite beads on supply lines. The grid is a high-impedance node specified for at least 50 MΩ insulation, so clean flux off the board and surround it with a guard ring if needed.</span><span lang="ru">Контур анодного тока делайте минимальным, земли соединяйте в одной точке. Лампу и аналоговую часть помещайте в заземлённый металлический экран, антенну Wi-Fi удаляйте, в цепи питания ставьте ферритовые бусины. Сетка — высокоомный узел с изоляцией не менее 50 МОм, поэтому отмывайте флюс и при необходимости окружайте её охранным кольцом.</span></span></div>
+      </article>
+
+      <article class="card">
+        <div class="tag">H · SEQUENCING</div>
+        <h3><span class="t"><span lang="ja">監視と投入順序</span><span lang="en">Monitoring and power sequencing</span><span lang="ru">Контроль и порядок включения</span></span></h3>
+        <div class="p"><span class="t"><span lang="ja">電流センサでヒーター電流（225 ± 25 mA）を監視して断線を検出し、陽極電流は陰極側の検出抵抗で測ります。投入はヒーター、10 秒以上の待ち（余裕を見て 30 秒）、フォト MOSFET リレーで陽極電源、の順にし、停止は陽極電源を先に切ります。</span><span lang="en">Monitor the heater current (225 ± 25 mA) with a current sensor to catch an open heater, and measure anode current on the cathode-side sense resistor. Power up in the order heater, a wait of at least 10 s (30 s for margin), then the anode supply through a photo-MOSFET relay; on shutdown remove the anode supply first.</span><span lang="ru">Ток накала (225 ± 25 мА) контролируйте датчиком тока для обнаружения обрыва, анодный ток измеряйте на резисторе в цепи катода. Порядок включения: накал, выдержка не менее 10 с (с запасом 30 с), затем анодное питание через оптореле на МОП-транзисторах; при выключении первым снимайте анодное питание.</span></span></div>
+        <dl class="parts">
+          <dt>EXAMPLE</dt>
+          <dd>INA219 (heater) · PhotoMOS relay ≥ 60 V (anode)</dd>
+        </dl>
+      </article>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div><span class="t"><span lang="ja">出典：ТГ1Б 技術指示書 No. 36（НИИ、1975 年 8 月、第 1〜2 葉）および特性図（1967 年 11 月、第 3〜5 葉）のスキャン PDF、全 10 ページ。</span><span lang="en">Source: scanned PDF of ТГ1Б Instruction No. 36 (НИИ, August 1975, sheets 1–2) and characteristic curves (November 1967, sheets 3–5), 10 pages.</span><span lang="ru">Источник: скан инструкции № 36 на ТГ1Б (НИИ, август 1975, листы 1–2) и характеристик (ноябрь 1967, листы 3–5), 10 страниц.</span></span></div>
+  <div>SHA-256 <span class="mono">198ee944da75a06223dda0e5781242403e4e3e9614cc64b67b6e71c1c22a4d1a</span></div>
+  <div><span class="t"><span lang="ja">部品名は例示です。定格と入手性は各メーカーの最新資料で確認してください。</span><span lang="en">Part numbers are examples; check ratings and availability in current manufacturer documentation.</span><span lang="ru">Обозначения компонентов приведены как примеры; параметры и доступность проверяйте по актуальной документации производителей.</span></span></div>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var MINUS = "−";
+
+  function num(v, d) {
+    var s = Math.abs(v).toFixed(d);
+    return (v < 0 && Number(s) !== 0 ? MINUS : "") + s;
+  }
+
+  function monotone(pts) {
+    var n = pts.length, xs = [], ys = [], d = [], m = [], i;
+    for (i = 0; i < n; i++) { xs.push(pts[i][0]); ys.push(pts[i][1]); }
+    for (i = 0; i < n - 1; i++) d.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+    m[0] = d[0];
+    m[n - 1] = d[n - 2];
+    for (i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+    for (i = 0; i < n - 1; i++) {
+      if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+      var a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+      if (s > 9) { var t = 3 / Math.sqrt(s); m[i] = t * a * d[i]; m[i + 1] = t * b * d[i]; }
+    }
+    var f = function (x) {
+      if (x < xs[0] - 1e-9 || x > xs[n - 1] + 1e-9) return null;
+      var k = 0;
+      while (k < n - 2 && x > xs[k + 1]) k++;
+      var h = xs[k + 1] - xs[k], u = (x - xs[k]) / h, u2 = u * u, u3 = u2 * u;
+      return (2 * u3 - 3 * u2 + 1) * ys[k] + (u3 - 2 * u2 + u) * h * m[k] + (-2 * u3 + 3 * u2) * ys[k + 1] + (u3 - u2) * h * m[k + 1];
+    };
+    f.x0 = xs[0];
+    f.x1 = xs[n - 1];
+    return f;
+  }
+
+  var FIRING_LO = [[-10, 220], [-8.9, 186], [-6.9, 146], [-4.9, 96], [-3.3, 58], [-2.1, 37], [-0.9, 24], [0, 20]];
+  var FIRING_HI = [[-5.06, 220], [-4.3, 180], [-3.7, 153], [-3.1, 125], [-2.5, 96], [-1.9, 71], [-1.3, 45], [-0.7, 36], [0, 30]];
+
+  var GRID_X = [-28, -20, -12, -8, -4, -2, -1, 0];
+  var GRID = {
+    "5": [-0.45, -0.37, -0.28, -0.24, -0.18, -0.14, -0.10, -0.02],
+    "10": [-0.88, -0.70, -0.50, -0.43, -0.34, -0.26, -0.18, -0.04],
+    "15": [-1.20, -0.97, -0.72, -0.60, -0.45, -0.33, -0.22, -0.05],
+    "20": [-1.58, -1.27, -0.93, -0.76, -0.58, -0.42, -0.28, -0.06],
+    "25": [-1.95, -1.60, -1.23, -1.05, -0.78, -0.55, -0.35, -0.08]
+  };
+
+  var RECOV_X = [-98, -90, -70, -50, -30, -20];
+  var RECOV = {
+    "20": [1.08, 1.01, 0.86, 0.67, 0.48, 0.37],
+    "40": [1.01, 0.95, 0.80, 0.62, 0.44, 0.33],
+    "100": [0.89, 0.84, 0.72, 0.54, 0.36, 0.26]
+  };
+
+  var DVDT_X = [-100, -80, -60, -40, -20];
+  var DVDT_C = ["0.001", "0.0037", "0.006", "0.0157", "0.026"];
+  var DVDT = {
+    "0": [[4.56, 4.40, 4.18, 3.70, 2.60], [3.57, 3.50, 3.30, 2.87, 2.12], [3.26, 3.18, 2.98, 2.55, 1.96], [2.71, 2.66, 2.50, 2.12, 1.53], [2.40, 2.33, 2.18, 1.86, 1.40]],
+    "50": [[4.25, 4.06, 3.76, 3.28, 2.66], [3.45, 3.33, 3.06, 2.63, 2.10], [3.11, 3.02, 2.85, 2.42, 1.91], [2.54, 2.47, 2.31, 2.00, 1.51], [2.20, 2.12, 1.96, 1.67, 1.29]],
+    "200": [[3.69, 3.58, 3.26, 2.89, 2.17], [2.70, 2.60, 2.41, 2.22, 1.61], [2.52, 2.44, 2.28, 2.04, 1.48], [1.87, 1.82, 1.72, 1.48, 1.13], [1.57, 1.52, 1.40, 1.24, 0.89]]
+  };
+
+  function zip(xs, ys) { return xs.map(function (x, i) { return [x, ys[i]]; }); }
+
+  var SERIES_COLORS = ["--s1", "--s2", "--s3", "--s4", "--s5"];
+
+  var charts = [];
+
+  charts.push({
+    id: "fig-firing",
+    aspect: 0.5,
+    x: { min: -12, max: 0, step: 2, label: "U<tspan baseline-shift=\"sub\" font-size=\"75%\">g</tspan>, V", digits: 1 },
+    y: { min: 0, max: 250, step: 50, label: "U<tspan baseline-shift=\"sub\" font-size=\"75%\">a,ign</tspan>, V", digits: 0 },
+    band: { lo: monotone(FIRING_LO), hi: monotone(FIRING_HI), top: 220 },
+    series: [
+      { name: "min", color: "--accent", f: monotone(FIRING_LO) },
+      { name: "max", color: "--accent", f: monotone(FIRING_HI) }
+    ],
+    tip: function (x, c) {
+      var lo = c.band.lo(x), hi = c.band.hi(x);
+      if (lo === null) return null;
+      var hiText = hi === null ? "> 220" : num(hi, 0);
+      return { head: "U_g = " + num(x, 1) + " V", rows: [{ color: "--accent", label: "U_a,ign", value: num(lo, 0) + " … " + hiText + " V" }], dots: [lo, hi] };
+    },
+    table: {
+      head: ["U_g, V", "U_a,ign min, V", "U_a,ign max, V"],
+      rows: [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0].map(function (x) {
+        var lo = monotone(FIRING_LO)(x), hi = monotone(FIRING_HI)(x);
+        return [num(x, 0), lo === null ? "—" : num(lo, 0), hi === null ? "> 220" : num(hi, 0)];
+      })
+    }
+  });
+
+  charts.push({
+    id: "fig-gridcur",
+    legend: "lg-gridcur",
+    aspect: 0.72,
+    x: { min: -28, max: 0, step: 4, label: "U<tspan baseline-shift=\"sub\" font-size=\"75%\">g</tspan>, V", digits: 1 },
+    y: { min: -2, max: 0, step: 0.5, label: "I<tspan baseline-shift=\"sub\" font-size=\"75%\">g</tspan>, mA", digits: 2 },
+    series: Object.keys(GRID).map(function (k, i) {
+      return { name: "I_a = " + k + " mA", color: SERIES_COLORS[i], f: monotone(zip(GRID_X, GRID[k])), pts: zip(GRID_X, GRID[k]) };
+    }),
+    unit: "mA",
+    table: {
+      head: ["U_g, V"].concat(Object.keys(GRID).map(function (k) { return "I_a " + k + " mA"; })),
+      rows: GRID_X.map(function (x, r) { return [num(x, 0)].concat(Object.keys(GRID).map(function (k) { return num(GRID[k][r], 2); })); })
+    }
+  });
+
+  var ION = [[0.5, 6.6], [5, 33.6]];
+  charts.push({
+    id: "fig-ion",
+    aspect: 0.72,
+    x: { min: 0, max: 6, step: 1, label: "I<tspan baseline-shift=\"sub\" font-size=\"75%\">a,pulse</tspan>, A", digits: 2, name: "I_a,pulse", unit: "A" },
+    y: { min: 0, max: 40, step: 8, label: "I<tspan baseline-shift=\"sub\" font-size=\"75%\">g,ion</tspan>, mA", digits: 1 },
+    series: [{ name: "I_g,ion", color: "--s1", f: monotone(ION), pts: ION }],
+    unit: "mA",
+    table: {
+      head: ["I_a,pulse, A", "I_g,ion, mA"],
+      rows: [0.5, 1, 2, 3, 4, 5].map(function (x) { return [x.toFixed(1), num(monotone(ION)(x), 1)]; })
+    }
+  });
+
+  charts.push({
+    id: "fig-recov",
+    legend: "lg-recov",
+    aspect: 0.45,
+    x: { min: -110, max: 0, step: 10, label: "U<tspan baseline-shift=\"sub\" font-size=\"75%\">g</tspan>, V", digits: 0 },
+    y: { min: 0, max: 1.2, step: 0.2, label: "I<tspan baseline-shift=\"sub\" font-size=\"75%\">g,ion</tspan>, mA", digits: 2 },
+    labelEnds: true,
+    series: Object.keys(RECOV).map(function (k, i) {
+      return { name: k + " V", color: SERIES_COLORS[i], f: monotone(zip(RECOV_X, RECOV[k])), pts: zip(RECOV_X, RECOV[k]) };
+    }),
+    unit: "mA",
+    table: {
+      head: ["U_g, V", "20 V", "40 V", "100 V"],
+      rows: RECOV_X.map(function (x, r) { return [num(x, 0), num(RECOV["20"][r], 2), num(RECOV["40"][r], 2), num(RECOV["100"][r], 2)]; })
+    }
+  });
+
+  ["0", "50", "200"].forEach(function (rg) {
+    charts.push({
+      id: "fig-dvdt" + rg,
+      legend: rg === "0" ? "lg-dvdt" : null,
+      legendNames: true,
+      aspect: 0.8,
+      x: { min: -100, max: 0, step: 20, label: "U<tspan baseline-shift=\"sub\" font-size=\"75%\">g</tspan>, V", digits: 0 },
+      y: { min: 0, max: 5, step: 1, label: "dU/dt, V/µs", digits: 2 },
+      series: DVDT_C.map(function (c, i) {
+        return { name: "C = " + c + " µF", color: SERIES_COLORS[i], f: monotone(zip(DVDT_X, DVDT[rg][i])), pts: zip(DVDT_X, DVDT[rg][i]) };
+      }),
+      unit: "V/µs"
+    });
+  });
+
+  function el(tag, attrs, text) {
+    var s = "<" + tag;
+    for (var k in attrs) s += " " + k + "=\"" + attrs[k] + "\"";
+    return s + ">" + (text || "") + "</" + tag + ">";
+  }
+
+  function draw(c) {
+    var host = document.getElementById(c.id);
+    if (!host) return;
+    var W = Math.max(260, Math.round(host.clientWidth));
+    var small = W < 420;
+    var H = Math.round(Math.min(460, Math.max(210, W * (small ? Math.max(c.aspect, 0.8) : c.aspect))));
+    var ends = c.labelEnds && !small;
+    var M = { l: small ? 44 : 52, r: ends ? 54 : 14, t: 12, b: 40 };
+    var pw = W - M.l - M.r, ph = H - M.t - M.b;
+    var sx = function (x) { return M.l + (x - c.x.min) / (c.x.max - c.x.min) * pw; };
+    var sy = function (y) { return M.t + (c.y.max - y) / (c.y.max - c.y.min) * ph; };
+    c._sx = sx; c._sy = sy; c._M = M; c._pw = pw; c._ph = ph;
+    var out = "";
+    var v, i;
+    var fs = small ? 10 : 11;
+
+    var yTicks = [];
+    for (v = c.y.min; v <= c.y.max + 1e-9; v += c.y.step) yTicks.push(Math.round(v * 1000) / 1000);
+    var xTicks = [];
+    var xStep = c.x.step * (small && (c.x.max - c.x.min) / c.x.step > 8 ? 2 : 1);
+    for (v = c.x.max; v >= c.x.min - 1e-9; v -= xStep) xTicks.unshift(Math.round(v * 1000) / 1000);
+
+    yTicks.forEach(function (t) {
+      out += el("line", { x1: M.l, x2: M.l + pw, y1: sy(t), y2: sy(t), style: "stroke:var(--grid);stroke-width:1" });
+      out += el("text", { x: M.l - 6, y: sy(t) + 3.5, "text-anchor": "end", style: "fill:var(--ink-3);font-size:" + fs + "px" }, num(t, c.y.step < 1 ? 1 : 0));
+    });
+    xTicks.forEach(function (t) {
+      out += el("line", { x1: sx(t), x2: sx(t), y1: M.t, y2: M.t + ph, style: "stroke:var(--grid);stroke-width:1" });
+      out += el("text", { x: sx(t), y: M.t + ph + 15, "text-anchor": "middle", style: "fill:var(--ink-3);font-size:" + fs + "px" }, num(t, c.x.step < 1 ? 1 : 0));
+    });
+    out += el("line", { x1: M.l, x2: M.l + pw, y1: M.t + ph, y2: M.t + ph, style: "stroke:var(--ink-3);stroke-width:1" });
+    out += el("text", { x: M.l + pw, y: M.t + ph + 32, "text-anchor": "end", style: "fill:var(--ink-2);font-size:" + fs + "px" }, c.x.label);
+    out += el("text", { x: M.l - (small ? 34 : 40), y: M.t + ph / 2, "text-anchor": "middle", transform: "rotate(-90 " + (M.l - (small ? 34 : 40)) + " " + (M.t + ph / 2) + ")", style: "fill:var(--ink-2);font-size:" + fs + "px" }, c.y.label);
+
+    if (c.band) {
+      var poly = [], steps = 80, x;
+      for (i = 0; i <= steps; i++) {
+        x = c.band.lo.x0 + (c.band.lo.x1 - c.band.lo.x0) * i / steps;
+        poly.push(sx(x).toFixed(1) + "," + sy(c.band.lo(x)).toFixed(1));
+      }
+      for (i = steps; i >= 0; i--) {
+        x = c.band.hi.x0 + (c.band.hi.x1 - c.band.hi.x0) * i / steps;
+        poly.push(sx(x).toFixed(1) + "," + sy(c.band.hi(x)).toFixed(1));
+      }
+      out += el("polygon", { points: poly.join(" "), style: "fill:var(--accent-band);stroke:none" });
+      out += el("line", { x1: sx(-10), x2: sx(-5.06), y1: sy(220), y2: sy(220), style: "stroke:var(--accent);stroke-width:1;stroke-dasharray:3 4" });
+      out += el("line", { x1: M.l, x2: M.l + pw, y1: sy(30), y2: sy(30), style: "stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3" });
+      out += el("text", { x: M.l + 6, y: sy(30) - 5, style: "fill:var(--ink-3);font-size:" + fs + "px" }, "U<tspan baseline-shift=\"sub\" font-size=\"75%\">ign</tspan> ≤ 30 V (U<tspan baseline-shift=\"sub\" font-size=\"75%\">g</tspan> = 0)");
+    }
+
+    c.series.forEach(function (s) {
+      var d = "", n = 120, first = true, xx, yy;
+      for (i = 0; i <= n; i++) {
+        xx = s.f.x0 + (s.f.x1 - s.f.x0) * i / n;
+        yy = s.f(xx);
+        if (yy === null) continue;
+        d += (first ? "M" : "L") + sx(xx).toFixed(1) + " " + sy(yy).toFixed(1);
+        first = false;
+      }
+      out += el("path", { d: d, style: "fill:none;stroke:var(" + s.color + ");stroke-width:2;stroke-linejoin:round;stroke-linecap:round" });
+      if (ends) {
+        var ex = s.f.x1, ey = s.f(ex);
+        out += el("circle", { cx: sx(ex), cy: sy(ey), r: 4, style: "fill:var(" + s.color + ");stroke:var(--surface);stroke-width:2" });
+        out += el("text", { x: sx(ex) + 8, y: sy(ey) + 4, style: "fill:var(--ink-2);font-size:" + fs + "px" }, s.name);
+      }
+    });
+
+    out += "<g class=\"hover\" style=\"display:none\">" +
+      el("line", { class: "cross", y1: M.t, y2: M.t + ph, style: "stroke:var(--ink-3);stroke-width:1" }) +
+      "<g class=\"dots\"></g></g>";
+    out += el("rect", { class: "hit", x: M.l, y: M.t, width: pw, height: ph, style: "fill:transparent;cursor:crosshair" });
+
+    host.innerHTML = "<svg viewBox=\"0 0 " + W + " " + H + "\" width=\"" + W + "\" height=\"" + H + "\" role=\"img\">" + out + "</svg><div class=\"tip\" hidden></div>";
+    bindHover(c, host);
+  }
+
+  function defaultTip(x, c) {
+    var rows = [], dots = [];
+    c.series.forEach(function (s) {
+      var y = s.f(x);
+      if (y === null) return;
+      rows.push({ color: s.color, label: s.name, value: num(y, c.y.digits) + " " + (c.unit || ""), y: y });
+      dots.push({ y: y, color: s.color });
+    });
+    if (!rows.length) return null;
+    rows.sort(function (a, b) { return b.y - a.y; });
+    return { head: (c.x.name || "U_g") + " = " + num(x, c.x.digits) + " " + (c.x.unit || "V"), rows: rows, dotsC: dots };
+  }
+
+  function bindHover(c, host) {
+    var svg = host.querySelector("svg");
+    var hit = svg.querySelector(".hit");
+    var g = svg.querySelector(".hover");
+    var cross = svg.querySelector(".cross");
+    var dotsG = svg.querySelector(".dots");
+    var tip = host.querySelector(".tip");
+    function move(ev) {
+      var rect = svg.getBoundingClientRect();
+      var scale = rect.width / svg.viewBox.baseVal.width;
+      var px = (ev.clientX - rect.left) / scale;
+      var x = c.x.min + (px - c._M.l) / c._pw * (c.x.max - c.x.min);
+      x = Math.max(c.x.min, Math.min(c.x.max, x));
+      var info = c.tip ? c.tip(x, c) : defaultTip(x, c);
+      if (!info) { leave(); return; }
+      g.style.display = "";
+      cross.setAttribute("x1", c._sx(x));
+      cross.setAttribute("x2", c._sx(x));
+      var dots = "";
+      if (info.dotsC) {
+        info.dotsC.forEach(function (d) { dots += el("circle", { cx: c._sx(x), cy: c._sy(d.y), r: 4, style: "fill:var(" + d.color + ");stroke:var(--surface);stroke-width:2" }); });
+      } else if (info.dots) {
+        info.dots.forEach(function (y) { if (y !== null) dots += el("circle", { cx: c._sx(x), cy: c._sy(y), r: 4, style: "fill:var(--accent);stroke:var(--surface);stroke-width:2" }); });
+      }
+      dotsG.innerHTML = dots;
+      var html = "<div class=\"h\">" + info.head.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</div>";
+      info.rows.forEach(function (r) {
+        html += "<div class=\"r\"><span><i style=\"background:var(" + r.color + ")\"></i>" + r.label.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</span><span>" + r.value + "</span></div>";
+      });
+      tip.innerHTML = html;
+      tip.hidden = false;
+      var tx = c._sx(x) * scale + 14;
+      var tw = tip.offsetWidth;
+      if (tx + tw > rect.width) tx = c._sx(x) * scale - tw - 14;
+      tip.style.left = Math.max(0, tx) + "px";
+      tip.style.top = (c._M.t * scale + 4) + "px";
+    }
+    function leave() { g.style.display = "none"; tip.hidden = true; }
+    hit.addEventListener("pointermove", move);
+    hit.addEventListener("pointerdown", move);
+    hit.addEventListener("pointerleave", leave);
+  }
+
+  function legend(c) {
+    if (!c.legend) return;
+    var host = document.getElementById(c.legend);
+    host.innerHTML = c.series.map(function (s) {
+      return "<span><i style=\"background:var(" + s.color + ")\"></i>" + s.name.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</span>";
+    }).join("");
+  }
+
+  function table(id, head, rows) {
+    var host = document.getElementById(id);
+    if (!host) return;
+    var h = "<table><thead><tr>" + head.map(function (t, i) { return "<th" + (i ? " class=\"num\"" : "") + ">" + t.replace(/_([a-z,]+)/g, "<sub>$1</sub>") + "</th>"; }).join("") + "</tr></thead><tbody>";
+    rows.forEach(function (r) { h += "<tr>" + r.map(function (v, i) { return "<td" + (i ? " class=\"num\"" : "") + ">" + v + "</td>"; }).join("") + "</tr>"; });
+    host.innerHTML = h + "</tbody></table>";
+  }
+
+  charts.forEach(function (c) { legend(c); if (c.table) table("tbl-" + c.id.replace("fig-", ""), c.table.head, c.table.rows); });
+
+  var dvHead = ["R_g", "U_g, V"].concat(DVDT_C.map(function (c) { return c + " µF"; }));
+  var dvRows = [];
+  ["0", "50", "200"].forEach(function (rg) {
+    DVDT_X.forEach(function (x, r) {
+      dvRows.push([rg === "0" ? "0" : rg + " kΩ", num(x, 0)].concat(DVDT[rg].map(function (s) { return s[r].toFixed(2); })));
+    });
+  });
+  table("tbl-dvdt", dvHead, dvRows);
+
+  function drawAll() { charts.forEach(draw); }
+  drawAll();
+  var pending = null;
+  if ("ResizeObserver" in window) {
+    var ro = new ResizeObserver(function () {
+      if (pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(drawAll);
+    });
+    charts.forEach(function (c) { var h = document.getElementById(c.id); if (h) ro.observe(h); });
+  } else {
+    window.addEventListener("resize", drawAll);
+  }
+
+  var BLOCKS = [
+    { x: 20, y: 30, w: 170, h: 70, ja: "入力 12 V", en: "12 V input", ru: "Вход 12 В", part: "USB-PD / adapter" },
+    { x: 220, y: 30, w: 170, h: 70, ja: "陽極電源 36〜48 V", en: "Anode supply 36–48 V", ru: "Анодное 36–48 В", part: "iso DC-DC + LC + TL783" },
+    { x: 430, y: 30, w: 140, h: 70, ja: "定電流源", en: "Current source", ru: "Источник тока", part: "DN2540 + PhotoMOS" },
+    { x: 220, y: 150, w: 170, h: 70, ja: "グリッドバイアス 0〜−6 V", en: "Grid bias 0…−6 V", ru: "Смещение 0…−6 В", part: "DAC + OPA365, 100k" },
+    { x: 220, y: 270, w: 170, h: 70, ja: "ヒーター 6.3 V", en: "Heater 6.3 V", ru: "Накал 6,3 В", part: "buck + LT3045" },
+    { x: 610, y: 30, w: 170, h: 70, ja: "アナログ信号系", en: "Analog front end", ru: "Аналоговый тракт", part: "OPA365 + ADS7042" },
+    { x: 610, y: 270, w: 170, h: 70, ja: "パルス検出", en: "Pulse detector", ru: "Детектор импульсов", part: "TLV3201" },
+    { x: 810, y: 30, w: 58, h: 310, ja: "デジタルアイソレータ", en: "Isolator", ru: "Изолятор", part: "", vertical: true },
+    { x: 890, y: 150, w: 150, h: 70, ja: "マイコン", en: "MCU", ru: "МК", part: "ESP32-C3 / RP2350" }
+  ];
+  var CTRL = { ja: "制御線（DAC・インターロック・監視）", en: "Control (DAC, interlock, monitoring)", ru: "Управление (ЦАП, блокировка, контроль)" };
+  var ISO = { ja: "絶縁境界", en: "Isolation barrier", ru: "Гальваническая развязка" };
+
+  function drawBlocks(lang) {
+    var L = lang === "all" ? "ja" : lang;
+    var g = document.getElementById("blocks");
+    var s = "";
+    BLOCKS.forEach(function (b) {
+      s += el("rect", { x: b.x, y: b.y, width: b.w, height: b.h, rx: 6, style: "fill:var(--surface-2);stroke:var(--rule);stroke-width:1.5" });
+      if (b.vertical) {
+        s += el("text", { x: b.x + b.w / 2, y: b.y + b.h / 2, "text-anchor": "middle", transform: "rotate(-90 " + (b.x + b.w / 2) + " " + (b.y + b.h / 2) + ")", style: "fill:var(--ink);font:500 13px var(--f-body)" }, b[L]);
+        s += el("text", { x: b.x + b.w / 2, y: b.y + b.h - 10, "text-anchor": "middle", style: "fill:var(--ink-3);font:10px var(--f-mono)" }, "ISO7741");
+        s += el("text", { x: b.x + b.w / 2, y: b.y + 18, "text-anchor": "middle", style: "fill:var(--ink-3);font:10px var(--f-mono)" }, "6N137");
+        return;
+      }
+      s += el("text", { x: b.x + 12, y: b.y + 28, style: "fill:var(--ink);font:500 13px var(--f-body)" }, b[L]);
+      if (lang === "all") s += el("text", { x: b.x + 12, y: b.y + 44, style: "fill:var(--ink-3);font:10.5px var(--f-body)" }, b.en);
+      s += el("text", { x: b.x + 12, y: b.y + b.h - 10, style: "fill:var(--ink-2);font:10.5px var(--f-mono)" }, b.part);
+    });
+    g.innerHTML = s;
+    document.getElementById("lbl-ctrl").textContent = CTRL[L];
+    document.getElementById("lbl-ctrl").setAttribute("text-anchor", "end");
+    document.getElementById("lbl-iso").textContent = ISO[L];
+  }
+
+  var buttons = Array.prototype.slice.call(document.querySelectorAll(".langs button"));
+  function setLang(lang) {
+    document.getElementById("sheet").setAttribute("data-lang", lang);
+    buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === lang)); });
+    document.documentElement.setAttribute("lang", lang === "all" ? "ja" : lang);
+    drawBlocks(lang);
+    try { localStorage.setItem("tg1b-lang", lang); } catch (e) {}
+  }
+  buttons.forEach(function (b) { b.addEventListener("click", function () { setLang(b.getAttribute("data-lang")); }); });
+  var saved = null;
+  try { saved = localStorage.getItem("tg1b-lang"); } catch (e) {}
+  setLang(saved && /^(all|ja|en|ru)$/.test(saved) ? saved : "all");
+})();
+</script>
