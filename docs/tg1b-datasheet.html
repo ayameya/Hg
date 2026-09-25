@@ -203,7 +203,37 @@ details.data td, details.data th { padding: 5px 10px; font-variant-numeric: tabu
 footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: center; }
 #copy { margin: 0; color: var(--iris); font-family: var(--f-sans); font-size: 14px; }
 
+.flow { display: none; }
+.flow-chain { background: var(--mist); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+.flow-h { font: 700 13px/1.4 var(--f-sans); color: var(--iris); }
+.flow-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.flow-step { background: var(--paper); border: 1.5px solid var(--rule); border-radius: 10px; padding: 5px 9px; font: 700 13px/1.35 var(--f-sans); color: var(--iris); }
+.flow-step.tube { background: var(--glow); border-color: var(--iris); }
+.flow-step small { display: block; font-weight: 400; font-size: 11.5px; color: var(--ink-2); }
+.flow-arrow { color: var(--lilac); font: 700 14px/1 var(--f-sans); }
+.flow-note { font: 12.5px/1.6 var(--f-sans); color: var(--ink-2); margin: 0; }
+
+@media (max-width: 700px) {
+  .diagram { display: none; }
+  .flow { display: grid; gap: 10px; margin: 0.6em 0 1.6em; }
+}
+
 @media (max-width: 600px) {
+  table.rt, .rt tbody, .rt td { display: block; }
+  table.rt { min-width: 0; border-top: 1px solid var(--rule); }
+  .rt thead { display: none; }
+  .rt tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; padding: 10px 12px; border: 1px solid var(--rule); border-top: 0; }
+  .rt td { border: 0; padding: 0; white-space: normal; }
+  .rt td:first-child { flex: 1 1 100%; margin-bottom: 2px; }
+  .rt tr.sub td:first-child { padding-left: 12px; }
+  .rt td.val { text-align: left; }
+  .rt td.na { display: none; }
+  .rt td[data-label]::before { content: attr(data-label); font: 500 12px var(--f-sans); color: var(--lilac); margin-right: 6px; }
+  .rt.elec td.sym { margin-right: auto; }
+  .rt.env td.val { flex: 1 1 100%; }
+  details.data table { font-size: 11.5px; }
+  details.data td, details.data th { padding: 4px 5px; }
+  details.data th { white-space: normal; }
   body { font-size: 16px; line-height: 1.9; }
   header.top { padding: 24px 20px 26px; }
   main.sheet { border-radius: 22px; margin: 0 10px; }
@@ -367,7 +397,7 @@ footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: 
 
 <h2 id="s3"><span class="t"><span lang="ja">3　電気的特性</span><span lang="en">3　Electrical characteristics</span><span lang="ru">3　Электрические данные</span></span></h2>
 <div class="tw">
-  <table>
+  <table class="rt elec">
     <thead><tr>
       <th><span class="t"><span lang="ja">項目</span><span lang="en">Parameter</span><span lang="ru">Параметр</span></span></th>
       <th>Sym.</th>
@@ -390,7 +420,7 @@ footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: 
 
 <h2 id="s4"><span class="t"><span lang="ja">4　最大定格</span><span lang="en">4　Limiting values</span><span lang="ru">4　Предельно допустимые эксплуатационные данные</span></span></h2>
 <div class="tw">
-  <table>
+  <table class="rt lim">
     <thead><tr>
       <th><span class="t"><span lang="ja">項目</span><span lang="en">Parameter</span><span lang="ru">Параметр</span></span></th>
       <th class="num">Min</th>
@@ -398,35 +428,35 @@ footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: 
       <th><span class="t"><span lang="ja">単位</span><span lang="en">Unit</span><span lang="ru">Ед.</span></span></th>
     </tr></thead>
     <tbody>
-      <tr><td><span class="t"><span lang="ja">ヒーター電圧</span><span lang="en">Heater voltage</span><span lang="ru">Напряжение накала</span></span></td><td class="val">5.7</td><td class="val">6.9</td><td class="unit">V</td></tr>
-      <tr><td><span class="t"><span lang="ja">陽極電圧の波高値（順方向・逆方向）</span><span lang="en">Peak anode voltage, forward and inverse</span><span lang="ru">Наибольшая амплитуда прямого и обратного напряжения анода</span></span></td><td class="val">—</td><td class="val">240</td><td class="unit">V</td></tr>
-      <tr><td><span class="t"><span lang="ja">陰極・ヒーター間電圧</span><span lang="en">Cathode-to-heater voltage</span><span lang="ru">Наименьшее напряжение между катодом и подогревателем</span></span></td><td class="val">−100</td><td class="val">—</td><td class="unit">V</td></tr>
-      <tr><td><span class="t"><span lang="ja">点弧ごとのグリッド電圧の変動</span><span lang="en">Grid voltage variation from firing to firing</span><span lang="ru">Наибольшее изменение сеточного напряжения от включения к включению</span></span></td><td class="val">—</td><td class="val">± 2</td><td class="unit">V</td></tr>
-      <tr><td><span class="t"><span lang="ja">陽極電流の波高値</span><span lang="en">Peak anode current</span><span lang="ru">Наибольшая амплитуда тока анода</span></span></td><td class="val">—</td><td class="val">120</td><td class="unit">mA</td></tr>
-      <tr><td><span class="t"><span lang="ja">陽極電流の平均値</span><span lang="en">Average anode current</span><span lang="ru">Наибольший средний ток анода</span></span></td><td class="val">—</td><td class="val">20</td><td class="unit">mA</td></tr>
-      <tr><td><span class="t"><span lang="ja">陰極の予熱時間</span><span lang="en">Cathode warm-up time</span><span lang="ru">Наименьшее время разогрева катода</span></span></td><td class="val">10</td><td class="val">—</td><td class="unit">s</td></tr>
-      <tr><td><span class="t"><span lang="ja">グリッド回路の抵抗</span><span lang="en">Grid circuit resistance</span><span lang="ru">Сопротивление в цепи сетки</span></span></td><td class="val">0.01</td><td class="val">1</td><td class="unit">MΩ</td></tr>
+      <tr><td><span class="t"><span lang="ja">ヒーター電圧</span><span lang="en">Heater voltage</span><span lang="ru">Напряжение накала</span></span></td><td class="val" data-label="Min">5.7</td><td class="val" data-label="Max">6.9</td><td class="unit">V</td></tr>
+      <tr><td><span class="t"><span lang="ja">陽極電圧の波高値（順方向・逆方向）</span><span lang="en">Peak anode voltage, forward and inverse</span><span lang="ru">Наибольшая амплитуда прямого и обратного напряжения анода</span></span></td><td class="val na" data-label="Min">—</td><td class="val" data-label="Max">240</td><td class="unit">V</td></tr>
+      <tr><td><span class="t"><span lang="ja">陰極・ヒーター間電圧</span><span lang="en">Cathode-to-heater voltage</span><span lang="ru">Наименьшее напряжение между катодом и подогревателем</span></span></td><td class="val" data-label="Min">−100</td><td class="val na" data-label="Max">—</td><td class="unit">V</td></tr>
+      <tr><td><span class="t"><span lang="ja">点弧ごとのグリッド電圧の変動</span><span lang="en">Grid voltage variation from firing to firing</span><span lang="ru">Наибольшее изменение сеточного напряжения от включения к включению</span></span></td><td class="val na" data-label="Min">—</td><td class="val" data-label="Max">± 2</td><td class="unit">V</td></tr>
+      <tr><td><span class="t"><span lang="ja">陽極電流の波高値</span><span lang="en">Peak anode current</span><span lang="ru">Наибольшая амплитуда тока анода</span></span></td><td class="val na" data-label="Min">—</td><td class="val" data-label="Max">120</td><td class="unit">mA</td></tr>
+      <tr><td><span class="t"><span lang="ja">陽極電流の平均値</span><span lang="en">Average anode current</span><span lang="ru">Наибольший средний ток анода</span></span></td><td class="val na" data-label="Min">—</td><td class="val" data-label="Max">20</td><td class="unit">mA</td></tr>
+      <tr><td><span class="t"><span lang="ja">陰極の予熱時間</span><span lang="en">Cathode warm-up time</span><span lang="ru">Наименьшее время разогрева катода</span></span></td><td class="val" data-label="Min">10</td><td class="val na" data-label="Max">—</td><td class="unit">s</td></tr>
+      <tr><td><span class="t"><span lang="ja">グリッド回路の抵抗</span><span lang="en">Grid circuit resistance</span><span lang="ru">Сопротивление в цепи сетки</span></span></td><td class="val" data-label="Min">0.01</td><td class="val" data-label="Max">1</td><td class="unit">MΩ</td></tr>
     </tbody>
   </table>
 </div>
 
 <h2 id="s5"><span class="t"><span lang="ja">5　耐環境性</span><span lang="en">5　Environmental ratings</span><span lang="ru">5　Устойчивость против внешних воздействий</span></span></h2>
 <div class="tw">
-  <table>
+  <table class="rt env">
     <thead><tr>
       <th><span class="t"><span lang="ja">項目</span><span lang="en">Parameter</span><span lang="ru">Параметр</span></span></th>
       <th class="num">ЧТУ 10.306-57</th>
       <th class="num">ЩА3.340.056 ТУ1</th>
     </tr></thead>
     <tbody>
-      <tr><td><span class="t"><span lang="ja">周囲温度</span><span lang="en">Ambient temperature</span><span lang="ru">Температура окружающей среды</span></span></td><td class="val">−70 … +90 °C</td><td class="val">−70 … +90 °C</td></tr>
-      <tr><td><span class="t"><span lang="ja">相対湿度（+15〜25 °C）</span><span lang="en">Relative humidity at +15 … 25 °C</span><span lang="ru">Относительная влажность при +15 … 25 °C</span></span></td><td class="val">95 … 98 %</td><td class="val">—</td></tr>
-      <tr><td><span class="t"><span lang="ja">周囲気圧の下限</span><span lang="en">Minimum ambient pressure</span><span lang="ru">Наименьшее давление окружающей среды</span></span></td><td class="val">5 mmHg</td><td class="val">—</td></tr>
-      <tr><td><span class="t"><span lang="ja">振動（周波数）</span><span lang="en">Vibration, frequency</span><span lang="ru">Виброустойчивость / вибропрочность, частота</span></span></td><td class="val">50 Hz</td><td class="val">50 Hz</td></tr>
-      <tr><td><span class="t"><span lang="ja">振動（加速度）</span><span lang="en">Vibration, acceleration</span><span lang="ru">Ускорение</span></span></td><td class="val">10 … 12 g</td><td class="val">10 g</td></tr>
-      <tr><td><span class="t"><span lang="ja">定常加速度</span><span lang="en">Constant acceleration</span><span lang="ru">Линейные нагрузки</span></span></td><td class="val">100 g</td><td class="val">—</td></tr>
-      <tr><td><span class="t"><span lang="ja">単発衝撃</span><span lang="en">Single shock</span><span lang="ru">Одиночные ударные нагрузки</span></span></td><td class="val">500 g</td><td class="val">—</td></tr>
-      <tr><td><span class="t"><span lang="ja">倉庫保管での保証期間</span><span lang="en">Guaranteed shelf life, warehouse storage</span><span lang="ru">Гарантийный срок хранения в складских условиях</span></span></td><td class="val">5.5 y</td><td class="val">—</td></tr>
+      <tr><td><span class="t"><span lang="ja">周囲温度</span><span lang="en">Ambient temperature</span><span lang="ru">Температура окружающей среды</span></span></td><td class="val" data-label="ЧТУ 10.306-57">−70 … +90 °C</td><td class="val" data-label="ЩА3.340.056 ТУ1">−70 … +90 °C</td></tr>
+      <tr><td><span class="t"><span lang="ja">相対湿度（+15〜25 °C）</span><span lang="en">Relative humidity at +15 … 25 °C</span><span lang="ru">Относительная влажность при +15 … 25 °C</span></span></td><td class="val" data-label="ЧТУ 10.306-57">95 … 98 %</td><td class="val na" data-label="ЩА3.340.056 ТУ1">—</td></tr>
+      <tr><td><span class="t"><span lang="ja">周囲気圧の下限</span><span lang="en">Minimum ambient pressure</span><span lang="ru">Наименьшее давление окружающей среды</span></span></td><td class="val" data-label="ЧТУ 10.306-57">5 mmHg</td><td class="val na" data-label="ЩА3.340.056 ТУ1">—</td></tr>
+      <tr><td><span class="t"><span lang="ja">振動（周波数）</span><span lang="en">Vibration, frequency</span><span lang="ru">Виброустойчивость / вибропрочность, частота</span></span></td><td class="val" data-label="ЧТУ 10.306-57">50 Hz</td><td class="val" data-label="ЩА3.340.056 ТУ1">50 Hz</td></tr>
+      <tr><td><span class="t"><span lang="ja">振動（加速度）</span><span lang="en">Vibration, acceleration</span><span lang="ru">Ускорение</span></span></td><td class="val" data-label="ЧТУ 10.306-57">10 … 12 g</td><td class="val" data-label="ЩА3.340.056 ТУ1">10 g</td></tr>
+      <tr><td><span class="t"><span lang="ja">定常加速度</span><span lang="en">Constant acceleration</span><span lang="ru">Линейные нагрузки</span></span></td><td class="val" data-label="ЧТУ 10.306-57">100 g</td><td class="val na" data-label="ЩА3.340.056 ТУ1">—</td></tr>
+      <tr><td><span class="t"><span lang="ja">単発衝撃</span><span lang="en">Single shock</span><span lang="ru">Одиночные ударные нагрузки</span></span></td><td class="val" data-label="ЧТУ 10.306-57">500 g</td><td class="val na" data-label="ЩА3.340.056 ТУ1">—</td></tr>
+      <tr><td><span class="t"><span lang="ja">倉庫保管での保証期間</span><span lang="en">Guaranteed shelf life, warehouse storage</span><span lang="ru">Гарантийный срок хранения в складских условиях</span></span></td><td class="val" data-label="ЧТУ 10.306-57">5.5 y</td><td class="val na" data-label="ЩА3.340.056 ТУ1">—</td></tr>
     </tbody>
   </table>
 </div>
@@ -493,6 +523,7 @@ footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: 
 <div class="p"><span class="t"><span lang="ja">ここで抑えるのは、電源リップル、商用電源のハム、無線モジュールからの飛び込みといった外から入る雑音である。放電そのものが生む雑音は乱数源なので残す。外来雑音は周期性があるため、乱数の偏りや相関の原因になる。</span><span lang="en">The aim is to suppress interference that enters from outside: supply ripple, mains hum and pickup from the radio module. The discharge's own noise is the entropy source, so it stays. External interference is periodic and shows up as bias and correlation in the random bits.</span><span lang="ru">Задача — подавить помехи извне: пульсации питания, сетевой фон и наводки от радиомодуля. Собственный шум разряда служит источником энтропии и сохраняется. Внешние помехи периодичны и проявляются как смещение и корреляция случайных битов.</span></span></div>
 
 <p class="cap"><span class="t"><span lang="ja">図 8　推奨する駆動回路の構成</span><span lang="en">Fig. 8　Recommended drive architecture</span><span lang="ru">Рис. 8　Рекомендуемая структура питания и регистрации</span></span></p>
+<div class="flow" id="flow"></div>
 <div class="diagram" role="img" aria-label="Recommended drive block diagram">
   <svg viewBox="0 0 1060 470" id="blockdiag">
     <defs>
@@ -948,12 +979,51 @@ footer { max-width: 920px; margin: 0 auto; padding: 26px 28px 40px; text-align: 
     document.getElementById("lbl-iso").textContent = ISO[L];
   }
 
+  var FLOWS = [
+    { ja: "陽極", en: "Anode", ru: "Анод", steps: [0, 1, 2, "A1 (1)"] },
+    { ja: "ヒーター", en: "Heater", ru: "Накал", steps: [0, 4, "H (2, 5)"] },
+    { ja: "グリッド", en: "Grid", ru: "Сетка", steps: [8, 3, "G (3)"] },
+    { ja: "アナログ方式の信号", en: "Analog-mode signal", ru: "Сигнал (аналоговый режим)", steps: ["A1 (1)", 5, 7, 8] },
+    { ja: "パルス方式の信号", en: "Pulse-mode signal", ru: "Сигнал (импульсный режим)", steps: ["K (4)", 6, 7, 8] }
+  ];
+  var FLOW_NOTE = {
+    ja: "マイコンからの制御（グリッドバイアスの DAC、陽極電源のインターロック、ヒーター電流の監視）もアイソレータを経由する。",
+    en: "Control from the MCU (grid-bias DAC, anode interlock, heater-current monitoring) also passes through the isolator.",
+    ru: "Управление от МК (ЦАП смещения сетки, блокировка анодного питания, контроль тока накала) также идёт через изолятор."
+  };
+
+  function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+  function drawFlow(lang) {
+    var L = lang === "all" ? "ja" : lang;
+    var host = document.getElementById("flow");
+    if (!host) return;
+    var h = "";
+    FLOWS.forEach(function (f) {
+      h += "<div class=\"flow-chain\"><div class=\"flow-h\">" + esc(f[L]) + (lang === "all" ? " / " + esc(f.en) + " / " + esc(f.ru) : "") + "</div><div class=\"flow-steps\">";
+      f.steps.forEach(function (st, i) {
+        if (i) h += "<span class=\"flow-arrow\" aria-hidden=\"true\">→</span>";
+        if (typeof st === "string") {
+          h += "<span class=\"flow-step tube\">ТГ1Б<small>" + esc(st) + "</small></span>";
+        } else {
+          var b = BLOCKS[st];
+          var part = b.part || "ISO7741 / 6N137";
+          h += "<span class=\"flow-step\">" + esc(b[L]) + "<small>" + esc(part) + "</small></span>";
+        }
+      });
+      h += "</div></div>";
+    });
+    h += "<p class=\"flow-note\">" + esc(FLOW_NOTE[L]) + "</p>";
+    host.innerHTML = h;
+  }
+
   var buttons = Array.prototype.slice.call(document.querySelectorAll(".langs button"));
   function setLang(lang) {
     document.getElementById("sheet").setAttribute("data-lang", lang);
     buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === lang)); });
     document.documentElement.setAttribute("lang", lang === "all" ? "ja" : lang);
     drawBlocks(lang);
+    drawFlow(lang);
     try { localStorage.setItem("tg1b-lang", lang); } catch (e) {}
   }
   buttons.forEach(function (b) { b.addEventListener("click", function () { setLang(b.getAttribute("data-lang")); }); });
