@@ -197,10 +197,12 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 <tr><td>上面のバネ爪</td><td class="num">中心 X ±3.7、幅 1.35、Y 0.7〜7.6</td><td class="c ok">実測</td></tr>
 <tr><td>側面の窓</td><td class="num">Y 2.8〜5.8、Z 2.0〜5.3</td><td class="c ok">実測</td></tr>
 <tr><td>信号ピン列の内側の間隔（前列と後列の間）</td><td class="num">1.5（1円硬貨がわずかにきつく挟まる<sup class="fn"><a href="#n4">*4</a></sup>）</td><td class="c ok">実測</td></tr>
-<tr><td>信号ピンの断面</td><td class="num">約 0.5（列ピッチ 2.0 − 内側の間隔 1.5）</td><td class="c ng">推定</td></tr>
+<tr><td>信号ピン根元の幅（差し込み口方向から見た幅）</td><td class="num">0.916（ノギス。測定誤差を含む）</td><td class="c ok">実測</td></tr>
+<tr><td>信号ピン先端の断面</td><td class="num">約 0.5（列ピッチ 2.0 − 内側の間隔 1.5）</td><td class="c ng">推定</td></tr>
 <tr><td>信号ピンの突出長</td><td class="num">2.8</td><td class="c ng">推定</td></tr>
 <tr><td>固定脚の突出長</td><td class="num">2.8</td><td class="c ng">推定</td></tr>
 </table></div>
+<p class="note">信号ピンは根元が幅広で、基板に入る先端側が細い。正面写真では本体の下面より下のピンの幅は約0.5 mmで、根元の幅広部分は本体の中（Z 1.3 より上）に収まっている。基板の穴寸法は先端側の断面で決める。</p>
 <p class="note">「実測」は定規を添えた写真からの読み取りで、誤差は ±0.2〜0.3 mm 程度を見込む。「推定」は写真の見え方や他の寸法から推し量った値である。</p>
 
 <h2 id="s4">第4　接点配置と信号</h2>
@@ -292,7 +294,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 
 <p class="cap">穴寸法の条件（mm）</p>
 <form class="params" id="pwb-params" autocomplete="off">
-  <label for="p-pinA">信号ピン断面（角）<input id="p-pinA" type="number" step="0.05" min="0.2" max="1.0" value="0.50"></label>
+  <label for="p-pinA">信号ピン先端の断面（角）<input id="p-pinA" type="number" step="0.05" min="0.2" max="1.0" value="0.50"></label>
   <label for="p-pinTol">断面の誤差（＋側）<input id="p-pinTol" type="number" step="0.05" min="0" max="0.5" value="0.10"></label>
   <label for="p-pinPos">ピン相対位置の誤差 ±<input id="p-pinPos" type="number" step="0.05" min="0" max="0.5" value="0.10"></label>
   <label for="p-legT">固定脚の板厚<input id="p-legT" type="number" step="0.05" min="0.1" max="1.0" value="0.30"></label>
@@ -309,7 +311,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
   <label for="p-protrude">筐体外面からの突出量<input id="p-protrude" type="number" step="0.1" min="-8.0" max="6.0" value="0.0"></label>
   <label class="chk" for="p-cutFrontLegs"><input id="p-cutFrontLegs" type="checkbox">前側の固定脚を切って使う</label>
 </form>
-<p class="note">突出量は、嵌合面が筐体の外面より外に出る量で、内側に引っ込める場合は負の値を入れる。信号ピン断面の初期値0.5 mmは、ピン列の内側の間隔（1円硬貨の厚さ1.5 mm）と列ピッチ2.0 mmの差から求めた。ほかの初期値は本書の推定寸法による。ノギスで測った値に書き換えると、下の図・表・ガーバーデータがすべて更新される。</p>
+<p class="note">突出量は、嵌合面が筐体の外面より外に出る量で、内側に引っ込める場合は負の値を入れる。信号ピン先端の断面の初期値0.5 mmは、ピン列の内側の間隔（1円硬貨の厚さ1.5 mm）と列ピッチ2.0 mmの差から求めた。ピンの根元は幅0.916 mmと太いが、本体の中に収まり基板の穴には入らないため、穴寸法の計算には使わない。ほかの初期値は本書の推定寸法による。ノギスで測った値に書き換えると、下の図・表・ガーバーデータがすべて更新される。</p>
 
 <p class="cap">穴寸法の求め方（0.05 mm単位で切り上げ）</p>
 <ul class="formula">

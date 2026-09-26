@@ -58,6 +58,8 @@ PIN_PITCH = 2.0
 PIN_ROW_FRONT = 10.2
 PIN_ROW_REAR = 12.2
 PIN_SIZE = 0.5
+PIN_ROOT_W = 0.916
+PIN_ROOT_Z0 = 1.3
 PIN_LEN = 2.8
 PIN_EXIT_Z = 4.7
 SLOT_W = 1.0
@@ -172,7 +174,9 @@ def make_contacts():
         c = c.union(lower).union(lbump.edges("|X").fillet(0.15))
         pf = box(x - PIN_SIZE / 2, x + PIN_SIZE / 2, PIN_ROW_FRONT - PIN_SIZE / 2, PIN_ROW_FRONT + PIN_SIZE / 2, -PIN_LEN, SLOT_Z + 0.01)
         pr = box(x - PIN_SIZE / 2, x + PIN_SIZE / 2, PIN_ROW_REAR - PIN_SIZE / 2, PIN_ROW_REAR + PIN_SIZE / 2, -PIN_LEN, PIN_EXIT_Z + PIN_SIZE / 2)
-        stub = box(x - PIN_SIZE / 2, x + PIN_SIZE / 2, D - GROOVE_D - 0.01, PIN_ROW_REAR + PIN_SIZE / 2, PIN_EXIT_Z - PIN_SIZE / 2, PIN_EXIT_Z + PIN_SIZE / 2)
+        stub = box(x - PIN_ROOT_W / 2, x + PIN_ROOT_W / 2, D - GROOVE_D - 0.01, PIN_ROW_REAR + PIN_SIZE / 2, PIN_EXIT_Z - PIN_SIZE / 2, PIN_EXIT_Z + PIN_SIZE / 2)
+        root = box(x - PIN_ROOT_W / 2, x + PIN_ROOT_W / 2, PIN_ROW_REAR - PIN_SIZE / 2, PIN_ROW_REAR + PIN_SIZE / 2, PIN_ROOT_Z0, PIN_EXIT_Z + PIN_SIZE / 2)
+        stub = stub.union(root)
         for p in (pf, pr):
             c = c.union(p.faces("<Z").edges().chamfer(0.1))
         c = c.union(stub)
