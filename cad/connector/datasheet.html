@@ -159,7 +159,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
   <li>基板へはスルーホールで実装する。信号ピンは6本（2列×3本、ピッチ2.0 mm）、シェルの固定脚は4本（片側2本）である。</li>
   <li>信号はI2C（SCL・SDA）、電源（3.3 V）、接続検出（Sense）、GNDで構成される<sup class="fn"><a href="#n1">*1</a></sup>。</li>
   <li>基板ピンと接点番号の対応、ピンと固定脚の突出長は確認できていない（第8参照）。</li>
-  <li>寸法の測定誤差を穴で吸収する評価用基板を設計し、ガーバーデータをこのページから生成できるようにした（第6）。</li>
+  <li>寸法の測定誤差を穴で吸収し、M3ネジで筐体に固定できる評価用基板を設計した。筐体の壁厚などを入力すると配置が求め直され、ガーバーデータをこのページから生成できる（第6）。</li>
 </ol>
 </div>
 
@@ -218,7 +218,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 <p class="note">番号・名称・機能は出典<sup class="fn"><a href="#n1">*1</a></sup>による。出典の写真はU字凸を上にして撮影されているため、本書ではこれを180°回転し、U字凸を下にした向きにそろえている。</p>
 
 <h2 id="s5">第5　推奨基板パターン</h2>
-<p>基板の部品面から見た配置を示す。穴寸法は、第6の設計式に初期値を入れて求めたもので、寸法の測定誤差を吸収する大きさにしてある。嵌合面を筐体の外に出して使う場合を考え、コネクタの前端を基板端から張り出させる配置を推奨する。図5では基板端を Y = 2.0（張り出し 2.0 mm）とした。張り出せる量は、前側の固定脚のランドと基板端との間隔（0.3 mm 以上）で決まり、本パターンでは最大 2.6 mm である。</p>
+<p>基板の部品面から見た配置を示す。穴寸法は、第6の設計式に初期値を入れて求めたもので、寸法の測定誤差を吸収する大きさにしてある。嵌合面を筐体の外に出して使う場合を考え、コネクタの前端を基板端から張り出させる配置を推奨する。図5では基板端を Y = 2.0（張り出し 2.0 mm）とした。張り出せる量は、前側の固定脚のランドと基板端との間隔（0.3 mm 以上）で決まり、本パターンでは最大 2.6 mm である。筐体の壁厚が厚いなどでこれを超える場合は、前側の固定脚を切り、後側の脚とネジで固定する。筐体との位置関係から張り出し量と筐体の穴寸法を求める計算は、第6の入力欄で行える。</p>
 <p>前端には幅方向に片側0.7 mmのフランジがある。嵌合面を筐体の外まで出す場合、筐体の穴はフランジを含めた幅 14.2 mm 以上が必要になる。フランジを筐体の内側に当てて位置決めする場合は、穴を本体（12.8 × 7.8 mm）よりわずかに大きくし、フランジが通らない大きさにする。</p>
 <p class="cap">図5　推奨基板パターン（部品面から見る。下が前面）</p>
 <figure class="dwg"><svg viewBox="0 0 450 435" role="img" aria-label="推奨基板パターン" style="max-width:450px"><defs><marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1.5 L9,5 L0,8.5 z" class="arh"/></marker></defs><polygon class="ln out" points="84.0,355.6 365.6,355.6 365.6,74.0 84.0,74.0"/><line class="pcb" x1="44.4" y1="355.6" x2="405.2" y2="355.6"/><text class="tx sm" x="44.4" y="371.6" text-anchor="start">嵌合面(Y=0)</text><line class="edge" x1="44.4" y1="311.6" x2="405.2" y2="311.6"/><text class="tx sm" x="44.4" y="326.6" text-anchor="start">基板端の例(Y=2.0)</text><circle class="pad" cx="180.8" cy="131.2" r="17.1"/><circle class="hole" cx="180.8" cy="131.2" r="11.6"/><circle class="pad" cx="180.8" cy="87.2" r="17.1"/><circle class="hole" cx="180.8" cy="87.2" r="11.6"/><circle class="pad" cx="224.8" cy="131.2" r="17.1"/><circle class="hole" cx="224.8" cy="131.2" r="11.6"/><circle class="pad" cx="224.8" cy="87.2" r="17.1"/><circle class="hole" cx="224.8" cy="87.2" r="11.6"/><circle class="pad" cx="268.8" cy="131.2" r="17.1"/><circle class="hole" cx="268.8" cy="131.2" r="11.6"/><circle class="pad" cx="268.8" cy="87.2" r="17.1"/><circle class="hole" cx="268.8" cy="87.2" r="11.6"/><text class="tx sm" x="180.8" y="162.2" text-anchor="middle">F1</text><text class="tx sm" x="224.8" y="162.2" text-anchor="middle">F2</text><text class="tx sm" x="268.8" y="162.2" text-anchor="middle">F3</text><text class="tx sm" x="180.8" y="66.2" text-anchor="middle">R1</text><text class="tx sm" x="224.8" y="66.2" text-anchor="middle">R2</text><text class="tx sm" x="268.8" y="66.2" text-anchor="middle">R3</text><polygon class="pad" points="71.9,276.6 72.4,280.5 73.9,284.2 76.3,287.4 79.5,289.8 83.2,291.3 87.1,291.8 87.5,291.8 91.4,291.3 95.1,289.8 98.3,287.4 100.7,284.2 102.2,280.5 102.7,276.6 102.7,241.0 102.2,237.1 100.7,233.4 98.3,230.2 95.1,227.8 91.4,226.3 87.5,225.8 87.1,225.8 83.2,226.3 79.5,227.8 76.3,230.2 73.9,233.4 72.4,237.1 71.9,241.0"/><polygon class="hole" points="78.5,276.6 78.8,278.8 79.6,280.9 81.0,282.7 82.8,284.1 84.9,284.9 87.1,285.2 87.5,285.2 89.7,284.9 91.8,284.1 93.6,282.7 95.0,280.9 95.8,278.8 96.1,276.6 96.1,241.0 95.8,238.8 95.0,236.7 93.6,234.9 91.8,233.5 89.7,232.7 87.5,232.4 87.1,232.4 84.9,232.7 82.8,233.5 81.0,234.9 79.6,236.7 78.8,238.8 78.5,241.0"/><polygon class="pad" points="71.9,155.6 72.4,159.5 73.9,163.2 76.3,166.4 79.5,168.8 83.2,170.3 87.1,170.8 87.5,170.8 91.4,170.3 95.1,168.8 98.3,166.4 100.7,163.2 102.2,159.5 102.7,155.6 102.7,120.0 102.2,116.1 100.7,112.4 98.3,109.2 95.1,106.8 91.4,105.3 87.5,104.8 87.1,104.8 83.2,105.3 79.5,106.8 76.3,109.2 73.9,112.4 72.4,116.1 71.9,120.0"/><polygon class="hole" points="78.5,155.6 78.8,157.8 79.6,159.9 81.0,161.7 82.8,163.1 84.9,163.9 87.1,164.2 87.5,164.2 89.7,163.9 91.8,163.1 93.6,161.7 95.0,159.9 95.8,157.8 96.1,155.6 96.1,120.0 95.8,117.8 95.0,115.7 93.6,113.9 91.8,112.5 89.7,111.7 87.5,111.4 87.1,111.4 84.9,111.7 82.8,112.5 81.0,113.9 79.6,115.7 78.8,117.8 78.5,120.0"/><polygon class="pad" points="346.9,276.6 347.4,280.5 348.9,284.2 351.3,287.4 354.5,289.8 358.2,291.3 362.1,291.8 362.5,291.8 366.4,291.3 370.1,289.8 373.3,287.4 375.7,284.2 377.2,280.5 377.7,276.6 377.7,241.0 377.2,237.1 375.7,233.4 373.3,230.2 370.1,227.8 366.4,226.3 362.5,225.8 362.1,225.8 358.2,226.3 354.5,227.8 351.3,230.2 348.9,233.4 347.4,237.1 346.9,241.0"/><polygon class="hole" points="353.5,276.6 353.8,278.8 354.6,280.9 356.0,282.7 357.8,284.1 359.9,284.9 362.1,285.2 362.5,285.2 364.7,284.9 366.8,284.1 368.6,282.7 370.0,280.9 370.8,278.8 371.1,276.6 371.1,241.0 370.8,238.8 370.0,236.7 368.6,234.9 366.8,233.5 364.7,232.7 362.5,232.4 362.1,232.4 359.9,232.7 357.8,233.5 356.0,234.9 354.6,236.7 353.8,238.8 353.5,241.0"/><polygon class="pad" points="346.9,155.6 347.4,159.5 348.9,163.2 351.3,166.4 354.5,168.8 358.2,170.3 362.1,170.8 362.5,170.8 366.4,170.3 370.1,168.8 373.3,166.4 375.7,163.2 377.2,159.5 377.7,155.6 377.7,120.0 377.2,116.1 375.7,112.4 373.3,109.2 370.1,106.8 366.4,105.3 362.5,104.8 362.1,104.8 358.2,105.3 354.5,106.8 351.3,109.2 348.9,112.4 347.4,116.1 346.9,120.0"/><polygon class="hole" points="353.5,155.6 353.8,157.8 354.6,159.9 356.0,161.7 357.8,163.1 359.9,163.9 362.1,164.2 362.5,164.2 364.7,163.9 366.8,163.1 368.6,161.7 370.0,159.9 370.8,157.8 371.1,155.6 371.1,120.0 370.8,117.8 370.0,115.7 368.6,113.9 366.8,112.5 364.7,111.7 362.5,111.4 362.1,111.4 359.9,111.7 357.8,112.5 356.0,113.9 354.6,115.7 353.8,117.8 353.5,120.0"/><line class="org" x1="211.6" y1="355.6" x2="238.0" y2="355.6"/><line class="org" x1="224.8" y1="368.8" x2="224.8" y2="342.4"/><text class="tx sm" x="224.8" y="347.6" text-anchor="middle">原点</text><line class="ext" x1="180.8" y1="87.2" x2="180.8" y2="41.6"/><line class="ext" x1="268.8" y1="87.2" x2="268.8" y2="41.6"/><line class="dim" x1="180.8" y1="47.6" x2="268.8" y2="47.6" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="224.8" y="41.6" text-anchor="middle">2.0 × 2</text><line class="ext" x1="362.3" y1="258.8" x2="402.4" y2="258.8"/><line class="ext" x1="362.3" y1="355.6" x2="402.4" y2="355.6"/><line class="dim" x1="396.4" y1="258.8" x2="396.4" y2="355.6" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="411.4" y="307.2" text-anchor="middle" transform="rotate(-90 411.4 307.2)">4.4</text><line class="ext" x1="87.3" y1="258.8" x2="87.3" y2="388.0"/><line class="ext" x1="362.3" y1="258.8" x2="362.3" y2="388.0"/><line class="dim" x1="87.3" y1="382.0" x2="362.3" y2="382.0" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="224.8" y="397.0" text-anchor="middle">12.5</text><line class="ext" x1="180.8" y1="87.2" x2="124.2" y2="87.2"/><line class="ext" x1="180.8" y1="131.2" x2="124.2" y2="131.2"/><line class="dim" x1="130.2" y1="87.2" x2="130.2" y2="131.2" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="123.2" y="109.2" text-anchor="middle" transform="rotate(-90 123.2 109.2)">2.0</text><line class="ext" x1="268.8" y1="131.2" x2="332.0" y2="131.2"/><line class="ext" x1="268.8" y1="355.6" x2="332.0" y2="355.6"/><line class="dim" x1="326.0" y1="131.2" x2="326.0" y2="355.6" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="341.0" y="243.4" text-anchor="middle" transform="rotate(-90 341.0 243.4)">10.2</text><line class="ext" x1="87.3" y1="137.8" x2="45.0" y2="137.8"/><line class="ext" x1="87.3" y1="258.8" x2="45.0" y2="258.8"/><line class="dim" x1="51.0" y1="137.8" x2="51.0" y2="258.8" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="44.0" y="198.3" text-anchor="middle" transform="rotate(-90 44.0 198.3)">5.5</text></svg></figure>
@@ -240,6 +240,9 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 }
 .params input:focus-visible, .btn:focus-visible, .seg button:focus-visible, select:focus-visible { outline: 3px solid var(--iris); outline-offset: 2px; }
 .params fieldset { border: 0; margin: 0; padding: 0; display: contents; }
+.params .sub { grid-column: 1 / -1; margin: 0.4em 0 -0.2em; font: 700 13.5px var(--gothic); color: var(--iris); }
+.params label.chk { justify-content: flex-start; }
+.params label.chk input { width: auto; accent-color: var(--iris); }
 .formula { font-family: var(--gothic); font-size: 13.5px; line-height: 1.9; margin: 0.2em 0 0.8em; padding-left: 1.2em; }
 .formula b { color: var(--iris); font-variant-numeric: tabular-nums; }
 .drc { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-family: var(--gothic); font-size: 14px; margin: 0.8em 0 0.4em; }
@@ -272,14 +275,16 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 </style>
 
 <h2 id="s6">第6　評価用ブレークアウト基板</h2>
-<p>本コネクタを実装して、6本の信号とシールドを2.54 mmピッチのピンヘッダに引き出す評価用の基板である。導通の確認や試作の配線に使う。寸法の多くが写真からの読み取りで誤差を含むため、穴の大きさで誤差を吸収する設計にした。また、嵌合面を筐体の外に出して使えるよう、コネクタの前端を基板端から張り出させている。</p>
+<p>本コネクタを実装して、6本の信号とシールドを2.54 mmピッチのピンヘッダに引き出す評価用の基板である。導通の確認や試作の配線に使う。寸法の多くが写真からの読み取りで誤差を含むため、穴の大きさで誤差を吸収する設計にした。また、嵌合面を筐体の外に出して使えるよう、コネクタの前端を基板端から張り出させ、M3ネジで筐体に固定する穴を設けている。</p>
 <div class="box">
 <p><b>設計方針</b></p>
 <ol>
   <li>コネクタ全体の位置は基板上で自由に決められる。吸収すべきなのは、部品の中での寸法同士のずれである。そこで、信号ピン6本の相対位置を基準にする。</li>
   <li>信号ピンの穴は丸穴とする。ピンがわずかにねじれていても入るよう、ピン断面の対角寸法から穴径を決める。</li>
   <li>固定脚の穴は奥行方向に長いスロット穴とする。脚の位置には奥行方向の測定誤差が最も大きく含まれるため、スロットの長さで吸収する。</li>
-  <li>コネクタの前端は基板端から張り出させる（初期値 2.0 mm）。張り出せる量は、前側の固定脚のランドと基板端との間隔で決まり、初期値の穴寸法では最大 2.6 mm である。</li>
+  <li>コネクタ前端の張り出し量は、基板端と筐体内壁の間隔、筐体の壁厚、筐体外面からの嵌合面の突出量の和で決める（初期値 0.5 ＋ 1.5 ＋ 0 ＝ 2.0 mm）。</li>
+  <li>前側の固定脚のランドと基板端の間隔は 0.3 mm 以上必要なため、前側の脚を使う場合の張り出しは初期値の穴寸法で最大 2.6 mm である。これを超える場合は前側の固定脚を切り、後側の脚とM3ネジで固定する。この場合の上限は、はんだ面の配線で決まり約 6.3 mm である。</li>
+  <li>M3ネジ用の取付穴（φ3.2、非めっき）を、ピンヘッダの後方に2か所設ける。ネジ頭やワッシャが配線・ランドに触れないよう、穴の中心から半径 3.0 mm を銅箔の禁止範囲とし、設計ルール確認の対象に含める。</li>
   <li>信号の記号F1〜F3（前列）、R1〜R3（後列）は、接点番号との対応が分かるまでの仮の名前である。シールドはSHとしてヘッダの端に出す。</li>
 </ol>
 </div>
@@ -297,15 +302,21 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
   <label for="p-drillTol">穴あけ公差<input id="p-drillTol" type="number" step="0.05" min="0" max="0.3" value="0.10"></label>
   <label for="p-ring">信号ランドの幅（片側）<input id="p-ring" type="number" step="0.05" min="0.15" max="0.6" value="0.25"></label>
   <label for="p-legRing">固定脚ランドの幅（片側）<input id="p-legRing" type="number" step="0.05" min="0.15" max="0.6" value="0.30"></label>
-  <label for="p-overhang">基板端からの張り出し<input id="p-overhang" type="number" step="0.1" min="0" max="4.0" value="2.0"></label>
+  <p class="sub">筐体との位置関係</p>
+  <label for="p-gap">基板端と筐体内壁の間隔<input id="p-gap" type="number" step="0.1" min="0" max="5.0" value="0.5"></label>
+  <label for="p-wall">筐体の壁厚<input id="p-wall" type="number" step="0.1" min="0" max="6.0" value="1.5"></label>
+  <label for="p-protrude">筐体外面からの突出量<input id="p-protrude" type="number" step="0.1" min="-8.0" max="6.0" value="0.0"></label>
+  <label class="chk" for="p-cutFrontLegs"><input id="p-cutFrontLegs" type="checkbox">前側の固定脚を切って使う</label>
 </form>
-<p class="note">初期値は本書の推定寸法による。ノギスで測った値に書き換えると、下の図・表・ガーバーデータがすべて更新される。</p>
+<p class="note">突出量は、嵌合面が筐体の外面より外に出る量で、内側に引っ込める場合は負の値を入れる。初期値は本書の推定寸法による。ノギスで測った値に書き換えると、下の図・表・ガーバーデータがすべて更新される。</p>
 
 <p class="cap">穴寸法の求め方（0.05 mm単位で切り上げ）</p>
 <ul class="formula">
   <li>信号ピン穴径 ＝（断面＋誤差）× √2 ＋ 2 × 相対位置誤差 ＋ 穴あけ公差 ＝ <b id="f-sig">―</b></li>
   <li>固定脚スロット幅 ＝（板厚＋誤差）＋ 2 × 位置誤差（幅方向）＋ 穴あけ公差 ＝ <b id="f-legw">―</b></li>
   <li>固定脚スロット長 ＝（脚幅＋誤差）＋ 2 × 位置誤差（奥行方向）＋ 穴あけ公差 ＝ <b id="f-legl">―</b></li>
+  <li>基板端からの張り出し ＝ 基板端と筐体内壁の間隔 ＋ 壁厚 ＋ 突出量 ＝ <b id="f-over">―</b></li>
+  <li>筐体の穴（推奨）＝ <b id="f-hole">―</b></li>
 </ul>
 
 <div class="drc" aria-live="polite">
@@ -319,7 +330,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     <button type="button" id="v-top" data-layer="T" aria-pressed="false">部品面</button>
     <button type="button" id="v-bot" data-layer="B" aria-pressed="false">はんだ面（透視）</button>
   </div></div>
-  <svg id="pwb-svg" viewBox="-12 -24.5 25 27.5" role="img" aria-label="ブレークアウト基板の配置図"></svg>
+  <svg id="pwb-svg" viewBox="-12.5 -30 26 34" role="img" aria-label="ブレークアウト基板の配置図"></svg>
   <div class="legend">
     <span><i style="background:#3a2a7a"></i>基板（レジスト）</span>
     <span><i style="background:#e0b24a"></i>ランド</span>
@@ -328,6 +339,8 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     <span><i style="background:#ffffff;border:1px solid var(--rule)"></i>シルク</span>
     <span><i style="background:transparent;border:1.5px dashed var(--sun)"></i>コネクタ外形</span>
     <span><i style="background:rgba(250,180,0,0.3)"></i>基板から張り出す部分</span>
+    <span><i style="background:transparent;border:1.5px dashed #e07a6a"></i>M3取付穴の銅箔禁止範囲</span>
+    <span><i style="background:repeating-linear-gradient(135deg,#7054a0 0 2px,transparent 2px 5px)"></i>筐体の壁</span>
   </div>
 </div>
 
@@ -339,6 +352,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 <tr><td>配線幅</td><td class="num">0.30 mm</td></tr>
 <tr><td>最小間隔</td><td class="num" id="spec-gap">―</td></tr>
 <tr><td>ピンヘッダ</td><td>2.54 mmピッチ 7ピン（F2・F1・R1・R2・R3・F3・SH）、穴 φ1.0、ランド φ1.7</td></tr>
+<tr><td>取付穴</td><td>M3ネジ用 φ3.2（非めっき）2か所、中心 (±6.3, 24.0)。銅箔禁止 半径 3.0 mm。ピンと固定脚が基板裏へ約1.2 mm出るため、スペーサは高さ 3 mm 以上を使う</td></tr>
 <tr><td>スロット穴</td><td>ドリルデータに含む（G00・M15・G01・M16による切削指定）</td></tr>
 </table></div>
 
@@ -360,16 +374,19 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
   </div>
   <pre id="file-pre"></pre>
 </details>
-<p class="note">ZIPには、部品面・はんだ面の銅箔、両面のレジスト、部品面のシルク、外形、穴（スロットを含む）の7ファイルが入る。発注前に、発注先のビューアで穴とスロットが正しく読み込まれていることを確認すること。スロット穴の指定方法は発注先によって異なる場合がある。</p>
+<p class="note">ZIPには、部品面・はんだ面の銅箔、両面のレジスト、部品面のシルク、外形、めっき穴（スロットを含む）、非めっき穴の8ファイルが入る。発注前に、発注先のビューアで穴とスロットが正しく読み込まれていることを確認すること。スロット穴の指定方法は発注先によって異なる場合がある。</p>
 
 <script>
 (function (root) {
   const DEFAULTS = {
     pinA: 0.40, pinTol: 0.10, pinPos: 0.10,
     legT: 0.30, legW: 1.40, legTol: 0.10, legPosX: 0.15, legPosY: 0.40,
-    drillTol: 0.10, ring: 0.25, legRing: 0.30, overhang: 2.0,
+    drillTol: 0.10, ring: 0.25, legRing: 0.30,
+    gap: 0.5, wall: 1.5, protrude: 0.0, cutFrontLegs: false,
   };
-  const BOARD = { x0: -10, x1: 10, y1: 21.5, thick: 1.6 };
+  const BOARD = { x0: -10, x1: 10, y1: 27.5, thick: 1.6 };
+  const MOUNTS = [[-6.3, 24.0], [6.3, 24.0]];
+  const M3 = { hole: 3.2, keep: 3.0, silk: 2.9, mask: 3.4 };
   const HDR_Y = 18.8;
   const HDR = [["F2", -7.62], ["F1", -5.08], ["R1", -2.54], ["R2", 0], ["R3", 2.54], ["F3", 5.08], ["SH", 7.62]];
   const TRACE_W = 0.3;
@@ -387,7 +404,9 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
       sigHole: r3(sigHole), sigPad: r3(sigHole + 2 * p.ring),
       legSlotW: r3(legSlotW), legSlotL: r3(legSlotL),
       legPadW: r3(legSlotW + 2 * p.legRing), legPadL: r3(legSlotL + 2 * p.legRing),
-      hdrHole: 1.0, hdrPad: 1.7, overhang: r3(p.overhang),
+      hdrHole: 1.0, hdrPad: 1.7,
+      overhang: r3(p.gap + p.wall + p.protrude), gap: p.gap, wall: p.wall, protrude: p.protrude,
+      cutFrontLegs: !!p.cutFrontLegs,
     };
   }
 
@@ -395,7 +414,8 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     const pads = [];
     for (const [n, x] of [["F1", -2], ["F2", 0], ["F3", 2]]) pads.push({ net: n, x, y: 10.2, w: d.sigPad, h: d.sigPad, hole: { d: d.sigHole } });
     for (const [n, x] of [["R1", -2], ["R2", 0], ["R3", 2]]) pads.push({ net: n, x, y: 12.2, w: d.sigPad, h: d.sigPad, hole: { d: d.sigHole } });
-    for (const x of [-6.25, 6.25]) for (const y of [4.4, 9.9]) {
+    const legYs = d.cutFrontLegs ? [9.9] : [4.4, 9.9];
+    for (const x of [-6.25, 6.25]) for (const y of legYs) {
       pads.push({ net: "SH", x, y, w: d.legPadW, h: d.legPadL, hole: { d: d.legSlotW, len: d.legSlotL } });
     }
     for (const [n, x] of HDR) pads.push({ net: n, x, y: HDR_Y, w: d.hdrPad, h: d.hdrPad, hole: { d: d.hdrHole }, hdr: true });
@@ -403,7 +423,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
       { net: "R1", layer: "T", pts: [[-2, 12.2], [-2, 17.2], [-2.54, 17.74], [-2.54, HDR_Y]] },
       { net: "R2", layer: "T", pts: [[0, 12.2], [0, HDR_Y]] },
       { net: "R3", layer: "T", pts: [[2, 12.2], [2, 17.2], [2.54, 17.74], [2.54, HDR_Y]] },
-      { net: "SH", layer: "T", pts: [[-6.25, 9.9], [-6.25, 4.4], [6.25, 4.4], [6.25, 9.9]] },
+      { net: "SH", layer: "T", pts: d.cutFrontLegs ? [[-6.25, 9.9], [-6.25, 8.0], [6.25, 8.0], [6.25, 9.9]] : [[-6.25, 9.9], [-6.25, 4.4], [6.25, 4.4], [6.25, 9.9]] },
       { net: "SH", layer: "T", pts: [[6.25, 9.9], [6.25, 16], [7.62, 17.37], [7.62, HDR_Y]] },
       { net: "F1", layer: "B", pts: [[-2, 10.2], [-2, 7.5], [-8.4, 7.5], [-8.4, 16], [-5.08, 17.4], [-5.08, HDR_Y]] },
       { net: "F2", layer: "B", pts: [[0, 10.2], [0, 6.8], [-9.2, 6.8], [-9.2, HDR_Y], [-7.62, HDR_Y]] },
@@ -411,7 +431,8 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     ];
     for (const t of traces) t.w = TRACE_W;
     const silk = silkLines(d);
-    return { pads, traces, silk, board: { ...BOARD, y0: d.overhang } };
+    const mounts = MOUNTS.map(([x, y]) => ({ x, y, ...M3 }));
+    return { pads, traces, silk, mounts, board: { ...BOARD, y0: d.overhang } };
   }
 
   const FONT = {
@@ -447,10 +468,10 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
   function silkLines(d) {
     const L = [];
     const gapHalf = d.legPadL / 2 + 0.25;
-    const cutY = [[4.4 - gapHalf, 4.4 + gapHalf], [9.9 - gapHalf, 9.9 + gapHalf]];
+    const cutY = (d.cutFrontLegs ? [9.9] : [4.4, 9.9]).map(y => [y - gapHalf, y + gapHalf]);
     for (const sx of [-1, 1]) {
       const x = sx * 6.55;
-      let y = d.overhang + 0.3;
+      let y = Math.max(d.overhang, 0) + 0.3;
       for (const [a, b] of cutY) {
         if (a > y) L.push([[x, y], [x, a]]);
         y = b;
@@ -459,8 +480,13 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     }
     L.push([[-6.55, 12.8], [-2.9, 12.8]], [[2.9, 12.8], [6.55, 12.8]]);
     for (const [n, x] of HDR) L.push(...text(n, x, HDR_Y + 1.25, 0.8, "middle"));
-    L.push(...text("WII EXT V0.2", 0, 14.3, 1.0, "middle"));
-    const e = d.overhang;
+    L.push(...text("WII EXT V0.3", 0, 14.3, 1.0, "middle"));
+    for (const [x, y] of MOUNTS) {
+      const ring = [];
+      for (let i = 0; i <= 48; i++) { const a = i / 48 * 2 * Math.PI; ring.push([x + M3.silk * Math.cos(a), y + M3.silk * Math.sin(a)]); }
+      L.push(ring);
+    }
+    const e = Math.max(d.overhang, 0);
     L.push([[-0.8, e + 1.5], [0, e + 0.9], [0.8, e + 1.5], [-0.8, e + 1.5]]);
     return L;
   }
@@ -473,6 +499,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
       for (const layer of ["T", "B"]) c.push({ net: p.net, layer, a: seg[0], b: seg[1], r, what: `${p.net}ランド` });
     }
     for (const t of lay.traces) for (let i = 1; i < t.pts.length; i++) c.push({ net: t.net, layer: t.layer, a: t.pts[i - 1], b: t.pts[i], r: t.w / 2, what: `${t.net}配線` });
+    for (const m of lay.mounts || []) for (const layer of ["T", "B"]) c.push({ net: "MH", layer, a: [m.x, m.y], b: [m.x, m.y], r: m.keep, what: "M3取付穴の禁止範囲" });
     return c;
   }
 
@@ -520,8 +547,8 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 
   function gerber(func, polarity, body, apertures) {
     const lines = [
-      "G04 Wii Remote extension connector breakout v0.2*",
-      "%TF.GenerationSoftware,AyameScience,ConnectorDatasheet,0.2*%",
+      "G04 Wii Remote extension connector breakout v0.3*",
+      "%TF.GenerationSoftware,AyameScience,ConnectorDatasheet,0.3*%",
       `%TF.FileFunction,${func}*%`,
       `%TF.FilePolarity,${polarity}*%`,
       "%FSLAX46Y46*%",
@@ -555,6 +582,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
   function mask(lay, func) {
     const ap = apertureSet(), body = [];
     for (const p of lay.pads) { body.push(`D${ap.get(padDef(p.w + 0.1, p.h + 0.1))}*`, `X${n6(p.x)}Y${n6(p.y)}D03*`); }
+    for (const m of lay.mounts || []) { body.push(`D${ap.get(`C,${m.mask.toFixed(6)}`)}*`, `X${n6(m.x)}Y${n6(m.y)}D03*`); }
     return gerber(func, "Negative", body, ap.list());
   }
 
@@ -576,7 +604,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     }
     const out = [
       "M48",
-      "; DRILL file Wii Remote extension connector breakout v0.2",
+      "; DRILL file Wii Remote extension connector breakout v0.3",
       "; #@! TF.FileFunction,Plated,1,2,PTH",
       "; FORMAT={-:-/ absolute / metric / decimal}",
       "FMAT,2",
@@ -598,13 +626,30 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     return out.join("\n") + "\n";
   }
 
+  function npth(lay) {
+    const ms = lay.mounts || [];
+    const out = [
+      "M48",
+      "; DRILL file Wii Remote extension connector breakout v0.3",
+      "; #@! TF.FileFunction,NonPlated,1,2,NPTH",
+      "; FORMAT={-:-/ absolute / metric / decimal}",
+      "FMAT,2",
+      "METRIC",
+    ];
+    if (ms.length) out.push(`T1C${f3(ms[0].hole)}`);
+    out.push("%", "G90", "G05");
+    if (ms.length) { out.push("T1"); for (const m of ms) out.push(`X${f3(m.x)}Y${f3(m.y)}`); }
+    out.push("M30");
+    return out.join("\n") + "\n";
+  }
+
   function outline(lay) {
     const b = lay.board;
     return lines([[[b.x0, b.y0], [b.x1, b.y0], [b.x1, b.y1], [b.x0, b.y1], [b.x0, b.y0]]], 0.1, "Profile,NP");
   }
 
   function files(lay) {
-    const base = "WiiExt_Breakout_v0.2";
+    const base = "WiiExt_Breakout_v0.3";
     return {
       [`${base}-F_Cu.gtl`]: copper(lay, "T", "Copper,L1,Top"),
       [`${base}-B_Cu.gbl`]: copper(lay, "B", "Copper,L2,Bot"),
@@ -613,6 +658,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
       [`${base}-F_Silkscreen.gto`]: lines(lay.silk, 0.15, "Legend,Top"),
       [`${base}-Edge_Cuts.gm1`]: outline(lay),
       [`${base}-PTH.drl`]: drill(lay),
+      [`${base}-NPTH.drl`]: npth(lay),
     };
   }
 
@@ -658,7 +704,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     return out;
   }
 
-  const api = { DEFAULTS, BOARD, HDR, TRACE_W, design, layout, drc, files, zip };
+  const api = { DEFAULTS, BOARD, HDR, TRACE_W, MOUNTS, M3, design, layout, drc, files, zip };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.PWB = api;
 })(typeof window !== "undefined" ? window : globalThis);
@@ -667,7 +713,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 <script>
 (function () {
   const P = window.PWB;
-  const ids = ["pinA", "pinTol", "pinPos", "legT", "legW", "legTol", "legPosX", "legPosY", "drillTol", "ring", "legRing", "overhang"];
+  const ids = ["pinA", "pinTol", "pinPos", "legT", "legW", "legTol", "legPosX", "legPosY", "drillTol", "ring", "legRing", "gap", "wall", "protrude"];
   const $ = id => document.getElementById(id);
   const f2 = v => v.toFixed(2);
   let current = null;
@@ -678,8 +724,9 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     const p = { ...P.DEFAULTS };
     for (const k of ids) {
       const v = parseFloat($("p-" + k).value);
-      if (Number.isFinite(v) && v >= 0) p[k] = v;
+      if (Number.isFinite(v) && (v >= 0 || k === "protrude")) p[k] = v;
     }
+    p.cutFrontLegs = $("p-cutFrontLegs").checked;
     return p;
   }
 
@@ -696,10 +743,29 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     return { x: x - w / 2, y: -(y + h / 2), width: w, height: h, rx: r, ry: r };
   }
 
-  function draw(lay) {
+  function enclosureHole(d) {
+    const inner = d.overhang - d.gap, outer = -d.protrude;
+    if (inner <= 0) return { w: 13.2, h: 8.2, text: "嵌合面が筐体の内側に収まる。穴はプラグが通る大きさでよい（参考 13.2 × 8.2 mm）" };
+    if (outer < 0.3) return { w: 14.6, h: 8.2, text: "幅 14.6 × 高さ 8.2 mm（フランジが穴を通るため。下端は基板上面の 0.2 mm 下）" };
+    return { w: 13.2, h: 8.2, text: "幅 13.2 × 高さ 8.2 mm（本体が穴を通り、フランジは筐体の内側に残る。下端は基板上面の 0.2 mm 下）" };
+  }
+
+  function draw(lay, d) {
     const svg = $("pwb-svg");
     svg.textContent = "";
     const b = lay.board;
+    const bottom = Math.max(0, d.protrude) + 3.2;
+    svg.setAttribute("viewBox", `-12.5 ${-(b.y1 + 2.6)} 26 ${b.y1 + 2.6 + bottom}`);
+    const defs = el("defs", {}, svg);
+    const pat = el("pattern", { id: "hatch", width: 0.6, height: 0.6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, defs);
+    el("rect", { x: 0, y: 0, width: 0.6, height: 0.6, fill: "#f3effa" }, pat);
+    el("line", { x1: 0, y1: 0, x2: 0, y2: 0.6, stroke: "#7054a0", "stroke-width": 0.18 }, pat);
+    const wy0 = -(d.overhang - d.gap), wy1 = d.protrude;
+    if (wy1 > wy0) {
+      const hw = enclosureHole(d).w / 2;
+      for (const [x0, x1] of [[-12.5, -hw], [hw, 13.5]]) el("rect", { x: x0, y: wy0, width: x1 - x0, height: wy1 - wy0, fill: "url(#hatch)", stroke: "#7054a0", "stroke-width": 0.06 }, svg);
+      el("text", { fill: "#7054a0", "font-size": 0.85, "font-family": "Noto Sans JP, sans-serif", "text-anchor": "end", x: 13.3, y: wy1 + 0.95 }, svg).textContent = "筐体の壁";
+    }
     el("rect", { x: b.x0, y: -b.y1, width: b.x1 - b.x0, height: b.y1 - b.y0, rx: 0.3, fill: "#3a2a7a" }, svg);
     if (b.y0 > 0) el("rect", { x: -6.4, y: -b.y0, width: 12.8, height: b.y0, fill: "#FAB400", opacity: 0.18 }, svg);
     const showT = layerView !== "B", showB = layerView !== "T";
@@ -712,21 +778,19 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
       el("rect", { ...obround(p.x, p.y, hw, hl), fill: "#fbfaff" }, svg);
     }
     if (showT) for (const s of lay.silk) el("polyline", { points: pts(s), fill: "none", stroke: "#ffffff", "stroke-width": 0.15, "stroke-linecap": "round", "stroke-linejoin": "round" }, svg);
+    for (const m of lay.mounts) {
+      el("circle", { cx: m.x, cy: -m.y, r: m.hole / 2, fill: "#fbfaff" }, svg);
+      el("circle", { cx: m.x, cy: -m.y, r: m.keep, fill: "none", stroke: "#e07a6a", "stroke-width": 0.1, "stroke-dasharray": "0.4 0.3" }, svg);
+    }
     el("rect", { x: -6.4, y: -12.8, width: 12.8, height: 12.8, fill: "none", stroke: "#FAB400", "stroke-width": 0.12, "stroke-dasharray": "0.5 0.35" }, svg);
     const dim = { fill: "#7054a0", "font-size": 0.95, "font-family": "Noto Sans JP, sans-serif", "text-anchor": "middle" };
-    el("line", { x1: b.x0, y1: 1.3, x2: b.x1, y2: 1.3, stroke: "#7054a0", "stroke-width": 0.06 }, svg);
-    el("text", { ...dim, x: 0, y: 2.5 }, svg).textContent = "基板幅 20.0";
+    el("line", { x1: b.x0, y1: bottom - 1.7, x2: b.x1, y2: bottom - 1.7, stroke: "#7054a0", "stroke-width": 0.06 }, svg);
+    el("text", { ...dim, x: 0, y: bottom - 0.5 }, svg).textContent = "基板幅 20.0";
     el("line", { x1: b.x1 + 1.0, y1: -b.y1, x2: b.x1 + 1.0, y2: -b.y0, stroke: "#7054a0", "stroke-width": 0.06 }, svg);
     const my = -(b.y0 + b.y1) / 2;
     const t = el("text", { ...dim, x: b.x1 + 1.6, y: my, transform: `rotate(90 ${b.x1 + 1.6} ${my})` }, svg);
     t.textContent = f2(b.y1 - b.y0);
-    if (b.y0 > 0) {
-      el("line", { x1: -8.6, y1: 0, x2: -6.4, y2: 0, stroke: "#7054a0", "stroke-width": 0.06 }, svg);
-      el("line", { x1: -8.6, y1: -b.y0, x2: b.x0, y2: -b.y0, stroke: "#7054a0", "stroke-width": 0.06 }, svg);
-      el("line", { x1: -8.2, y1: 0, x2: -8.2, y2: -b.y0, stroke: "#7054a0", "stroke-width": 0.06 }, svg);
-      el("text", { ...dim, x: -8.5, y: -b.y0 / 2 + 0.35, "text-anchor": "end" }, svg).textContent = f2(b.y0);
-    }
-    el("text", { ...dim, x: 0, y: -23.1, fill: "#2C1486" }, svg).textContent = "ピンヘッダ側";
+    el("text", { ...dim, x: 0, y: -(b.y1 + 1.0), fill: "#2C1486" }, svg).textContent = "M3取付穴・ピンヘッダ側";
   }
 
   function holeTable(d) {
@@ -735,8 +799,9 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     const rows = [
       ["信号ピン F1〜F3", 3, `φ${f2(d.sigHole)}`, `φ${f2(d.sigPad)}`, "(−2.0, 10.2) (0, 10.2) (2.0, 10.2)"],
       ["信号ピン R1〜R3", 3, `φ${f2(d.sigHole)}`, `φ${f2(d.sigPad)}`, "(−2.0, 12.2) (0, 12.2) (2.0, 12.2)"],
-      ["固定脚", 4, `スロット ${f2(d.legSlotW)} × ${f2(d.legSlotL)}`, `${f2(d.legPadW)} × ${f2(d.legPadL)}`, "(±6.25, 4.4) (±6.25, 9.9)"],
+      ["固定脚", d.cutFrontLegs ? 2 : 4, `スロット ${f2(d.legSlotW)} × ${f2(d.legSlotL)}`, `${f2(d.legPadW)} × ${f2(d.legPadL)}`, d.cutFrontLegs ? "(±6.25, 9.9)（前側の脚は切る）" : "(±6.25, 4.4) (±6.25, 9.9)"],
       ["ピンヘッダ", 7, `φ${f2(d.hdrHole)}`, `φ${f2(d.hdrPad)}`, "X = −7.62〜+7.62（2.54ピッチ）, Y = 18.8"],
+      ["M3取付穴", 2, "φ3.20（非めっき）", "なし（半径3.0を銅箔禁止）", "(±6.3, 24.0)"],
     ];
     for (const r of rows) {
       const tr = tb.insertRow();
@@ -754,6 +819,8 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     $("f-sig").textContent = `φ${f2(d.sigHole)}`;
     $("f-legw").textContent = f2(d.legSlotW);
     $("f-legl").textContent = f2(d.legSlotL);
+    $("f-over").textContent = `${f2(d.overhang)} mm`;
+    $("f-hole").textContent = enclosureHole(d).text;
     const pill = $("drc-pill");
     pill.className = "pill " + (drc.ok ? "ok" : "ng");
     pill.textContent = drc.ok ? "問題なし" : "間隔不足";
@@ -761,10 +828,10 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
       ? `最小間隔 ${f2(drc.gap)} mm（${drc.pair}）、基板端まで ${f2(drc.edge)} mm`
       : (drc.gap < drc.minClear
         ? `${drc.pair} の間隔が ${f2(Math.max(drc.gap, 0))} mm で、${f2(drc.minClear)} mm に足りない。誤差かランド幅を小さくすること。`
-        : `ランドと基板端の間隔が ${f2(Math.max(drc.edge, 0))} mm で、${f2(drc.edgeClear)} mm に足りない。張り出しを小さくすること。`);
+        : `ランドや配線と基板端の間隔が ${f2(Math.max(drc.edge, 0))} mm で、${f2(drc.edgeClear)} mm に足りない。張り出しを小さくするか、前側の固定脚を切る設定にすること。`);
     $("spec-gap").textContent = `${f2(drc.gap)} mm（設計基準 ${f2(drc.minClear)} mm 以上）`;
     $("spec-size").textContent = `20.0 × ${f2(lay.board.y1 - lay.board.y0)} mm（コネクタの嵌合面が基板端から ${f2(lay.board.y0)} mm 張り出す）`;
-    draw(lay);
+    draw(lay, d);
     holeTable(d);
     const sel = $("file-sel"), prev = sel.value;
     sel.textContent = "";
@@ -787,15 +854,16 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
       return;
     }
     btn.disabled = false;
-    msg.textContent = "7ファイルをZIPにまとめて保存する。";
+    msg.textContent = "8ファイルをZIPにまとめて保存する。";
   }
 
   document.getElementById("pwb-params").addEventListener("input", update);
+  document.getElementById("pwb-params").addEventListener("change", update);
   document.getElementById("pwb-params").addEventListener("submit", e => e.preventDefault());
   document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
     layerView = b.dataset.layer;
     document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-    draw(current.lay);
+    draw(current.lay, current.d);
   }));
   $("file-sel").addEventListener("change", () => { $("file-pre").textContent = current.files[$("file-sel").value] || ""; });
   $("file-copy").addEventListener("click", () => {
@@ -811,7 +879,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
     const msg = $("gerber-msg");
     const zip = P.zip(current.files);
     try {
-      await downloads.save({ filename: "WiiExt_Breakout_v0.2_gerber.zip", data: new Blob([zip], { type: "application/zip" }) });
+      await downloads.save({ filename: "WiiExt_Breakout_v0.3_gerber.zip", data: new Blob([zip], { type: "application/zip" }) });
       msg.textContent = "保存した。";
     } catch (e) {
       const code = e && e.code;
