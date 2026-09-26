@@ -1,0 +1,267 @@
+<title>Wiiリモコン拡張コネクタ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;800&family=Noto+Serif+JP:wght@400;700&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --sun: #FAB400;
+  --iris: #2C1486;
+  --lilac: #7054a0;
+  --ink: #1d1631;
+  --paper: #ffffff;
+  --mist: #f3effa;
+  --rule: #cfc6e4;
+  --ok: #e8f3e5;
+  --ng: #fbe7e6;
+  --note: #4a4163;
+  --housing: #3b3350;
+  --gothic: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", YuGothic, "Noto Sans JP", sans-serif;
+  --mincho: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Noto Serif JP", "Noto Serif CJK JP", serif;
+}
+* { box-sizing: border-box; }
+html { text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--sun);
+  color: var(--ink);
+  font-family: var(--mincho);
+  font-size: 17px;
+  line-height: 1.95;
+  padding-inline: 16px;
+}
+header.top { max-width: 880px; margin: 0 auto; padding-block: 44px 36px; padding-inline: 12px; }
+header.top h1 {
+  margin: 0; color: var(--iris); font-family: var(--gothic); font-weight: 800;
+  font-size: clamp(28px, 5vw, 44px); line-height: 1.3; letter-spacing: 0.02em; text-wrap: balance;
+}
+header.top .sub { margin: 14px 0 0; color: var(--iris); font-family: var(--gothic); font-size: 16px; line-height: 1.6; }
+header.top .meta { margin: 22px 0 0; color: var(--iris); font-family: var(--gothic); font-size: 14px; line-height: 1.8; }
+main.sheet {
+  max-width: 880px; margin: 0 auto; background: var(--paper); border-radius: 28px;
+  padding-block: 48px 56px; padding-inline: clamp(20px, 6vw, 72px);
+}
+.sheet p { margin: 0 0 1em; text-indent: 1em; }
+.sheet p.ni, .sheet p.note, .sheet p.cap, .sheet .box p, .sheet .toc p { text-indent: 0; }
+h2, h3, .cap, .toc-h, th, .code { font-family: var(--gothic); }
+h2 {
+  color: var(--iris); font-size: 22px; line-height: 1.5; margin: 2.6em 0 0.9em;
+  padding-bottom: 0.35em; border-bottom: 2px solid var(--iris); scroll-margin-top: 16px; text-wrap: balance;
+}
+.toc { border: 1.5px solid var(--iris); border-radius: 18px; padding: 18px 24px 14px; margin: 0 0 2.4em; }
+.toc-h { margin: 0 0 0.4em; font-weight: 700; color: var(--iris); font-size: 15px; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; font-size: 15px; line-height: 1.9; }
+.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.toc a:hover { color: var(--iris); border-bottom-color: var(--iris); }
+a:focus-visible { outline: 3px solid var(--iris); outline-offset: 2px; border-radius: 4px; }
+.box { background: var(--mist); border-radius: 18px; padding: 20px 26px 10px; margin: 0.4em 0 1.6em; }
+.box ol { padding-left: 1.4em; margin: 0.4em 0 0.6em; }
+.box li { margin-bottom: 0.55em; }
+.cap { margin: 1.8em 0 0.5em; font-size: 14px; font-weight: 700; color: var(--iris); }
+.tw { overflow-x: auto; margin: 0 0 0.6em; }
+table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 14px; line-height: 1.7; }
+th, td { border: 1px solid var(--rule); padding: 8px 10px; vertical-align: top; text-align: left; }
+th { background: var(--mist); color: var(--iris); font-weight: 700; }
+td.c, th.c { text-align: center; }
+td.num { font-family: var(--gothic); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.ok { background: var(--ok); }
+td.ng { background: var(--ng); }
+.note { font-size: 13.5px; line-height: 1.8; color: var(--note); }
+.code { font-size: 0.9em; background: var(--mist); padding: 0.05em 0.35em; border-radius: 4px; }
+figure.dwg { margin: 0 0 0.6em; border: 1px solid var(--rule); border-radius: 18px; padding: 14px 10px; overflow-x: auto; text-align: center; }
+figure.dwg svg { width: 100%; height: auto; display: inline-block; }
+.dwg-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+svg .ln { fill: none; stroke: var(--iris); stroke-width: 1.4; stroke-linejoin: round; }
+svg .body { fill: #fbfaff; }
+svg .cav { fill: var(--mist); }
+svg .hs { fill: var(--housing); stroke: var(--iris); }
+svg .ct { fill: var(--sun); stroke: #8a5a00; stroke-width: 1; }
+svg .hid { stroke-dasharray: 4 3; fill: none; stroke: var(--lilac); }
+svg .thin { stroke: var(--rule); stroke-width: 1; }
+svg .pcb { stroke: var(--lilac); stroke-width: 1.2; stroke-dasharray: 10 4 2 4; }
+svg .out { fill: none; stroke: var(--lilac); stroke-width: 1.2; stroke-dasharray: 6 4; }
+svg .pad { fill: #fde8b0; stroke: #b07c00; stroke-width: 1; }
+svg .hole { fill: var(--paper); stroke: #b07c00; stroke-width: 1; }
+svg .org { stroke: var(--iris); stroke-width: 1.2; }
+svg .ext { stroke: var(--lilac); stroke-width: 0.8; }
+svg .dim { stroke: var(--lilac); stroke-width: 1; }
+svg .arh { fill: var(--lilac); }
+svg .dt { fill: var(--lilac); font: 700 13px var(--gothic); font-variant-numeric: tabular-nums; }
+svg .tx { fill: var(--ink); font: 13px var(--gothic); }
+svg .sm { font-size: 12px; fill: var(--note); }
+svg .nb { fill: var(--iris); stroke: none; }
+svg .nbt { fill: #ffffff; font: 700 14px var(--gothic); text-anchor: middle; }
+sup.fn { font-size: 0.68em; line-height: 0; margin: 0 0.1em; font-family: var(--gothic); }
+sup.fn a { color: var(--iris); text-decoration: none; font-weight: 700; }
+sup.fn a:hover { text-decoration: underline; }
+ol.notes { list-style: none; padding: 0; margin: 0; font-size: 14.5px; line-height: 1.85; }
+ol.notes li { display: flex; gap: 0.8em; margin-bottom: 0.7em; scroll-margin-top: 16px; }
+ol.notes .nm { flex: 0 0 2.6em; color: var(--iris); font-weight: 700; font-family: var(--gothic); }
+ol.notes .nt { flex: 1 1 0%; min-width: 0; overflow-wrap: anywhere; }
+ol.notes a { color: var(--iris); }
+ol.notes li:target { background: var(--mist); border-radius: 10px; }
+.ref { font-size: 14.5px; line-height: 1.8; padding-left: 1.4em; }
+.ref li { margin-bottom: 0.3em; overflow-wrap: anywhere; }
+.ref a, .sheet a { color: var(--iris); }
+footer { max-width: 880px; margin: 0 auto; padding-block: 26px 40px; text-align: center; }
+footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size: 14px; }
+@media (max-width: 600px) {
+  body { font-size: 16px; line-height: 1.9; padding-inline: 10px; }
+  header.top { padding-block: 28px 26px; }
+  main.sheet { border-radius: 22px; }
+  h2 { font-size: 19px; }
+}
+</style>
+
+<header class="top">
+  <h1>Wiiリモコン拡張コネクタ</h1>
+  <p class="sub">金属シェル付き 6接点レセプタクル　参考データシート</p>
+  <p class="meta">第0.1版（暫定）　2026年9月26日作成<br>現物写真からの採寸と公開資料に基づく</p>
+</header>
+
+<main class="sheet">
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>
+  <li><a href="#s1">第1　概要</a></li>
+  <li><a href="#s2">第2　部品の識別と概要仕様</a></li>
+  <li><a href="#s3">第3　外形寸法</a></li>
+  <li><a href="#s4">第4　接点配置と信号</a></li>
+  <li><a href="#s5">第5　推奨基板パターン</a></li>
+  <li><a href="#s6">第6　電気的特性</a></li>
+  <li><a href="#s7">第7　未確認事項と確認方法</a></li>
+  <li><a href="#s8">第8　CADデータ</a></li>
+  <li><a href="#s9">注</a></li>
+  <li><a href="#s10">参考資料</a></li>
+</ol></nav>
+
+<h2 id="s1">第1　概要</h2>
+<p>本書は、Wiiリモコン下端の拡張端子に使われるレセプタクル（交換部品）について、外形寸法、接点配置、推奨基板パターンをまとめた参考資料である。メーカーが公表した図面や規格書は見つかっていない。そのため、寸法は定規を添えて撮影した現物写真から読み取った値であり、信号の割り当ては公開されているピン配置情報に基づく。</p>
+<div class="box">
+<p><b>要点</b></p>
+<ol>
+  <li>金属シェル付きの6接点レセプタクルである。Wii用・Wii U用に共通のWiiリモコンで、ヌンチャクなどの拡張機器を接続する端子に当たる<sup class="fn"><a href="#n1">*1</a></sup>。</li>
+  <li>外形は幅12.8 mm、奥行12.8 mm、高さ7.8 mm。前端の外向きフランジを含めた幅は14.2 mmである。</li>
+  <li>基板へはスルーホールで実装する。信号ピンは6本（2列×3本、ピッチ2.0 mm）、シェルの固定脚は4本（片側2本）である。</li>
+  <li>信号はI2C（SCL・SDA）、電源（3.3 V）、接続検出（Sense）、GNDで構成される<sup class="fn"><a href="#n1">*1</a></sup>。</li>
+  <li>基板ピンと接点番号の対応、ピンと固定脚の突出長は確認できていない（第7参照）。</li>
+</ol>
+</div>
+
+<h2 id="s2">第2　部品の識別と概要仕様</h2>
+<p class="cap">表1　概要仕様</p>
+<div class="tw"><table>
+<tr><th style="width:22%">項目</th><th>内容</th><th style="width:26%">根拠</th></tr>
+<tr><td>名称</td><td>Wiiリモコン 拡張コネクタ（レセプタクル）</td><td>公開写真との形状一致<sup class="fn"><a href="#n1">*1</a></sup></td></tr>
+<tr><td>搭載機器</td><td>Wiiリモコン（Wii・Wii U共通）</td><td>部品の入手元情報</td></tr>
+<tr><td>形式</td><td>金属シェル付き。嵌合面の底側にU字形の凸、上面に抜け止め用のバネ爪2本、両側面に窓</td><td>現物写真</td></tr>
+<tr><td>接点数</td><td>6（中央のコンタクト台の上面に3、下面に3）</td><td>現物写真・公開写真<sup class="fn"><a href="#n1">*1</a></sup></td></tr>
+<tr><td>実装方式</td><td>スルーホール。信号ピン6本、シェル固定脚4本</td><td>現物写真</td></tr>
+<tr><td>材質</td><td>シェルは金属板（板厚 約0.3 mm）、ハウジングは黒色樹脂</td><td>現物写真（板厚は推定）</td></tr>
+<tr><td>製造者・型番</td><td>不明</td><td>―</td></tr>
+</table></div>
+<p class="note">Wii本体背面のセンサーバー端子とは別の部品である。センサーバー端子は赤色樹脂の口に2接点を持つ形で、金属シェルはない<sup class="fn"><a href="#n2">*2</a></sup><sup class="fn"><a href="#n3">*3</a></sup>。</p>
+
+<h2 id="s3">第3　外形寸法</h2>
+<p>座標の原点は、嵌合面（前面）の幅方向中央で、基板面の高さに置く。X は幅方向、Y は奥行方向（前面を0として後方が正）、Z は高さ方向（基板面を0として上方が正）とする。単位はすべてmmである。</p>
+<p class="cap">図1　正面図（嵌合面）</p>
+<figure class="dwg"><svg viewBox="0 0 441 366" role="img" aria-label="正面図" style="max-width:441px"><defs><marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1.5 L9,5 L0,8.5 z" class="arh"/></marker></defs><polygon class="ln body" points="79.6,232.4 79.8,234.1 80.3,235.8 81.1,237.3 82.2,238.6 83.5,239.7 85.0,240.5 86.7,241.0 88.4,241.2 165.5,241.2 166.7,241.1 167.9,240.9 169.0,240.5 170.1,239.9 171.1,239.2 172.0,238.3 172.7,237.4 173.3,236.3 182.8,217.5 183.4,216.4 184.1,215.5 185.0,214.6 186.0,213.9 187.1,213.3 188.2,212.9 189.4,212.7 190.6,212.6 250.2,212.6 251.4,212.7 252.6,212.9 253.7,213.3 254.8,213.9 255.8,214.6 256.7,215.5 257.4,216.4 258.0,217.5 267.5,236.3 268.1,237.4 268.8,238.3 269.7,239.2 270.7,239.9 271.8,240.5 272.9,240.9 274.1,241.1 275.3,241.2 352.4,241.2 354.1,241.0 355.8,240.5 357.3,239.7 358.6,238.6 359.7,237.3 360.5,235.8 361.0,234.1 361.2,232.4 361.2,89.4 360.8,85.5 359.7,81.8 357.9,78.4 355.4,75.4 352.4,72.9 349.0,71.1 345.3,70.0 341.4,69.6 99.4,69.6 95.5,70.0 91.8,71.1 88.4,72.9 85.4,75.4 82.9,78.4 81.1,81.8 80.0,85.5 79.6,89.4"/><polygon class="ln cav" points="86.2,214.8 86.3,215.7 86.5,216.5 86.9,217.2 87.5,217.9 88.2,218.5 88.9,218.9 89.7,219.1 90.6,219.2 174.5,219.2 174.9,219.2 175.4,219.1 175.8,219.0 176.2,218.8 176.6,218.6 177.0,218.4 177.4,218.1 177.7,217.8 186.5,208.1 187.0,207.7 187.6,207.2 188.1,206.9 188.7,206.6 189.4,206.3 190.0,206.1 190.7,206.0 191.4,206.0 249.4,206.0 250.1,206.0 250.8,206.1 251.4,206.3 252.1,206.6 252.7,206.9 253.2,207.2 253.8,207.7 254.3,208.1 263.1,217.8 263.4,218.1 263.8,218.4 264.2,218.6 264.6,218.8 265.0,219.0 265.4,219.1 265.9,219.2 266.3,219.2 350.2,219.2 351.1,219.1 351.9,218.9 352.6,218.5 353.3,217.9 353.9,217.2 354.3,216.5 354.5,215.7 354.6,214.8 354.6,89.4 354.3,86.8 353.6,84.3 352.4,82.1 350.7,80.1 348.7,78.4 346.5,77.2 344.0,76.5 341.4,76.2 99.4,76.2 96.8,76.5 94.3,77.2 92.1,78.4 90.1,80.1 88.4,82.1 87.2,84.3 86.5,86.8 86.2,89.4"/><polygon class="ln hs" points="152.2,124.6 288.6,124.6 288.6,87.2 152.2,87.2"/><polygon class="ln cav" points="166.5,124.6 186.3,124.6 186.3,91.6 166.5,91.6"/><polygon class="ln cav" points="210.5,124.6 230.3,124.6 230.3,91.6 210.5,91.6"/><polygon class="ln cav" points="254.5,124.6 274.3,124.6 274.3,91.6 254.5,91.6"/><polygon class="ln hs" points="152.2,153.2 152.3,154.3 152.8,155.4 153.5,156.3 154.4,157.0 155.5,157.5 156.6,157.6 284.2,157.6 285.3,157.5 286.4,157.0 287.3,156.3 288.0,155.4 288.5,154.3 288.6,153.2 288.6,129.0 288.5,127.9 288.0,126.8 287.3,125.9 286.4,125.2 285.3,124.7 284.2,124.6 156.6,124.6 155.5,124.7 154.4,125.2 153.5,125.9 152.8,126.8 152.3,127.9 152.2,129.0"/><polygon class="ln ct" points="172.0,124.6 180.8,124.6 180.8,111.4 172.0,111.4"/><polygon class="ln ct" points="172.0,170.8 180.8,170.8 180.8,157.6 172.0,157.6"/><polygon class="ln ct" points="216.0,124.6 224.8,124.6 224.8,111.4 216.0,111.4"/><polygon class="ln ct" points="216.0,170.8 224.8,170.8 224.8,157.6 216.0,157.6"/><polygon class="ln ct" points="260.0,124.6 268.8,124.6 268.8,111.4 260.0,111.4"/><polygon class="ln ct" points="260.0,170.8 268.8,170.8 268.8,157.6 260.0,157.6"/><polygon class="ln body" points="79.6,217.0 64.2,217.0 64.2,104.8 79.6,104.8"/><polygon class="ln body" points="86.2,232.4 79.6,232.4 79.6,296.2 82.9,302.8 86.2,296.2"/><polygon class="ln body" points="361.2,217.0 376.6,217.0 376.6,104.8 361.2,104.8"/><polygon class="ln body" points="354.6,232.4 361.2,232.4 361.2,296.2 357.9,302.8 354.6,296.2"/><polygon class="ln ct" points="172.0,214.8 180.8,214.8 180.8,300.6 176.4,302.8 172.0,300.6"/><polygon class="ln ct" points="216.0,214.8 224.8,214.8 224.8,300.6 220.4,302.8 216.0,300.6"/><polygon class="ln ct" points="260.0,214.8 268.8,214.8 268.8,300.6 264.4,302.8 260.0,300.6"/><line class="pcb" x1="44.4" y1="241.2" x2="396.4" y2="241.2"/><line class="ext" x1="79.6" y1="69.6" x2="79.6" y2="43.8"/><line class="ext" x1="361.2" y1="69.6" x2="361.2" y2="43.8"/><line class="dim" x1="79.6" y1="49.8" x2="361.2" y2="49.8" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="220.4" y="43.8" text-anchor="middle">12.8</text><line class="ext" x1="64.2" y1="217.0" x2="64.2" y2="319.8"/><line class="ext" x1="376.6" y1="217.0" x2="376.6" y2="319.8"/><line class="dim" x1="64.2" y1="313.8" x2="376.6" y2="313.8" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="220.4" y="328.8" text-anchor="middle">14.2</text><line class="ext" x1="64.2" y1="241.2" x2="47.2" y2="241.2"/><line class="ext" x1="64.2" y1="69.6" x2="47.2" y2="69.6"/><line class="dim" x1="53.2" y1="241.2" x2="53.2" y2="69.6" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="46.2" y="155.4" text-anchor="middle" transform="rotate(-90 46.2 155.4)">7.8</text><line class="ext" x1="361.2" y1="302.8" x2="398.0" y2="302.8"/><line class="ext" x1="361.2" y1="241.2" x2="398.0" y2="241.2"/><line class="dim" x1="392.0" y1="302.8" x2="392.0" y2="241.2" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="407.0" y="272.0" text-anchor="middle" transform="rotate(-90 407.0 272.0)">2.8</text></svg></figure>
+<div class="dwg-pair">
+  <div><p class="cap">図2　上面図（下が前面）</p><figure class="dwg"><svg viewBox="0 0 441 425" role="img" aria-label="上面図" style="max-width:441px"><defs><marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1.5 L9,5 L0,8.5 z" class="arh"/></marker></defs><polygon class="ln body" points="79.6,346.8 361.2,346.8 361.2,65.2 307.3,65.2 307.3,82.8 274.3,82.8 274.3,65.2 166.5,65.2 166.5,82.8 133.5,82.8 133.5,65.2 79.6,65.2"/><polygon class="ln cav" points="111.5,331.4 166.5,331.4 166.5,179.6 111.5,179.6"/><polygon class="ln body" points="124.1,179.6 124.1,316.0 124.5,318.8 125.6,321.5 127.4,323.8 129.6,325.5 132.3,326.6 135.1,327.0 142.8,327.0 145.7,326.6 148.3,325.5 150.6,323.8 152.4,321.5 153.5,318.8 153.8,316.0 153.8,179.6"/><polygon class="ln cav" points="174.2,150.1 173.9,152.1 173.2,153.9 172.0,155.4 170.5,156.6 168.7,157.3 166.7,157.6 126.7,157.6 124.7,157.3 122.9,156.6 121.4,155.4 120.2,153.9 119.5,152.1 119.2,150.1 119.2,149.7 119.5,147.7 120.2,145.9 121.4,144.4 122.9,143.2 124.7,142.5 126.7,142.2 166.7,142.2 168.7,142.5 170.5,143.2 172.0,144.4 173.2,145.9 173.9,147.7 174.2,149.7"/><polygon class="ln body" points="64.2,346.8 79.6,346.8 79.6,340.2 64.2,340.2"/><polygon class="ln hs" points="164.3,82.8 135.7,82.8 135.7,65.2 164.3,65.2"/><polygon class="ln cav" points="274.3,331.4 329.3,331.4 329.3,179.6 274.3,179.6"/><polygon class="ln body" points="286.9,179.6 286.9,316.0 287.3,318.8 288.4,321.5 290.2,323.8 292.4,325.5 295.1,326.6 297.9,327.0 305.6,327.0 308.5,326.6 311.1,325.5 313.4,323.8 315.2,321.5 316.3,318.8 316.6,316.0 316.6,179.6"/><polygon class="ln cav" points="266.6,150.1 266.9,152.1 267.6,153.9 268.8,155.4 270.3,156.6 272.1,157.3 274.1,157.6 314.1,157.6 316.1,157.3 317.9,156.6 319.4,155.4 320.6,153.9 321.3,152.1 321.6,150.1 321.6,149.7 321.3,147.7 320.6,145.9 319.4,144.4 317.9,143.2 316.1,142.5 314.1,142.2 274.1,142.2 272.1,142.5 270.3,143.2 268.8,144.4 267.6,145.9 266.9,147.7 266.6,149.7"/><polygon class="ln body" points="361.2,346.8 376.6,346.8 376.6,340.2 361.2,340.2"/><polygon class="ln hs" points="276.5,82.8 305.1,82.8 305.1,65.2 276.5,65.2"/><text class="tx sm" x="220.4" y="394.8" text-anchor="middle">嵌合面(前面)</text><line class="ext" x1="79.6" y1="65.2" x2="79.6" y2="39.4"/><line class="ext" x1="361.2" y1="65.2" x2="361.2" y2="39.4"/><line class="dim" x1="79.6" y1="45.4" x2="361.2" y2="45.4" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="220.4" y="39.4" text-anchor="middle">12.8</text><line class="ext" x1="376.6" y1="65.2" x2="395.8" y2="65.2"/><line class="ext" x1="376.6" y1="346.8" x2="395.8" y2="346.8"/><line class="dim" x1="389.8" y1="65.2" x2="389.8" y2="346.8" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="404.8" y="206.0" text-anchor="middle" transform="rotate(-90 404.8 206.0)">12.8</text><line class="ext" x1="111.5" y1="331.4" x2="111.5" y2="368.2"/><line class="ext" x1="166.5" y1="331.4" x2="166.5" y2="368.2"/><line class="dim" x1="111.5" y1="362.2" x2="166.5" y2="362.2" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="139.0" y="377.2" text-anchor="middle">2.5</text></svg></figure></div>
+  <div><p class="cap">図3　側面図（+X側から見る。左が前面）</p><figure class="dwg"><svg viewBox="0 0 428 360" role="img" aria-label="側面図" style="max-width:428px"><defs><marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1.5 L9,5 L0,8.5 z" class="arh"/></marker></defs><polygon class="ln body" points="66.4,241.2 348.0,241.2 348.0,69.6 66.4,69.6"/><line class="thin" x1="66.4" y1="89.4" x2="348.0" y2="89.4"/><polygon class="ln body" points="66.4,217.0 73.0,217.0 73.0,104.8 66.4,104.8"/><polygon class="ln cav" points="128.0,197.2 194.0,197.2 194.0,124.6 128.0,124.6"/><polygon class="ln cav" points="295.2,118.0 306.2,118.0 306.2,102.6 295.2,102.6"/><polygon class="ln cav" points="295.2,144.4 306.2,144.4 306.2,131.2 295.2,131.2"/><polygon class="ln body" points="147.8,241.2 178.6,241.2 178.6,296.2 172.0,302.8 154.4,302.8 147.8,296.2"/><polygon class="ln body" points="268.8,241.2 299.6,241.2 299.6,296.2 293.0,302.8 275.4,302.8 268.8,296.2"/><polygon class="ln hid" points="286.4,241.2 295.2,241.2 295.2,300.6 290.8,302.8 286.4,300.6"/><polygon class="ln ct" points="330.4,241.2 339.2,241.2 339.2,300.6 334.8,302.8 330.4,300.6"/><line class="pcb" x1="44.4" y1="241.2" x2="383.2" y2="241.2"/><line class="ext" x1="66.4" y1="69.6" x2="66.4" y2="43.8"/><line class="ext" x1="348.0" y1="69.6" x2="348.0" y2="43.8"/><line class="dim" x1="66.4" y1="49.8" x2="348.0" y2="49.8" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="207.2" y="43.8" text-anchor="middle">12.8</text><line class="ext" x1="66.4" y1="241.2" x2="47.2" y2="241.2"/><line class="ext" x1="66.4" y1="69.6" x2="47.2" y2="69.6"/><line class="dim" x1="53.2" y1="241.2" x2="53.2" y2="69.6" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="46.2" y="155.4" text-anchor="middle" transform="rotate(-90 46.2 155.4)">7.8</text><line class="ext" x1="66.4" y1="302.8" x2="66.4" y2="319.8"/><line class="ext" x1="163.2" y1="302.8" x2="163.2" y2="319.8"/><line class="dim" x1="66.4" y1="313.8" x2="163.2" y2="313.8" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="114.8" y="328.8" text-anchor="middle">4.4</text><text class="dt" x="284.2" y="320.8" text-anchor="middle">9.9</text><text class="dt" x="334.8" y="320.8" text-anchor="middle">12.2</text><text class="tx sm" x="77.7" y="98.8" text-anchor="start">フランジ</text></svg></figure></div>
+</div>
+<p class="note">一点鎖線は基板面（Z = 0）を示す。図3の破線は、固定脚の陰に隠れる前列のピンを示す。</p>
+<p class="cap">表2　主要寸法</p>
+<div class="tw"><table>
+<tr><th style="width:34%">項目</th><th>値</th><th class="c" style="width:14%">区分</th></tr>
+<tr><td>本体 幅 × 奥行 × 高さ</td><td class="num">12.8 × 12.8 × 7.8</td><td class="c ok">実測</td></tr>
+<tr><td>フランジを含む幅</td><td class="num">14.2（片側0.7張り出し、Z 1.1〜6.2）</td><td class="c ok">実測</td></tr>
+<tr><td>底面のU字凸</td><td class="num">幅 4.5（下端）／3.2（上端）、高さ 1.3</td><td class="c ok">実測</td></tr>
+<tr><td>開口の内寸</td><td class="num">約 12.2 × 6.5</td><td class="c ng">推定</td></tr>
+<tr><td>開口の奥行（ハウジング前面まで）</td><td class="num">8.6</td><td class="c ng">推定</td></tr>
+<tr><td>コンタクト台</td><td class="num">幅 6.2、Z 3.8〜5.3、Y 5.0〜8.6</td><td class="c ok">実測</td></tr>
+<tr><td>上面のバネ爪</td><td class="num">中心 X ±3.7、幅 1.35、Y 0.7〜7.6</td><td class="c ok">実測</td></tr>
+<tr><td>側面の窓</td><td class="num">Y 2.8〜5.8、Z 2.0〜5.3</td><td class="c ok">実測</td></tr>
+<tr><td>信号ピンの突出長</td><td class="num">2.8</td><td class="c ng">推定</td></tr>
+<tr><td>固定脚の突出長</td><td class="num">2.8</td><td class="c ng">推定</td></tr>
+</table></div>
+<p class="note">「実測」は定規を添えた写真からの読み取りで、誤差は ±0.2〜0.3 mm 程度を見込む。「推定」は写真の見え方や他の寸法から推し量った値である。</p>
+
+<h2 id="s4">第4　接点配置と信号</h2>
+<p class="cap">図4　接点配置図（嵌合面を正面から見る。底面のU字凸が下）</p>
+<figure class="dwg"><svg viewBox="0 0 300 212" role="img" aria-label="接点配置図" style="max-width:300px"><defs><marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1.5 L9,5 L0,8.5 z" class="arh"/></marker></defs><polygon class="ln hs" points="68.4,113.5 68.6,114.9 69.1,116.2 70.0,117.4 71.2,118.3 72.5,118.8 73.9,119.0 247.7,119.0 249.1,118.8 250.5,118.3 251.6,117.4 252.5,116.2 253.0,114.9 253.2,113.5 253.2,98.1 253.0,96.7 252.5,95.3 251.6,94.2 250.5,93.3 249.1,92.8 247.7,92.6 73.9,92.6 72.5,92.8 71.2,93.3 70.0,94.2 69.1,95.3 68.6,96.7 68.4,98.1"/><polygon class="ln ct" points="109.1,92.6 124.5,92.6 124.5,82.7 109.1,82.7"/><circle class="nb" cx="116.8" cy="60.7" r="9.2"/><text class="nbt" x="116.8" y="65.7" text-anchor="middle">1</text><text class="tx" x="116.8" y="38.7" text-anchor="middle">VCC</text><polygon class="ln ct" points="153.1,92.6 168.5,92.6 168.5,82.7 153.1,82.7"/><circle class="nb" cx="160.8" cy="60.7" r="9.2"/><text class="nbt" x="160.8" y="65.7" text-anchor="middle">3</text><text class="tx" x="160.8" y="38.7" text-anchor="middle">Sense</text><polygon class="ln ct" points="197.1,92.6 212.5,92.6 212.5,82.7 197.1,82.7"/><circle class="nb" cx="204.8" cy="60.7" r="9.2"/><text class="nbt" x="204.8" y="65.7" text-anchor="middle">5</text><text class="tx" x="204.8" y="38.7" text-anchor="middle">SDA</text><polygon class="ln ct" points="109.1,128.9 124.5,128.9 124.5,119.0 109.1,119.0"/><circle class="nb" cx="116.8" cy="150.9" r="9.2"/><text class="nbt" x="116.8" y="155.9" text-anchor="middle">2</text><text class="tx" x="116.8" y="176.9" text-anchor="middle">SCL</text><polygon class="ln ct" points="153.1,128.9 168.5,128.9 168.5,119.0 153.1,119.0"/><circle class="nb" cx="160.8" cy="150.9" r="9.2"/><text class="nbt" x="160.8" y="155.9" text-anchor="middle">4</text><text class="tx" x="160.8" y="176.9" text-anchor="middle">未使用</text><polygon class="ln ct" points="197.1,128.9 212.5,128.9 212.5,119.0 197.1,119.0"/><circle class="nb" cx="204.8" cy="150.9" r="9.2"/><text class="nbt" x="204.8" y="155.9" text-anchor="middle">6</text><text class="tx" x="204.8" y="176.9" text-anchor="middle">GND</text><text class="tx sm" x="59.6" y="93.3" text-anchor="end">上段</text><text class="tx sm" x="59.6" y="127.4" text-anchor="end">下段</text></svg></figure>
+<p class="cap">表3　接点の割り当て</p>
+<div class="tw"><table>
+<tr><th class="c" style="width:9%">番号</th><th style="width:14%">名称</th><th>機能</th><th style="width:22%">位置</th></tr>
+<tr><td class="c num">1</td><td>VCC</td><td>電源 3.3 V（公称）</td><td class="num">上段 X = −2.0</td></tr>
+<tr><td class="c num">2</td><td>SCL</td><td>I2C クロック</td><td class="num">下段 X = −2.0</td></tr>
+<tr><td class="c num">3</td><td>Sense</td><td>接続検出。拡張機器の側でVCCに引き上げる</td><td class="num">上段 X = 0</td></tr>
+<tr><td class="c num">4</td><td>未使用</td><td>接続なし。機器によってはこの位置にピンがない</td><td class="num">下段 X = 0</td></tr>
+<tr><td class="c num">5</td><td>SDA</td><td>I2C データ</td><td class="num">上段 X = +2.0</td></tr>
+<tr><td class="c num">6</td><td>GND</td><td>グラウンド</td><td class="num">下段 X = +2.0</td></tr>
+</table></div>
+<p class="note">番号・名称・機能は出典<sup class="fn"><a href="#n1">*1</a></sup>による。出典の写真はU字凸を上にして撮影されているため、本書ではこれを180°回転し、U字凸を下にした向きにそろえている。</p>
+
+<h2 id="s5">第5　推奨基板パターン</h2>
+<p>基板の部品面から見た配置を示す。嵌合面を基板端にそろえる場合は、Y = 0 を基板端に合わせる。前端のフランジが幅方向に片側0.7 mm張り出すため、筐体のパネルや隣接部品との干渉に注意する。</p>
+<p class="cap">図5　推奨基板パターン（部品面から見る。下が前面）</p>
+<figure class="dwg"><svg viewBox="0 0 450 435" role="img" aria-label="推奨基板パターン" style="max-width:450px"><defs><marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1.5 L9,5 L0,8.5 z" class="arh"/></marker></defs><polygon class="ln out" points="84.0,355.6 365.6,355.6 365.6,74.0 84.0,74.0"/><line class="pcb" x1="44.4" y1="355.6" x2="405.2" y2="355.6"/><text class="tx sm" x="44.4" y="349.6" text-anchor="start">前面(Y=0)</text><circle class="pad" cx="180.8" cy="131.2" r="14.3"/><circle class="hole" cx="180.8" cy="131.2" r="8.8"/><circle class="pad" cx="180.8" cy="87.2" r="14.3"/><circle class="hole" cx="180.8" cy="87.2" r="8.8"/><circle class="pad" cx="224.8" cy="131.2" r="14.3"/><circle class="hole" cx="224.8" cy="131.2" r="8.8"/><circle class="pad" cx="224.8" cy="87.2" r="14.3"/><circle class="hole" cx="224.8" cy="87.2" r="8.8"/><circle class="pad" cx="268.8" cy="131.2" r="14.3"/><circle class="hole" cx="268.8" cy="131.2" r="8.8"/><circle class="pad" cx="268.8" cy="87.2" r="14.3"/><circle class="hole" cx="268.8" cy="87.2" r="8.8"/><text class="tx sm" x="180.8" y="159.2" text-anchor="middle">F1</text><text class="tx sm" x="224.8" y="159.2" text-anchor="middle">F2</text><text class="tx sm" x="268.8" y="159.2" text-anchor="middle">F3</text><text class="tx sm" x="180.8" y="68.2" text-anchor="middle">R1</text><text class="tx sm" x="224.8" y="68.2" text-anchor="middle">R2</text><text class="tx sm" x="268.8" y="68.2" text-anchor="middle">R3</text><polygon class="pad" points="74.1,273.3 74.5,276.7 75.8,279.8 77.9,282.5 80.6,284.6 83.7,285.9 87.1,286.3 87.5,286.3 90.9,285.9 94.0,284.6 96.7,282.5 98.8,279.8 100.1,276.7 100.5,273.3 100.5,244.3 100.1,240.9 98.8,237.8 96.7,235.1 94.0,233.0 90.9,231.7 87.5,231.3 87.1,231.3 83.7,231.7 80.6,233.0 77.9,235.1 75.8,237.8 74.5,240.9 74.1,244.3"/><polygon class="hole" points="79.6,271.1 79.9,273.1 80.6,274.9 81.8,276.4 83.3,277.6 85.1,278.3 87.1,278.6 87.5,278.6 89.5,278.3 91.3,277.6 92.8,276.4 94.0,274.9 94.7,273.1 95.0,271.1 95.0,246.5 94.7,244.5 94.0,242.7 92.8,241.2 91.3,240.0 89.5,239.3 87.5,239.0 87.1,239.0 85.1,239.3 83.3,240.0 81.8,241.2 80.6,242.7 79.9,244.5 79.6,246.5"/><polygon class="pad" points="74.1,152.3 74.5,155.7 75.8,158.8 77.9,161.5 80.6,163.6 83.7,164.9 87.1,165.3 87.5,165.3 90.9,164.9 94.0,163.6 96.7,161.5 98.8,158.8 100.1,155.7 100.5,152.3 100.5,123.3 100.1,119.9 98.8,116.8 96.7,114.1 94.0,112.0 90.9,110.7 87.5,110.3 87.1,110.3 83.7,110.7 80.6,112.0 77.9,114.1 75.8,116.8 74.5,119.9 74.1,123.3"/><polygon class="hole" points="79.6,150.1 79.9,152.1 80.6,153.9 81.8,155.4 83.3,156.6 85.1,157.3 87.1,157.6 87.5,157.6 89.5,157.3 91.3,156.6 92.8,155.4 94.0,153.9 94.7,152.1 95.0,150.1 95.0,125.5 94.7,123.5 94.0,121.7 92.8,120.2 91.3,119.0 89.5,118.3 87.5,118.0 87.1,118.0 85.1,118.3 83.3,119.0 81.8,120.2 80.6,121.7 79.9,123.5 79.6,125.5"/><polygon class="pad" points="349.1,273.3 349.5,276.7 350.8,279.8 352.9,282.5 355.6,284.6 358.7,285.9 362.1,286.3 362.5,286.3 365.9,285.9 369.0,284.6 371.7,282.5 373.8,279.8 375.1,276.7 375.5,273.3 375.5,244.3 375.1,240.9 373.8,237.8 371.7,235.1 369.0,233.0 365.9,231.7 362.5,231.3 362.1,231.3 358.7,231.7 355.6,233.0 352.9,235.1 350.8,237.8 349.5,240.9 349.1,244.3"/><polygon class="hole" points="354.6,271.1 354.9,273.1 355.6,274.9 356.8,276.4 358.3,277.6 360.1,278.3 362.1,278.6 362.5,278.6 364.5,278.3 366.3,277.6 367.8,276.4 369.0,274.9 369.7,273.1 370.0,271.1 370.0,246.5 369.7,244.5 369.0,242.7 367.8,241.2 366.3,240.0 364.5,239.3 362.5,239.0 362.1,239.0 360.1,239.3 358.3,240.0 356.8,241.2 355.6,242.7 354.9,244.5 354.6,246.5"/><polygon class="pad" points="349.1,152.3 349.5,155.7 350.8,158.8 352.9,161.5 355.6,163.6 358.7,164.9 362.1,165.3 362.5,165.3 365.9,164.9 369.0,163.6 371.7,161.5 373.8,158.8 375.1,155.7 375.5,152.3 375.5,123.3 375.1,119.9 373.8,116.8 371.7,114.1 369.0,112.0 365.9,110.7 362.5,110.3 362.1,110.3 358.7,110.7 355.6,112.0 352.9,114.1 350.8,116.8 349.5,119.9 349.1,123.3"/><polygon class="hole" points="354.6,150.1 354.9,152.1 355.6,153.9 356.8,155.4 358.3,156.6 360.1,157.3 362.1,157.6 362.5,157.6 364.5,157.3 366.3,156.6 367.8,155.4 369.0,153.9 369.7,152.1 370.0,150.1 370.0,125.5 369.7,123.5 369.0,121.7 367.8,120.2 366.3,119.0 364.5,118.3 362.5,118.0 362.1,118.0 360.1,118.3 358.3,119.0 356.8,120.2 355.6,121.7 354.9,123.5 354.6,125.5"/><line class="org" x1="211.6" y1="355.6" x2="238.0" y2="355.6"/><line class="org" x1="224.8" y1="368.8" x2="224.8" y2="342.4"/><text class="tx sm" x="224.8" y="347.6" text-anchor="middle">原点</text><line class="ext" x1="180.8" y1="87.2" x2="180.8" y2="41.6"/><line class="ext" x1="268.8" y1="87.2" x2="268.8" y2="41.6"/><line class="dim" x1="180.8" y1="47.6" x2="268.8" y2="47.6" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="224.8" y="41.6" text-anchor="middle">2.0 × 2</text><line class="ext" x1="362.3" y1="258.8" x2="402.4" y2="258.8"/><line class="ext" x1="362.3" y1="355.6" x2="402.4" y2="355.6"/><line class="dim" x1="396.4" y1="258.8" x2="396.4" y2="355.6" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="411.4" y="307.2" text-anchor="middle" transform="rotate(-90 411.4 307.2)">4.4</text><line class="ext" x1="87.3" y1="258.8" x2="87.3" y2="388.0"/><line class="ext" x1="362.3" y1="258.8" x2="362.3" y2="388.0"/><line class="dim" x1="87.3" y1="382.0" x2="362.3" y2="382.0" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="224.8" y="397.0" text-anchor="middle">12.5</text><line class="ext" x1="180.8" y1="87.2" x2="124.2" y2="87.2"/><line class="ext" x1="180.8" y1="131.2" x2="124.2" y2="131.2"/><line class="dim" x1="130.2" y1="87.2" x2="130.2" y2="131.2" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="123.2" y="109.2" text-anchor="middle" transform="rotate(-90 123.2 109.2)">2.0</text><line class="ext" x1="268.8" y1="131.2" x2="332.0" y2="131.2"/><line class="ext" x1="268.8" y1="355.6" x2="332.0" y2="355.6"/><line class="dim" x1="326.0" y1="131.2" x2="326.0" y2="355.6" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="341.0" y="243.4" text-anchor="middle" transform="rotate(-90 341.0 243.4)">10.2</text><line class="ext" x1="87.3" y1="137.8" x2="45.0" y2="137.8"/><line class="ext" x1="87.3" y1="258.8" x2="45.0" y2="258.8"/><line class="dim" x1="51.0" y1="137.8" x2="51.0" y2="258.8" marker-start="url(#ar)" marker-end="url(#ar)"/><text class="dt" x="44.0" y="198.3" text-anchor="middle" transform="rotate(-90 44.0 198.3)">5.5</text></svg></figure>
+<p class="cap">表4　穴位置</p>
+<div class="tw"><table>
+<tr><th style="width:18%">記号</th><th class="c">X</th><th class="c">Y</th><th>穴</th><th>ランド</th></tr>
+<tr><td>F1 / F2 / F3</td><td class="c num">−2.0 / 0 / +2.0</td><td class="c num">10.2</td><td class="num">φ0.8</td><td class="num">φ1.3</td></tr>
+<tr><td>R1 / R2 / R3</td><td class="c num">−2.0 / 0 / +2.0</td><td class="c num">12.2</td><td class="num">φ0.8</td><td class="num">φ1.3</td></tr>
+<tr><td>固定脚（4か所）</td><td class="c num">±6.25</td><td class="c num">4.4 / 9.9</td><td class="num">長穴 0.7 × 1.8</td><td class="num">1.2 × 2.5</td></tr>
+</table></div>
+<p class="note">一点鎖線は前面（Y = 0）、破線は本体の外形を示す。穴径は、ピン断面 0.4 mm 角・固定脚 0.3 × 1.4 mm（いずれも推定）に対する目安である。実物を測ってから確定すること。記号F1〜R3と接点番号1〜6の対応は確認できていない。</p>
+
+<h2 id="s6">第6　電気的特性</h2>
+<p class="cap">表5　電気的特性</p>
+<div class="tw"><table>
+<tr><th style="width:30%">項目</th><th>値</th><th style="width:18%">根拠</th></tr>
+<tr><td>電源電圧（VCC）</td><td>3.3 V（公称）</td><td>出典<sup class="fn"><a href="#n1">*1</a></sup></td></tr>
+<tr><td>インタフェース</td><td>I2C（SCL・SDA）</td><td>出典<sup class="fn"><a href="#n1">*1</a></sup></td></tr>
+<tr><td>接続検出</td><td>Sense端子。拡張機器がVCCに引き上げることで接続を示す</td><td>出典<sup class="fn"><a href="#n1">*1</a></sup></td></tr>
+<tr><td>定格電流・接触抵抗・耐電圧</td><td class="ng">不明</td><td>―</td></tr>
+<tr><td>挿抜寿命</td><td class="ng">不明</td><td>―</td></tr>
+</table></div>
+
+<h2 id="s7">第7　未確認事項と確認方法</h2>
+<p class="cap">表6　未確認事項</p>
+<div class="tw"><table>
+<tr><th style="width:30%">項目</th><th style="width:24%">現状</th><th>確認方法</th></tr>
+<tr><td>基板ピン F1〜R3 と接点 1〜6 の対応</td><td class="ng">不明</td><td>テスターの導通モードで、嵌合面の各接点と基板側の各ピンの間を当たる</td></tr>
+<tr><td>信号ピン・固定脚の突出長</td><td class="ng">約2.8 mm（推定）</td><td>ノギスで実測する</td></tr>
+<tr><td>信号ピンの断面</td><td class="ng">0.4 mm角（推定）</td><td>ノギスまたはマイクロメータで実測する</td></tr>
+<tr><td>開口の内寸・コンタクト台の奥行</td><td class="ng">推定</td><td>相手側のプラグ（ヌンチャク等）を挿して嵌合を確かめる</td></tr>
+<tr><td>製造者・型番</td><td class="ng">不明</td><td>部品の刻印や購入元の表示を確認する</td></tr>
+</table></div>
+
+<h2 id="s8">第8　CADデータ</h2>
+<p>本書の寸法に基づくCADモデルを、リポジトリの <span class="code">cad/connector/</span> に置いている。座標系は第3と同じである。</p>
+<p class="cap">表7　ファイル一覧</p>
+<div class="tw"><table>
+<tr><th style="width:28%">ファイル</th><th>内容</th></tr>
+<tr><td><span class="code">connector.step</span></td><td>STEPアセンブリ。シェル、ハウジング、コンタクト・ピンを部品ごとに色分けしている</td></tr>
+<tr><td><span class="code">connector.stl</span></td><td>全体を一体化したメッシュ。3Dプリントや干渉確認に使う</td></tr>
+<tr><td><span class="code">connector.py</span></td><td>CadQueryによるパラメトリックモデル。冒頭の定数を実測値に書き換えて実行すると、STEPとSTLを出力し直す</td></tr>
+<tr><td><span class="code">viewer.html</span></td><td>ブラウザで回転・部品の表示切替・基板との重ね合わせができる3Dビューア</td></tr>
+</table></div>
+<p class="ni">3Dビューア：<a href="https://claude.ai/artifact/31uBjWq9UNxM1HnmtZdbVg">https://claude.ai/artifact/31uBjWq9UNxM1HnmtZdbVg</a></p>
+
+<h2 id="s9">注</h2>
+<ol class="notes">
+  <li id="n1"><span class="nm">*1</span><span class="nt">ConsoleMods Wiki「Wii:Connector Pinouts」の Wii Remote Extension Controller の項。接点の番号・名称・機能と、嵌合面の写真が掲載されている。</span></li>
+  <li id="n2"><span class="nm">*2</span><span class="nt">同ページの Wii Sensor Bar の項。センサーバー端子は Ground と Power の2接点で、写真では赤色樹脂の口を持つ。</span></li>
+  <li id="n3"><span class="nm">*3</span><span class="nt">PinoutGuide.com「Nintendo Wii Sensor Bar pinout」。外側シールド（未接続）、Ground、+5V の構成とされている。</span></li>
+</ol>
+
+<h2 id="s10">参考資料</h2>
+<ol class="ref">
+  <li>ConsoleMods Wiki「Wii:Connector Pinouts」（2025年6月25日版）<br><a href="https://consolemods.org/wiki/Wii:Connector_Pinouts">https://consolemods.org/wiki/Wii:Connector_Pinouts</a></li>
+  <li>PinoutGuide.com「Nintendo Wii Sensor Bar pinout signals」（2021年11月25日更新）<br><a href="https://pinoutguide.com/Game/nintendo_wii_sensor_pinout.shtml">https://pinoutguide.com/Game/nintendo_wii_sensor_pinout.shtml</a></li>
+  <li>現物写真（定規を添えて撮影したもの。上面・底面・正面・背面・斜め方向）</li>
+</ol>
+</main>
+
+<footer>
+  <p>本書は公開資料と現物写真に基づく参考資料であり、メーカーの仕様書ではない。</p>
+</footer>
