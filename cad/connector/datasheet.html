@@ -143,10 +143,9 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
   <li><a href="#s5">第5　推奨基板パターン</a></li>
   <li><a href="#s6">第6　評価用ブレークアウト基板</a></li>
   <li><a href="#s7">第7　電気的特性</a></li>
-  <li><a href="#s8">第8　未確認事項と確認方法</a></li>
-  <li><a href="#s9">第9　CADデータ</a></li>
-  <li><a href="#s10">注</a></li>
-  <li><a href="#s11">参考資料</a></li>
+  <li><a href="#s8">第8　CADデータ</a></li>
+  <li><a href="#s9">注</a></li>
+  <li><a href="#s10">参考資料</a></li>
 </ol></nav>
 
 <h2 id="s1">第1　概要</h2>
@@ -158,7 +157,7 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
   <li>外形は幅12.8 mm、奥行12.8 mm、高さ7.8 mm。前端の外向きフランジを含めた幅は14.2 mmである。</li>
   <li>基板へはスルーホールで実装する。信号ピンは6本（2列×3本、ピッチ2.0 mm）、シェルの固定脚は4本（片側2本）である。</li>
   <li>信号はI2C（SCL・SDA）、電源（3.3 V）、接続検出（Sense）、GNDで構成される<sup class="fn"><a href="#n1">*1</a></sup>。</li>
-  <li>基板ピンと接点番号の対応、ピンと固定脚の突出長は確認できていない（第8参照）。</li>
+  <li>基板ピンと接点番号の対応、ピンと固定脚の突出長は確認できていない。</li>
   <li>寸法の測定誤差を穴で吸収し、M3ネジで筐体に固定できる評価用基板を設計した。筐体の壁厚などを入力すると配置が求め直され、ガーバーデータをこのページから生成できる（第6）。</li>
 </ol>
 </div>
@@ -910,20 +909,9 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 <tr><td>挿抜寿命</td><td class="ng">不明</td><td>―</td></tr>
 </table></div>
 
-<h2 id="s8">第8　未確認事項と確認方法</h2>
-<p class="cap">表8　未確認事項</p>
-<div class="tw"><table>
-<tr><th style="width:30%">項目</th><th style="width:24%">現状</th><th>確認方法</th></tr>
-<tr><td>基板ピン F1〜R3 と接点 1〜6 の対応</td><td class="ng">不明</td><td>テスターの導通モードで、嵌合面の各接点と基板側の各ピンの間を当たる</td></tr>
-<tr><td>信号ピン・固定脚の突出長</td><td class="ng">約2.8 mm（推定）</td><td>ノギスで実測する</td></tr>
-<tr><td>信号ピンの断面</td><td class="ng">0.4 mm角（推定）</td><td>ノギスまたはマイクロメータで実測する</td></tr>
-<tr><td>開口の内寸・コンタクト台の奥行</td><td class="ng">推定</td><td>相手側のプラグ（ヌンチャク等）を挿して嵌合を確かめる</td></tr>
-<tr><td>製造者・型番</td><td class="ng">不明</td><td>部品の刻印や購入元の表示を確認する</td></tr>
-</table></div>
-
-<h2 id="s9">第9　CADデータ</h2>
+<h2 id="s8">第8　CADデータ</h2>
 <p>本書の寸法に基づくCADモデルを、リポジトリの <span class="code">cad/connector/</span> に置いている。座標系は第3と同じである。</p>
-<p class="cap">表9　ファイル一覧</p>
+<p class="cap">表8　ファイル一覧</p>
 <div class="tw"><table>
 <tr><th style="width:28%">ファイル</th><th>内容</th></tr>
 <tr><td><span class="code">connector.step</span></td><td>STEPアセンブリ。シェル、ハウジング、コンタクト・ピンを部品ごとに色分けしている</td></tr>
@@ -933,14 +921,14 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 </table></div>
 <p class="ni">3Dビューア：<a href="https://claude.ai/artifact/31uBjWq9UNxM1HnmtZdbVg">https://claude.ai/artifact/31uBjWq9UNxM1HnmtZdbVg</a></p>
 
-<h2 id="s10">注</h2>
+<h2 id="s9">注</h2>
 <ol class="notes">
   <li id="n1"><span class="nm">*1</span><span class="nt">ConsoleMods Wiki「Wii:Connector Pinouts」の Wii Remote Extension Controller の項。接点の番号・名称・機能と、嵌合面の写真が掲載されている。</span></li>
   <li id="n2"><span class="nm">*2</span><span class="nt">同ページの Wii Sensor Bar の項。センサーバー端子は Ground と Power の2接点で、写真では赤色樹脂の口を持つ。</span></li>
   <li id="n3"><span class="nm">*3</span><span class="nt">PinoutGuide.com「Nintendo Wii Sensor Bar pinout」。外側シールド（未接続）、Ground、+5V の構成とされている。</span></li>
 </ol>
 
-<h2 id="s11">参考資料</h2>
+<h2 id="s10">参考資料</h2>
 <ol class="ref">
   <li>ConsoleMods Wiki「Wii:Connector Pinouts」（2025年6月25日版）<br><a href="https://consolemods.org/wiki/Wii:Connector_Pinouts">https://consolemods.org/wiki/Wii:Connector_Pinouts</a></li>
   <li>PinoutGuide.com「Nintendo Wii Sensor Bar pinout signals」（2021年11月25日更新）<br><a href="https://pinoutguide.com/Game/nintendo_wii_sensor_pinout.shtml">https://pinoutguide.com/Game/nintendo_wii_sensor_pinout.shtml</a></li>
