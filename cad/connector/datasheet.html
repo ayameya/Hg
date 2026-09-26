@@ -373,8 +373,8 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 </table></div>
 
 <div class="dl">
-  <button type="button" class="btn" id="gerber-btn" disabled>ガーバーデータを生成（ZIP）</button>
-  <span class="msg" id="gerber-msg">保存機能を準備しています。</span>
+  <button type="button" class="btn" id="gerber-btn">ガーバーデータを生成（ZIP）</button>
+  <span class="msg" id="gerber-msg">8ファイルをZIPにまとめて保存する。</span>
 </div>
 <details class="files">
   <summary>生成されるファイルの中身を見る</summary>
@@ -865,11 +865,6 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
 
   function refreshButton() {
     const btn = $("gerber-btn"), msg = $("gerber-msg");
-    if (!downloads) {
-      btn.disabled = true;
-      msg.textContent = "この表示ではファイルの保存を使えない。下の「ファイルの中身を見る」から内容をコピーできる。";
-      return;
-    }
     if (current && !current.drc.ok) {
       btn.disabled = true;
       msg.textContent = "設計ルール確認で間隔不足があるため、生成できない。";
@@ -896,26 +891,44 @@ footer p { margin: 0; color: var(--iris); font-family: var(--gothic); font-size:
       navigator.clipboard.writeText(text).then(() => done(true), () => { selectPre(); done(false); });
     } catch (e) { selectPre(); done(false); }
   });
+  const ZIP_NAME = "WiiExt_Breakout_v0.6_gerber.zip";
+  function saveByLink(blob) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = ZIP_NAME;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
   $("gerber-btn").addEventListener("click", async () => {
-    if (!downloads || !current) return;
+    if (!current || !current.drc.ok) return;
     const msg = $("gerber-msg");
-    const zip = P.zip(current.files);
+    const blob = new Blob([P.zip(current.files)], { type: "application/zip" });
+    if (downloads) {
+      try {
+        await downloads.save({ filename: ZIP_NAME, data: blob });
+        msg.textContent = "保存した。";
+        return;
+      } catch (e) {
+        const code = e && e.code;
+        if (code === "declined") { msg.textContent = "保存を取り消した。"; return; }
+        if (code === "rate_limited") { msg.textContent = "保存の確認画面がすでに開いている。閉じてからもう一度押すこと。"; return; }
+      }
+    }
     try {
-      await downloads.save({ filename: "WiiExt_Breakout_v0.6_gerber.zip", data: new Blob([zip], { type: "application/zip" }) });
-      msg.textContent = "保存した。";
+      saveByLink(blob);
+      msg.textContent = `${ZIP_NAME} を保存した。`;
     } catch (e) {
-      const code = e && e.code;
-      msg.textContent = code === "declined" ? "保存を取り消した。"
-        : code === "rate_limited" ? "保存の確認画面がすでに開いている。閉じてからもう一度押すこと。"
-        : "この表示では保存できなかった。下の「ファイルの中身を見る」から内容をコピーできる。";
+      msg.textContent = "保存できなかった。下の「ファイルの中身を見る」から内容をコピーできる。";
     }
   });
 
   update();
   if (window.claude && typeof window.claude.use === "function") {
-    window.claude.use("downloads").then(ns => { downloads = ns; refreshButton(); }, () => refreshButton());
-  } else {
-    refreshButton();
+    window.claude.use("downloads").then(ns => { downloads = ns; }, () => {});
   }
 })();
 </script>
