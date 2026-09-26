@@ -55,10 +55,10 @@ CONTACT_H = 0.6
 CONTACT_Y0 = 5.6
 
 PIN_PITCH = 2.0
-PIN_ROW_FRONT = 10.2
-PIN_ROW_REAR = 12.2
+PIN_ROW_FRONT = 10.35
+PIN_ROW_REAR = 12.1
 PIN_W = 0.583
-PIN_SIZE = 0.5
+PIN_SIZE = 0.25
 PIN_LEN = 2.8
 PIN_EXIT_Z = 4.7
 SLOT_W = 1.0
@@ -66,6 +66,7 @@ SLOT_D = 3.2
 SLOT_Z = 1.2
 GROOVE_D = 1.0
 
+LEG_X = 6.75
 LEG_Y = (4.4, 9.9)
 LEG_W = 1.4
 LEG_LEN = 2.8
@@ -138,9 +139,11 @@ def make_shell(outer, inner):
         shell = shell.union(flange.edges("|Y").fillet(0.1))
 
         for y in LEG_Y:
-            xa, xb = sorted((sx * W / 2, sx * (W / 2 - T)))
+            xa, xb = sorted((sx * (LEG_X - T / 2), sx * (LEG_X + T / 2)))
             leg = box(xa, xb, y - LEG_W / 2, y + LEG_W / 2, -LEG_LEN, R_BOT + 0.2)
             shell = shell.union(leg.edges("|X and <Z").chamfer(0.3))
+            ba, bb = sorted((sx * (W / 2 - T), sx * (LEG_X + T / 2)))
+            shell = shell.union(box(ba, bb, y - LEG_W / 2, y + LEG_W / 2, R_BOT, R_BOT + 0.2 + T))
     return shell
 
 
