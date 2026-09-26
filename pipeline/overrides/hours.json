@@ -1,0 +1,183 @@
+{
+  "edges": [
+    {
+      "id": "shinjuku-fukutoshin-chikahodo",
+      "name": "新宿副都心 地下歩道（新宿駅西口〜都庁方面）",
+      "match": {
+        "polygon": [
+          [
+            [
+              139.6905,
+              35.6872
+            ],
+            [
+              139.6972,
+              35.6872
+            ],
+            [
+              139.6972,
+              35.6926
+            ],
+            [
+              139.6905,
+              35.6926
+            ],
+            [
+              139.6905,
+              35.6872
+            ]
+          ]
+        ],
+        "categories": [
+          "public"
+        ]
+      },
+      "opening_hours": "06:00-23:00",
+      "confidence": "medium",
+      "source": "https://www.watch.impress.co.jp/docs/news/1470201.html",
+      "note": "既存の地下歩道は6:00〜23:00（2022年に開通した区間は6:15〜22:45）と報じられている。管理は東京都建設局第三建設事務所。"
+    },
+    {
+      "id": "shinjuku-subnade",
+      "name": "新宿サブナード",
+      "match": {
+        "area_regex": "^新宿サブナード",
+        "name_regex": "サブナード",
+        "categories": [
+          "mall",
+          "public",
+          "building"
+        ]
+      },
+      "opening_hours": "24/7",
+      "confidence": "low",
+      "source": "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q125803332",
+      "note": "通路は24時間通行可能という投稿に基づく。公式サイト（subnade.co.jp）で要確認。"
+    }
+  ],
+  "entrances": [
+    {
+      "id": "otemachi-b9-b10",
+      "name": "大手町駅 B9a・B9b・B10 出入口",
+      "center": [
+        139.7645,
+        35.6862
+      ],
+      "radius_m": 700,
+      "refs": [
+        "B9a",
+        "B9b",
+        "B10"
+      ],
+      "opening_hours": "07:00-23:00",
+      "confidence": "medium",
+      "source": "https://ekitan.com/sta-info/station/1709/exit",
+      "note": "出口案内の検索結果要約から取得。東京メトロ構内図で要確認。",
+      "station": "大手町"
+    },
+    {
+      "id": "otemachi-c1-c2a",
+      "name": "大手町駅 C1・C2a 出入口",
+      "center": [
+        139.7645,
+        35.6862
+      ],
+      "radius_m": 700,
+      "refs": [
+        "C1",
+        "C2a"
+      ],
+      "opening_hours": "06:00-00:30",
+      "confidence": "medium",
+      "source": "https://ekitan.com/sta-info/station/1709/exit",
+      "note": "6:00〜終電。終電時刻を0:30として近似。",
+      "station": "大手町"
+    },
+    {
+      "id": "otemachi-d2",
+      "name": "大手町駅 D2 出入口",
+      "center": [
+        139.7645,
+        35.6862
+      ],
+      "radius_m": 700,
+      "refs": [
+        "D2"
+      ],
+      "opening_hours": "05:00-20:00",
+      "confidence": "medium",
+      "source": "https://ekitan.com/sta-info/station/1709/exit",
+      "note": "初電〜20:00。初電を5:00として近似。",
+      "station": "大手町"
+    },
+    {
+      "id": "otemachi-d3",
+      "name": "大手町駅 D3 出入口",
+      "center": [
+        139.7645,
+        35.6862
+      ],
+      "radius_m": 700,
+      "refs": [
+        "D3"
+      ],
+      "opening_hours": "05:00-00:15",
+      "confidence": "medium",
+      "source": "https://ekitan.com/sta-info/station/1709/exit",
+      "note": "初電〜24:15。初電を5:00として近似。",
+      "station": "大手町"
+    },
+    {
+      "id": "otemachi-b2a",
+      "name": "大手町駅 B2a 出入口",
+      "center": [
+        139.7645,
+        35.6862
+      ],
+      "radius_m": 700,
+      "refs": [
+        "B2a"
+      ],
+      "opening_hours": "06:00-23:00",
+      "confidence": "medium",
+      "source": "https://ekitan.com/sta-info/station/1709/exit",
+      "note": "出口案内の検索結果要約から取得。",
+      "station": "大手町"
+    },
+    {
+      "id": "otemachi-a1-a2",
+      "name": "大手町駅 A1・A2 出入口",
+      "center": [
+        139.7645,
+        35.6862
+      ],
+      "radius_m": 700,
+      "refs": [
+        "A1",
+        "A2"
+      ],
+      "opening_hours": "05:30-00:30",
+      "confidence": "medium",
+      "source": "https://ekitan.com/sta-info/station/1709/exit",
+      "note": "5:30〜終電。終電時刻を0:30として近似。",
+      "station": "大手町"
+    },
+    {
+      "id": "otemachi-b7",
+      "name": "大手町駅 B7 出入口（東西線）",
+      "center": [
+        139.7645,
+        35.6862
+      ],
+      "radius_m": 700,
+      "refs": [
+        "B7"
+      ],
+      "opening_hours": "off",
+      "confidence": "low",
+      "source": "https://marunouchi.metropolitan.jp/feature/tozai-line_otemachi-closure.html",
+      "note": "B7出入口は閉鎖され、7:00〜23:00はB8手前のサピアタワー連絡口（旧B7）を利用するよう案内されている。閉鎖期間は要確認。",
+      "station": "大手町"
+    }
+  ]
+}

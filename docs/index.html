@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>東京23区 地下通路マップ</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect width=%2216%22 height=%2216%22 rx=%223%22 fill=%22%231f6fd1%22/%3E%3Cpath d=%22M3 11h10M5 11V6h6v5%22 stroke=%22white%22 stroke-width=%221.6%22 fill=%22none%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="maplibre-gl.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="map"></div>
+<button id="panel-toggle" aria-label="パネルの表示切替">☰</button>
+<aside id="panel">
+  <h1>東京23区 地下通路マップ</h1>
+  <section>
+    <h2>日時</h2>
+    <div class="row">
+      <input type="date" id="date">
+      <button id="now">現在</button>
+    </div>
+    <div class="row time-row">
+      <input type="range" id="time" min="0" max="1435" step="5" value="720">
+      <span id="time-label" class="time-label">12:00</span>
+    </div>
+    <div id="day-kind" class="muted"></div>
+  </section>
+  <section>
+    <h2>表示</h2>
+    <label><input type="radio" name="mode" value="open" checked>利用可能な経路のみ</label>
+    <label><input type="radio" name="mode" value="closed">閉鎖中の区間も表示</label>
+    <label><input type="radio" name="mode" value="all">時刻を無視して全区間</label>
+    <label><input type="checkbox" id="hide-isolated" checked>地上から入れない区間を隠す</label>
+    <div id="stats" class="stats"></div>
+  </section>
+  <section>
+    <h2>地下経路検索</h2>
+    <button id="route-toggle">地下経路を検索</button>
+    <label><input type="checkbox" id="step-free">階段を使わない</label>
+    <div id="route-info" class="route-info"></div>
+  </section>
+  <section>
+    <h2>凡例</h2>
+    <div id="legend-cats"></div>
+  </section>
+  <section>
+    <h2>主題レイヤ</h2>
+    <label><input type="checkbox" data-group="rail" checked>鉄道路線</label>
+    <label><input type="checkbox" data-group="station" checked>駅</label>
+    <label><input type="checkbox" data-group="bus">バス路線</label>
+    <label><input type="checkbox" data-group="busstop">バス停</label>
+    <label><input type="checkbox" data-group="ferry" checked>フェリー・水上バス</label>
+    <label><input type="checkbox" data-group="building" checked>建物</label>
+    <label><input type="checkbox" data-group="facility" checked>官公庁・大使館</label>
+    <div id="fac-list" class="indent"></div>
+  </section>
+  <section>
+    <h2>移動</h2>
+    <div class="jumps">
+      <button data-jump="139.7671,35.6812,15.5">東京・大手町</button>
+      <button data-jump="139.7005,35.6905,15.5">新宿</button>
+      <button data-jump="139.7016,35.6580,16">渋谷</button>
+      <button data-jump="139.7109,35.7295,16">池袋</button>
+      <button data-jump="139.7640,35.6717,16">銀座・日比谷</button>
+      <button data-jump="139.7590,35.6640,16">新橋・汐留</button>
+      <button data-jump="139.7773,35.7120,16">上野</button>
+      <button data-jump="139.7400,35.6280,16">品川</button>
+    </div>
+  </section>
+  <section class="notes">
+    <p>通行時間は OSM の <code>opening_hours</code> タグ、個別ルール、施設種別ごとの推定値の順に決めています。区間をクリックすると根拠と確度を確認できます。<b>推定値は実際と異なる場合があります</b>。実際に移動する前に、各事業者の案内で確認してください。</p>
+    <p id="meta" class="muted"></p>
+  </section>
+</aside>
+<script src="app.js"></script>
+</body>
+</html>
