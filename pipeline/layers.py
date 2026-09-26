@@ -25,16 +25,6 @@ ROAD_MINZOOM = {"motorway": 8, "trunk": 9, "primary": 10, "secondary": 11, "tert
 RAIL_KIND = {"rail", "subway", "light_rail", "monorail", "tram", "narrow_gauge", "funicular"}
 RAIL_ROUTES = {"train", "subway", "light_rail", "monorail", "tram", "railway"}
 
-NATIONAL = re.compile(
-    r"(省|庁|国会|議員会館|内閣|最高裁判所|高等裁判所|地方裁判所|家庭裁判所|簡易裁判所|検察庁|法務局|税務署|国税|税関|"
-    r"労働基準監督署|公共職業安定所|ハローワーク|入国|出入国|気象|宮内|皇居|御所|自衛隊|防衛|海上保安|人事院|会計検査院|"
-    r"迎賓館|国立|独立行政法人|年金事務所|運輸支局|検疫所|日本銀行|国土地理院|特許|統計|拘置所|刑務所|少年院|"
-    r"地方整備局|国道事務所|河川事務所|財務局|経済産業局|厚生局|運輸局|航空局|国家公務員|衆議院|参議院|首相官邸|総理大臣官邸)"
-)
-TOKYO = re.compile(r"(^東京都(?!.*区)|^都立|^都営|東京都庁|都庁|警視庁|東京消防庁|消防署|警察署|都税事務所|東京都水道局|東京都下水道局|東京都交通局|東京都建設局|東京都港湾局|東京都住宅供給公社|都民)")
-TOKYO_OPERATOR = re.compile(r"^(東京都(?!\S{1,5}[区市町村](\s|$))|警視庁|東京消防庁|Tokyo Metropolitan Government)")
-WARD = re.compile(r"(区役所|区民|区立|出張所|区総合庁舎|特別出張所)")
-GOV_TAGS = {"townhall", "courthouse", "police", "fire_station", "prison"}
 
 
 def run(*args):
@@ -311,82 +301,6 @@ def ferries():
     print("ferry", write_geojsonseq(LAYERS / "ferry.geojsonseq", out))
 
 
-def classify_facility(p):
-    name = p.get("name", "") or ""
-    op = p.get("operator", "") or ""
-    text = name + " " + op + " " + (p.get("official_name", "") or "")
-    amenity = p.get("amenity")
-    if amenity == "embassy" or p.get("office") == "diplomatic" or "diplomatic" in p:
-        sub = p.get("diplomatic") or ("embassy" if amenity == "embassy" else "diplomatic")
-        return "embassy", sub
-    if p.get("military") or p.get("landuse") == "military":
-        return "national", "military"
-    tokyo = TOKYO.search(name) or TOKYO_OPERATOR.search(op)
-    if tokyo and not re.search(r"(区立|区役所|市立|市役所)", name):
-        if amenity == "police" or "警察署" in name or "交番" in name:
-            if "交番" in name or "駐在所" in name or p.get("police") == "koban":
-                return None
-            return "tokyo", "police"
-        if amenity == "fire_station" or "消防署" in name or "消防" in op:
-            return "tokyo", "fire_station"
-        return "tokyo", p.get("government") or amenity or p.get("tourism") or p.get("leisure") or p.get("office") or "facility"
-    if NATIONAL.search(text) and not re.search(r"(都立|区立|区役所|警視庁)", text):
-        if p.get("office") == "government" or p.get("government") or amenity in GOV_TAGS or p.get("building") in ("government", "public", "civic"):
-            return "national", p.get("government") or amenity or "office"
-        if re.search(r"(国立|独立行政法人)", text) or re.search(r"(省|庁|裁判所|税務署|法務局|国会|議員会館|公共職業安定所|ハローワーク|労働基準監督署|年金事務所|税関|迎賓館|首相官邸|拘置所)", name):
-            return "national", amenity or p.get("tourism") or "office"
-    if amenity == "townhall" or WARD.search(name) and (p.get("office") == "government" or amenity in ("townhall", "community_centre")):
-        return "ward", amenity or "office"
-    if p.get("office") == "government" or p.get("government"):
-        return "national" if NATIONAL.search(text) else "other_gov", p.get("government") or "office"
-    if amenity == "courthouse":
-        return "national", "courthouse"
-    return None
-
-
-def ward_area():
-    area = shape(json.loads((WORK / "wards_union.geojson").read_text())).buffer(0.002)
-    shapely.prepare(area)
-    return area
-
-
-def facilities():
-    area = ward_area()
-    out = []
-    filters = [
-        "nwr/office=government,diplomatic", "nwr/government", "nwr/diplomatic", "nwr/military", "wr/landuse=military",
-        "nwr/amenity=townhall,courthouse,police,fire_station,embassy,prison,library,hospital,school,university,college,community_centre,arts_centre,social_facility",
-        "nwr/tourism=museum,gallery", "nwr/leisure=park,sports_centre,stadium,garden", "nwr/building=government,public,civic",
-    ]
-    seen = set()
-    for f in export("facility", filters):
-        p = f["properties"]
-        res = classify_facility(p)
-        if not res:
-            continue
-        pt = centroid_feature(f)
-        if not area.contains(shapely.Point(pt["coordinates"])):
-            continue
-        cat, sub = res
-        key = (cat, p.get("name"), p.get("@type"), p.get("@id"))
-        if key in seen:
-            continue
-        seen.add(key)
-        mz = {"embassy": 12, "national": 11, "tokyo": 12, "ward": 12, "other_gov": 13}[cat]
-        if cat == "tokyo" and sub in ("police", "fire_station"):
-            mz = 13
-        if cat == "tokyo" and p.get("leisure") == "park":
-            mz = 12
-        props = {
-            "cat": cat, "sub": sub, "name": p.get("name"), "name_en": p.get("name:en"), "operator": p.get("operator"),
-            "country": p.get("country") or p.get("target"), "osm": f"{p.get('@type')}/{p.get('@id')}",
-            "addr": " ".join(x for x in [p.get("addr:city"), p.get("addr:quarter"), p.get("addr:neighbourhood"), p.get("addr:block_number"), p.get("addr:housenumber")] if x) or None,
-            "website": p.get("website") or p.get("contact:website"),
-        }
-        out.append(with_zoom(feature(pt, props), mz))
-    print("facility", write_geojsonseq(LAYERS / "facility.geojsonseq", out))
-
-
 def places():
     out = []
     for f in export("place", ["n/place=city,town,suburb,quarter,neighbourhood,village,island"]):
@@ -400,7 +314,7 @@ def places():
 def main():
     LAYERS.mkdir(parents=True, exist_ok=True)
     (WORK / "export_all_lines.json").write_text(json.dumps({"linear_tags": True, "area_tags": False}))
-    steps = [buildings, roads, water, green, railways, stations, buses, ferries, facilities, places]
+    steps = [buildings, roads, water, green, railways, stations, buses, ferries, places]
     only = set(sys.argv[1:])
     for step in steps:
         if not only or step.__name__ in only:

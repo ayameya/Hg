@@ -14,10 +14,9 @@ await build({
   format: "iife",
   target: ["es2020"],
   outfile: join(out, "app.js"),
-  legalComments: "linked",
+  legalComments: "none",
 });
 
 cpSync(join(here, "index.html"), join(out, "index.html"));
 cpSync(join(here, "app.css"), join(out, "app.css"));
-cpSync(join(here, "node_modules", "maplibre-gl", "dist", "maplibre-gl.css"), join(out, "maplibre-gl.css"));
 console.log("built", out);

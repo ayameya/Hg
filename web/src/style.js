@@ -12,289 +12,170 @@ export const CAT_LABELS = {
   public: "公共地下道・横断地下道",
 };
 
-export const FAC_COLORS = {
-  national: "#6b3fa0",
-  tokyo: "#0b7a75",
-  ward: "#4f7f2a",
-  other_gov: "#777777",
-  embassy: "#c0392b",
+export const FACILITY = {
+  national: { label: "国の機関", color: "#6b3fa0", glyph: "国", zoom: 13 },
+  tokyo: { label: "都の機関・都立施設", color: "#0b7a75", glyph: "都", zoom: 13 },
+  ward: { label: "区の施設", color: "#4f7f2a", glyph: "区", zoom: 14 },
+  police: { label: "警察署・交番", color: "#2c4a8a", glyph: "警", zoom: 14 },
+  fire: { label: "消防署", color: "#b8321f", glyph: "消", zoom: 15 },
+  post: { label: "郵便局", color: "#d0342c", glyph: "〒", zoom: 15 },
+  culture: { label: "図書館・博物館・美術館", color: "#8a5a14", glyph: "館", zoom: 14 },
+  sports: { label: "スポーツ施設", color: "#3b7fb0", glyph: "運", zoom: 16 },
+  school: { label: "学校", color: "#5a6b2f", glyph: "文", zoom: 15 },
+  medical: { label: "病院", color: "#c0392b", glyph: "+", zoom: 15 },
+  welfare: { label: "福祉施設・保育所", color: "#9a6aa8", glyph: "福", zoom: 17 },
+  toilet: { label: "公衆トイレ", color: "#2d7fa6", glyph: "W", zoom: 16 },
+  park: { label: "公園", color: "#3f8f3f", glyph: "", zoom: 15 },
+  embassy: { label: "大使館・領事館", color: "#9b2335", glyph: "大", zoom: 14 },
+  other: { label: "その他の公的機関", color: "#6f6f6f", glyph: "公", zoom: 16 },
 };
 
-export const FAC_LABELS = {
-  national: "国の施設",
-  tokyo: "東京都の施設",
-  ward: "区の施設",
-  other_gov: "その他の官公署",
-  embassy: "大使館・領事館",
+const ROAD_W = {
+  1: [[10, 1.6], [14, 3], [16, 7], [19, 22]],
+  2: [[10, 1.4], [14, 2.6], [16, 6], [19, 20]],
+  3: [[10, 1], [14, 2.2], [16, 5], [19, 18]],
+  4: [[11, 0.7], [14, 1.8], [16, 4], [19, 15]],
+  5: [[12, 0.6], [14, 1.4], [16, 3.2], [19, 12]],
+  6: [[13, 0.5], [15, 1], [16, 2], [19, 8]],
+  7: [[14, 0.4], [16, 1.2], [19, 5]],
+  8: [[15, 0.4], [17, 1], [19, 2.5]],
 };
+const ROAD_C = { 1: "#e9b86a", 2: "#e9c486", 3: "#c9c4b8", 4: "#cfcabe", 5: "#d4d0c6", 6: "#dcd8cf", 7: "#e2dfd8", 8: "#d9d3c8" };
 
-const FONT = ["Noto Sans Regular"];
-const FONT_BOLD = ["Noto Sans Medium"];
-const NAME = ["coalesce", ["get", "name"], ""];
-
-export function baseStyle(pmtilesUrl, glyphsUrl) {
-  return {
-    version: 8,
-    glyphs: glyphsUrl,
-    sources: {
-      base: {
-        type: "vector",
-        url: pmtilesUrl,
-        attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>',
-      },
-    },
-    layers: [
-      { id: "bg", type: "background", paint: { "background-color": "#f6f5f1" } },
-      { id: "green", type: "fill", source: "base", "source-layer": "green", paint: { "fill-color": "#e2ecd6" } },
-      { id: "water", type: "fill", source: "base", "source-layer": "water", paint: { "fill-color": "#c9dfee" } },
-      {
-        id: "waterway", type: "line", source: "base", "source-layer": "waterway",
-        paint: { "line-color": "#c9dfee", "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.6, 16, 4] },
-      },
-      {
-        id: "building", type: "fill", source: "base", "source-layer": "building", minzoom: 14,
-        paint: { "fill-color": "#ebe9e3", "fill-outline-color": "#d6d3ca", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 14, 0, 15, 1] },
-      },
-      {
-        id: "road-casing", type: "line", source: "base", "source-layer": "road",
-        filter: ["all", ["!=", ["get", "tunnel"], 1], ["!=", ["get", "class"], "path"]],
-        layout: { "line-join": "round", "line-cap": "round" },
-        paint: {
-          "line-color": "#d8d5cc",
-          "line-width": ["interpolate", ["exponential", 1.6], ["zoom"],
-            10, ["match", ["get", "class"], ["motorway", "trunk"], 2.2, "primary", 1.8, "secondary", 1.4, 0.6],
-            16, ["match", ["get", "class"], ["motorway", "trunk"], 16, "primary", 14, "secondary", 12, "tertiary", 10, "minor", 7, 4],
-            18, ["match", ["get", "class"], ["motorway", "trunk"], 40, "primary", 34, "secondary", 30, "tertiary", 26, "minor", 18, 10]],
-        },
-      },
-      {
-        id: "road", type: "line", source: "base", "source-layer": "road",
-        filter: ["all", ["!=", ["get", "tunnel"], 1], ["!=", ["get", "class"], "path"]],
-        layout: { "line-join": "round", "line-cap": "round" },
-        paint: {
-          "line-color": ["match", ["get", "class"], ["motorway", "trunk"], "#fbe7c6", "#ffffff"],
-          "line-width": ["interpolate", ["exponential", 1.6], ["zoom"],
-            10, ["match", ["get", "class"], ["motorway", "trunk"], 1.4, "primary", 1.1, "secondary", 0.8, 0.3],
-            16, ["match", ["get", "class"], ["motorway", "trunk"], 13, "primary", 11.5, "secondary", 9.5, "tertiary", 8, "minor", 5.5, 3],
-            18, ["match", ["get", "class"], ["motorway", "trunk"], 36, "primary", 31, "secondary", 27, "tertiary", 23, "minor", 16, 8]],
-        },
-      },
-      {
-        id: "path", type: "line", source: "base", "source-layer": "road", minzoom: 15,
-        filter: ["==", ["get", "class"], "path"],
-        paint: { "line-color": "#d2cfc6", "line-width": ["interpolate", ["linear"], ["zoom"], 15, 0.5, 18, 2], "line-dasharray": [2, 1] },
-      },
-      {
-        id: "ward-line", type: "line", source: "base", "source-layer": "ward",
-        paint: { "line-color": "#9c8fb0", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.8, 15, 2.2], "line-dasharray": [3, 1.5, 1, 1.5] },
-      },
-      {
-        id: "ferry-route", type: "line", source: "base", "source-layer": "ferry",
-        filter: ["==", ["get", "kind"], "ferry_route"],
-        metadata: { group: "ferry" },
-        paint: { "line-color": "#3a7dc9", "line-width": 1.6, "line-dasharray": [4, 3] },
-      },
-      {
-        id: "bus-route", type: "line", source: "base", "source-layer": "bus_route",
-        metadata: { group: "bus" },
-        layout: { "line-join": "round", "line-cap": "round" },
-        paint: {
-          "line-color": "#e08a1e",
-          "line-opacity": 0.55,
-          "line-width": ["interpolate", ["linear"], ["zoom"], 11, ["min", 3, ["+", 0.6, ["*", 0.25, ["get", "n"]]]], 17, ["min", 8, ["+", 1.5, ["*", 0.6, ["get", "n"]]]]],
-        },
-      },
-      {
-        id: "rail-tunnel", type: "line", source: "base", "source-layer": "rail",
-        filter: ["==", ["get", "tunnel"], 1],
-        metadata: { group: "rail" },
-        paint: {
-          "line-color": ["coalesce", ["get", "colour"], "#8a8a8a"],
-          "line-opacity": 0.5,
-          "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1, 16, 3.5],
-          "line-dasharray": [2, 1.2],
-        },
-      },
-      {
-        id: "rail-casing", type: "line", source: "base", "source-layer": "rail",
-        filter: ["all", ["!=", ["get", "tunnel"], 1], ["!", ["has", "colour"]]],
-        metadata: { group: "rail" },
-        paint: { "line-color": "#777777", "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.4, 16, 4] },
-      },
-      {
-        id: "rail-hatch", type: "line", source: "base", "source-layer": "rail",
-        filter: ["all", ["!=", ["get", "tunnel"], 1], ["!", ["has", "colour"]]],
-        metadata: { group: "rail" },
-        paint: { "line-color": "#ffffff", "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.6, 16, 2], "line-dasharray": [3, 3] },
-      },
-      {
-        id: "rail-colour", type: "line", source: "base", "source-layer": "rail",
-        filter: ["all", ["!=", ["get", "tunnel"], 1], ["has", "colour"]],
-        metadata: { group: "rail" },
-        paint: { "line-color": ["get", "colour"], "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.4, 16, 4] },
-      },
-      {
-        id: "bus-stop", type: "circle", source: "base", "source-layer": "bus_stop", minzoom: 15,
-        metadata: { group: "busstop" },
-        paint: { "circle-radius": 3, "circle-color": "#ffffff", "circle-stroke-color": "#e08a1e", "circle-stroke-width": 1.5 },
-      },
-      {
-        id: "ferry-terminal", type: "circle", source: "base", "source-layer": "ferry",
-        filter: ["==", ["get", "kind"], "ferry_terminal"],
-        metadata: { group: "ferry" },
-        paint: { "circle-radius": 6, "circle-color": "#3a7dc9", "circle-stroke-color": "#ffffff", "circle-stroke-width": 2 },
-      },
-      {
-        id: "facility", type: "circle", source: "base", "source-layer": "facility",
-        metadata: { group: "facility" },
-        paint: {
-          "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 3, 16, 6],
-          "circle-color": ["match", ["get", "cat"], "national", FAC_COLORS.national, "tokyo", FAC_COLORS.tokyo, "ward", FAC_COLORS.ward, "embassy", FAC_COLORS.embassy, FAC_COLORS.other_gov],
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 1.5,
-        },
-      },
-      {
-        id: "station", type: "circle", source: "base", "source-layer": "station",
-        metadata: { group: "station" },
-        paint: {
-          "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 2.5, 16, 6],
-          "circle-color": "#ffffff",
-          "circle-stroke-color": "#333333",
-          "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 11, 1.2, 16, 2],
-        },
-      },
-    ],
-  };
+function interp(stops, z) {
+  if (z <= stops[0][0]) return stops[0][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (z <= stops[i][0]) {
+      const [z0, v0] = stops[i - 1];
+      const [z1, v1] = stops[i];
+      return v0 * (v1 / v0) ** ((z - z0) / (z1 - z0));
+    }
+  }
+  return stops[stops.length - 1][1];
 }
 
-export function labelLayers() {
-  return [
-    {
-      id: "road-label", type: "symbol", source: "base", "source-layer": "road", minzoom: 14,
-      filter: ["all", ["has", "name"], ["match", ["get", "class"], ["motorway", "trunk", "primary", "secondary", "tertiary"], true, false]],
-      layout: { "symbol-placement": "line", "text-field": NAME, "text-font": FONT, "text-size": 11 },
-      paint: { "text-color": "#6f6a60", "text-halo-color": "#ffffff", "text-halo-width": 1.5 },
-    },
-    {
-      id: "place-label", type: "symbol", source: "base", "source-layer": "place",
-      layout: { "text-field": NAME, "text-font": FONT, "text-size": ["match", ["get", "kind"], ["quarter", "neighbourhood"], 11, 13] },
-      paint: { "text-color": "#8a8478", "text-halo-color": "#f6f5f1", "text-halo-width": 1.5 },
-    },
-    {
-      id: "ward-label", type: "symbol", source: "base", "source-layer": "ward_label", maxzoom: 14,
-      layout: { "text-field": NAME, "text-font": FONT_BOLD, "text-size": ["interpolate", ["linear"], ["zoom"], 9, 12, 13, 18] },
-      paint: { "text-color": "#6d5f86", "text-halo-color": "#ffffff", "text-halo-width": 2 },
-    },
-    {
-      id: "facility-label", type: "symbol", source: "base", "source-layer": "facility", minzoom: 14,
-      metadata: { group: "facility" },
-      layout: { "text-field": NAME, "text-font": FONT, "text-size": 11, "text-offset": [0, 0.9], "text-anchor": "top", "text-optional": true },
-      paint: {
-        "text-color": ["match", ["get", "cat"], "national", FAC_COLORS.national, "tokyo", FAC_COLORS.tokyo, "ward", FAC_COLORS.ward, "embassy", FAC_COLORS.embassy, FAC_COLORS.other_gov],
-        "text-halo-color": "#ffffff", "text-halo-width": 1.5,
-      },
-    },
-    {
-      id: "ferry-label", type: "symbol", source: "base", "source-layer": "ferry", minzoom: 12,
-      filter: ["==", ["get", "kind"], "ferry_terminal"],
-      metadata: { group: "ferry" },
-      layout: { "text-field": NAME, "text-font": FONT, "text-size": 11, "text-offset": [0, 1], "text-anchor": "top" },
-      paint: { "text-color": "#2b5f9a", "text-halo-color": "#ffffff", "text-halo-width": 1.5 },
-    },
-    {
-      id: "busstop-label", type: "symbol", source: "base", "source-layer": "bus_stop", minzoom: 17,
-      metadata: { group: "busstop" },
-      layout: { "text-field": NAME, "text-font": FONT, "text-size": 10, "text-offset": [0, 0.8], "text-anchor": "top", "text-optional": true },
-      paint: { "text-color": "#a2600f", "text-halo-color": "#ffffff", "text-halo-width": 1.2 },
-    },
-    {
-      id: "station-label", type: "symbol", source: "base", "source-layer": "station", minzoom: 12,
-      metadata: { group: "station" },
-      layout: { "text-field": NAME, "text-font": FONT_BOLD, "text-size": ["interpolate", ["linear"], ["zoom"], 12, 11, 16, 14], "text-offset": [0, 0.9], "text-anchor": "top" },
-      paint: { "text-color": "#222222", "text-halo-color": "#ffffff", "text-halo-width": 2 },
-    },
-  ];
+function addParts(p, parts, closed) {
+  for (const ring of parts) {
+    p.moveTo(ring[0], ring[1]);
+    for (let i = 2; i < ring.length; i += 2) p.lineTo(ring[i], ring[i + 1]);
+    if (closed) p.closePath();
+  }
 }
 
-export function networkLayers() {
-  const catColor = ["match", ["get", "cat"], "station", CAT_COLORS.station, "mall", CAT_COLORS.mall, "building", CAT_COLORS.building, CAT_COLORS.public];
-  const width = ["interpolate", ["linear"], ["zoom"], 11, 1.2, 15, 3, 18, 7];
-  return [
-    {
-      id: "ug-area", type: "fill", source: "areas", minzoom: 14,
-      paint: { "fill-color": "#6d8fb3", "fill-opacity": 0.18, "fill-outline-color": "#6d8fb3" },
-    },
-    {
-      id: "net-closed", type: "line", source: "net",
-      layout: { "line-cap": "round", "line-join": "round" },
-      paint: {
-        "line-color": "#c23b3b",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 0.8, 15, 2, 18, 4],
-        "line-dasharray": [1, 1.5],
-        "line-opacity": ["case", ["==", ["feature-state", "st"], 0], 0.75, 0],
-      },
-    },
-    {
-      id: "net-isolated", type: "line", source: "net",
-      layout: { "line-cap": "round", "line-join": "round" },
-      paint: {
-        "line-color": "#9a9a9a",
-        "line-width": width,
-        "line-opacity": ["case", ["==", ["feature-state", "st"], 1], 0.8, 0],
-      },
-    },
-    {
-      id: "net-open-casing", type: "line", source: "net",
-      layout: { "line-cap": "round", "line-join": "round" },
-      paint: {
-        "line-color": "#ffffff",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 2.4, 15, 5.5, 18, 11],
-        "line-opacity": ["case", ["==", ["feature-state", "st"], 2], 0.9, 0],
-      },
-    },
-    {
-      id: "net-open", type: "line", source: "net",
-      layout: { "line-cap": "round", "line-join": "round" },
-      paint: {
-        "line-color": catColor,
-        "line-width": width,
-        "line-opacity": ["case", ["==", ["feature-state", "st"], 2], 1, 0],
-      },
-    },
-    {
-      id: "net-hit", type: "line", source: "net",
-      paint: { "line-color": "#000000", "line-width": 12, "line-opacity": 0 },
-    },
-    {
-      id: "route", type: "line", source: "route",
-      layout: { "line-cap": "round", "line-join": "round" },
-      paint: { "line-color": "#ffcc00", "line-width": ["interpolate", ["linear"], ["zoom"], 11, 4, 18, 12], "line-opacity": 0.85 },
-    },
-    {
-      id: "access", type: "circle", source: "access", minzoom: 14,
-      paint: {
-        "circle-radius": ["interpolate", ["linear"], ["zoom"], 14, 2.5, 18, 7],
-        "circle-color": ["case", ["==", ["feature-state", "open"], false], "#c23b3b", ["==", ["get", "entrance"], 1], "#111111", "#ffffff"],
-        "circle-stroke-color": ["case", ["==", ["feature-state", "open"], false], "#ffffff", "#111111"],
-        "circle-stroke-width": 1.2,
-        "circle-opacity": accessOpacity(false),
-        "circle-stroke-opacity": accessOpacity(false),
-      },
-    },
-    {
-      id: "access-label", type: "symbol", source: "access", minzoom: 16,
-      filter: ["!=", ["get", "ref"], ""],
-      layout: { "text-field": ["get", "ref"], "text-font": FONT_BOLD, "text-size": 11, "text-offset": [0, -1.1], "text-allow-overlap": false },
-      paint: { "text-color": "#111111", "text-halo-color": "#ffffff", "text-halo-width": 2 },
-    },
-    {
-      id: "route-ends", type: "circle", source: "route-ends",
-      paint: { "circle-radius": 7, "circle-color": ["match", ["get", "kind"], "from", "#1a9e6a", "#c23b3b"], "circle-stroke-color": "#ffffff", "circle-stroke-width": 2 },
-    },
-  ];
+function bucketKey(layer, props) {
+  switch (layer) {
+    case "road":
+      return String(props.c || 6);
+    case "rail":
+      return `${props.c || ""}|${props.t ? 1 : 0}|${props.s ? 1 : 0}`;
+    case "waterway":
+      return props.r ? "r" : "s";
+    case "ferry":
+      return "f";
+    default:
+      return "_";
+  }
 }
 
-export function accessOpacity(showClosed) {
-  return ["case", ["==", ["feature-state", "open"], false], showClosed ? 1 : 0, 1];
-}
+const PATH_LAYERS = ["water", "park", "block", "waterway", "road", "rail", "ward", "bus", "ferry"];
+const POINT_LAYERS = ["station", "facility", "place", "wlabel", "bstop", "ferry"];
+
+export const style = {
+  background: "#fbfaf7",
+  prepare(layers) {
+    const paths = {};
+    const points = [];
+    let extent = 4096;
+    for (const name of PATH_LAYERS) {
+      const l = layers[name];
+      if (!l) continue;
+      extent = l.extent;
+      const groups = new Map();
+      for (const f of l.features) {
+        if (f.type === 1) continue;
+        const k = bucketKey(name, f.props);
+        if (!groups.has(k)) groups.set(k, []);
+        groups.get(k).push(f);
+      }
+      const buckets = [];
+      for (const [k, fs] of groups) {
+        const p = new Path2D();
+        for (const f of fs) addParts(p, f.parts, f.type === 3);
+        buckets.push([k, p]);
+      }
+      if (name === "road") buckets.sort((a, b) => Number(b[0]) - Number(a[0]));
+      paths[name] = buckets;
+    }
+    for (const name of POINT_LAYERS) {
+      const l = layers[name];
+      if (!l) continue;
+      for (const f of l.features) {
+        if (f.type !== 1) continue;
+        for (const part of f.parts) points.push({ layer: name, x: part[0], y: part[1], props: f.props });
+      }
+    }
+    return { extent, paths, points };
+  },
+  layers: [
+    { source: "water", paint: () => ({ fill: "#d3e5f2" }) },
+    { source: "park", minzoom: 13, paint: () => ({ fill: "#e8f0df" }) },
+    { source: "block", minzoom: 15, group: "building", paint: (k, z) => ({ fill: "#f0ede7", stroke: "#cbc5ba", width: z < 16 ? 0.4 : 0.7 }) },
+    { source: "waterway", paint: (k, z) => ({ stroke: "#bcd6ea", width: k === "r" ? interp([[11, 1], [16, 4]], z) : 0.8 }) },
+    { source: "road", paint: (k, z) => (z < ROAD_W[k][0][0] ? null : { stroke: ROAD_C[k], width: interp(ROAD_W[k], z), dash: k === "8" ? [2, 2] : null }) },
+    { source: "ward", paint: (k, z) => ({ stroke: "#a99bbd", width: z < 13 ? 1 : 1.6, dash: [5, 3] }) },
+    { source: "bus", group: "bus", paint: (k, z) => ({ stroke: "rgba(224,138,30,0.55)", width: z < 15 ? 1.2 : 2.4 }) },
+    { source: "ferry", group: "ferry", paint: () => ({ stroke: "#3a7dc9", width: 1.4, dash: [5, 4] }) },
+    {
+      source: "rail",
+      group: "rail",
+      paint: (k, z) => {
+        const [c, t, s] = k.split("|");
+        const w = interp([[10, s === "1" ? 0.5 : 1.2], [16, s === "1" ? 1 : 3], [19, s === "1" ? 2 : 6]], z);
+        if (t === "1") return { stroke: c ? `${c}80` : "#9a9a9a80", width: w, dash: [4, 3] };
+        return { stroke: c || "#6d6d6d", width: w };
+      },
+    },
+  ],
+  point(p, z, hidden) {
+    const pr = p.props;
+    switch (p.layer) {
+      case "wlabel":
+        if (z >= 14) return null;
+        return { priority: 40, text: pr.n, font: "700 15px system-ui, sans-serif", size: 15, textColor: "#6d5f86", textRequired: true };
+      case "place":
+        if (z < (pr.k === 1 ? 14 : 16)) return null;
+        return { priority: 60, text: pr.n, font: "12px system-ui, sans-serif", size: 12, textColor: "#8a8478", textRequired: true };
+      case "station":
+        if (hidden.has("station") || z < 11) return null;
+        return { priority: 10, radius: z < 14 ? 3 : 5, color: "#fff", ring: "#222", ringWidth: 2, text: z >= 12.5 ? pr.n : null, font: "700 13px system-ui, sans-serif", size: 13, textColor: "#111" };
+      case "bstop":
+        if (hidden.has("bus") || z < 17) return null;
+        return { priority: 70, radius: 3, color: "#fff", ring: "#e08a1e", text: z >= 18 ? pr.n : null, font: "11px system-ui, sans-serif", size: 11, textColor: "#a2600f" };
+      case "ferry":
+        if (hidden.has("ferry") || !pr.k) return null;
+        return { priority: 20, radius: 6, color: "#3a7dc9", ring: "#fff", glyph: "船", text: z >= 13 ? pr.n : null, font: "12px system-ui, sans-serif", size: 12, textColor: "#2b5f9a" };
+      case "facility": {
+        const g = FACILITY[pr.g];
+        if (!g || hidden.has(`fac:${pr.g}`) || hidden.has("facility")) return null;
+        let minz = g.zoom;
+        if (pr.g === "police" && pr.s === "station") minz = 13;
+        if (pr.g === "ward" && pr.s === "townhall") minz = 12;
+        if (z < minz) return null;
+        const big = z >= minz + 1.5 && g.glyph;
+        return {
+          priority: 30 + Object.keys(FACILITY).indexOf(pr.g),
+          radius: big ? 7 : 3.5,
+          color: g.color,
+          ring: "#fff",
+          glyph: big ? g.glyph : null,
+          text: z >= minz + 2 ? pr.n : null,
+          font: "11px system-ui, sans-serif",
+          size: 11,
+          textColor: g.color,
+        };
+      }
+      default:
+        return null;
+    }
+  },
+};

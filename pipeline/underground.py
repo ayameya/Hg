@@ -12,6 +12,8 @@ from shapely.geometry import LineString, Point, shape
 from shapely.strtree import STRtree
 
 from common import OUT, PIPE, WORK, haversine, line_length, parse_layer, parse_levels, r6, write_json
+from exits import load_rules as load_ekitan_rules
+from exits import norm_label
 
 PED = {"footway", "pedestrian", "path", "corridor", "steps", "elevator", "living_street", "track"}
 LINKLIKE = {"steps", "elevator"}
@@ -338,6 +340,7 @@ def apply_hours(edges, rules):
             e["oh"], e["src"], e["conf"], e["note"], e["rule"] = oh, "default", "low", note, None
 
 
+STATION_NAMES = set()
 EXIT_REF = re.compile(r"(?<![A-Za-z0-9])([A-Z]{1,2}\d{1,2}[a-z]?(?:\(\d\))?)(?![A-Za-z0-9])")
 
 
@@ -348,27 +351,52 @@ def exit_ref(t):
     return m.group(1) if m else ""
 
 
-def rule_station_ok(r, t, coord, station_lookup):
+def rule_station_ok(r, t, coord, station_lookup, station_names):
     want = r.get("station")
     if not want:
         return True
     name = t.get("name", "") or ""
     if want in name:
         return True
-    if re.sub(EXIT_REF, "", name).strip(" 　駅出入口") and not name.startswith(want):
+    if any(n in name for n in station_names if n != want and want not in n):
         return False
     return want in station_lookup(coord)
 
 
-def node_hours(t, coord, label, flags, entrance_rules, ohid, station_lookup):
+def node_labels(t, station):
+    out = set()
+    for v in (t.get("ref"), t.get("name"), exit_ref(t)):
+        if v:
+            n = norm_label(v, station)
+            if n:
+                out.add(n)
+    return out
+
+
+def node_hours(t, coord, flags, entrance_rules, ohid, station_lookup, matched):
     gate = bool(flags & 6) or "barrier" in t or "door" in t
+    if flags & 2:
+        for r in entrance_rules:
+            if haversine(coord, r["center"]) > r["radius_m"]:
+                continue
+            if r["label"] in node_labels(t, r["station"]) and rule_station_ok(r, t, coord, station_lookup, STATION_NAMES):
+                matched.add(r["id"])
+                return ohid(r["opening_hours"]), r.get("kind", "override"), r["id"]
     if "opening_hours" in t and gate and "shop" not in t and "amenity" not in t:
         return ohid(t["opening_hours"]), "osm", ""
-    if flags & 2 and label:
-        for r in entrance_rules:
-            if label in r["refs"] and haversine(coord, r["center"]) <= r["radius_m"] and rule_station_ok(r, t, coord, station_lookup):
-                return ohid(r["opening_hours"]), "override", r["id"]
     return -1, "", ""
+
+
+def load_entrance_rules():
+    manual = []
+    for r in json.loads((PIPE / "overrides" / "hours.json").read_text(encoding="utf-8")).get("entrances", []):
+        for ref in r["refs"]:
+            manual.append(dict(r, label=norm_label(ref), kind="override"))
+    ek, stats = load_ekitan_rules()
+    for r in ek:
+        r["kind"] = "ekitan"
+    print("ekitan", {k: v for k, v in stats.items() if k != "unparsed"})
+    return manual + ek
 
 
 def write_areas(ug_areas, union):
@@ -401,7 +429,8 @@ def build(ways, surface_nodes, points, polys, buildings, union):
             e["cat_base"] = e["cat"]
     rules = load_overrides(polys)
     apply_hours(edges, rules)
-    entrance_rules = json.loads((PIPE / "overrides" / "hours.json").read_text(encoding="utf-8")).get("entrances", [])
+    entrance_rules = load_entrance_rules()
+    matched = set()
 
     node_ids = {}
     nodes = []
@@ -495,17 +524,20 @@ def build(ways, surface_nodes, points, polys, buildings, union):
             continue
         if not shapely.contains_xy(union, lon, lat):
             continue
-        near = tree.query(Point(lon, lat), predicate="dwithin", distance=0.0005) if tree is not None else []
+        near = tree.query(Point(lon, lat), predicate="dwithin", distance=0.0008) if tree is not None else []
         if len(near) == 0:
             continue
         best = int(min(near, key=lambda i: haversine((lon, lat), nodes[i]["c"])))
         d = haversine((lon, lat), nodes[best]["c"])
-        if d > 40:
+        if d > 60:
             continue
         unattached.append((ref, lon, lat, t, best, d))
 
     st_list = [(v[1], v[2], v[3].get("name", "")) for v in points.values() if v[0] == "station" and v[3].get("name")]
     st_tree = STRtree([Point(x, y) for x, y, _ in st_list])
+
+    STATION_NAMES.clear()
+    STATION_NAMES.update(n for _, _, n in st_list if len(n) >= 2)
 
     def station_lookup(coord):
         i = st_tree.nearest(Point(coord))
@@ -524,13 +556,13 @@ def build(ways, surface_nodes, points, polys, buildings, union):
             flags |= 4
         label = exit_ref(t)
         name = t.get("name") or ""
-        oh, src, rule = node_hours(t, n["c"], label, flags, entrance_rules, ohid, station_lookup)
+        oh, src, rule = node_hours(t, n["c"], flags, entrance_rules, ohid, station_lookup, matched)
         out_nodes.append([r6(n["c"][0]), r6(n["c"][1]), flags, oh, label, name, ref, src, rule])
 
     for ref, lon, lat, t, best, d in unattached:
         idx = len(out_nodes)
         flags = 1 | 2
-        oh, src, rule = node_hours(t, (lon, lat), exit_ref(t), flags, entrance_rules, ohid, station_lookup)
+        oh, src, rule = node_hours(t, (lon, lat), flags, entrance_rules, ohid, station_lookup, matched)
         out_nodes.append([r6(lon), r6(lat), flags, oh, exit_ref(t), t.get("name") or "", ref, src, rule])
         bx, by = nodes[best]["c"]
         host = next((e for e in out_edges if e[0] == best or e[1] == best), None)
@@ -539,12 +571,34 @@ def build(ways, surface_nodes, points, polys, buildings, union):
             host[10] if host else ohid(DEFAULT_HOURS["station"][0]), "virtual", "low", noteid("OSM上で出入口ノードが地下通路に接続されていないため、最寄りの地下通路ノードへ仮接続（通行時間は接続先の通路に準じる）"), "", "",
         ])
 
-    rules_meta = [{k: v for k, v in r.items() if not k.startswith("_") and k != "match"} for r in rules + entrance_rules]
+    placed = {n[6] for n in out_nodes}
+    standalone = 0
+    for ref, (kind, lon, lat, t) in points.items():
+        if kind != "entrance" or ref in placed:
+            continue
+        if t.get("railway") not in ("subway_entrance", "train_station_entrance"):
+            continue
+        if not shapely.contains_xy(union, lon, lat):
+            continue
+        flags = 1 | 2 | 8
+        oh, src, rule = node_hours(t, (lon, lat), flags, entrance_rules, ohid, station_lookup, matched)
+        out_nodes.append([r6(lon), r6(lat), flags, oh, exit_ref(t), t.get("name") or "", ref, src, rule, station_lookup((lon, lat))])
+        standalone += 1
+    for n in out_nodes:
+        if len(n) == 9:
+            n.append(station_lookup((n[0], n[1])) if n[2] & 2 else "")
+    print("standalone entrances", standalone)
+
+    used = {r["id"] for r in rules} | matched
+    rules_meta = [{k: v for k, v in r.items() if not k.startswith("_") and k not in ("match", "label", "center", "radius_m", "refs", "kind")} for r in rules + entrance_rules if r["id"] in used]
+    unmatched = [r["name"] for r in entrance_rules if r["id"] not in matched]
+    print("entrance rules matched", len(matched), "of", len(entrance_rules), "unmatched sample", unmatched[:15])
+    write_json(WORK / "unmatched_exit_rules.json", unmatched)
     net = {
         "generated": subprocess.run(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"], capture_output=True, text=True).stdout.strip(),
         "source": "© OpenStreetMap contributors (ODbL)",
         "edge_fields": ["a", "b", "coords", "len", "way", "cat", "connector", "highway", "name", "level", "oh", "src", "conf", "note", "rule", "wheelchair"],
-        "node_fields": ["lon", "lat", "flags", "oh", "ref", "name", "osm_id", "src", "rule"],
+        "node_fields": ["lon", "lat", "flags", "oh", "ref", "name", "osm_id", "src", "rule", "station"],
         "oh": oh_table,
         "notes": note_table,
         "defaults": {k: {"opening_hours": v[0], "note": v[1]} for k, v in DEFAULT_HOURS.items()},

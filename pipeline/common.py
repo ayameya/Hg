@@ -1,11 +1,12 @@
 import json
 import math
+import os
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PIPE = ROOT / "pipeline"
-WORK = Path("/home/user/data")
+WORK = Path(os.environ.get("WORK", "/home/user/data"))
 OUT = ROOT / "docs" / "data"
 
 BBOX = (139.45, 35.40, 140.05, 35.95)
@@ -53,7 +54,7 @@ def line_length(coords):
 
 
 def r6(x):
-    return round(x, 7)
+    return round(x, 6)
 
 
 def write_json(path, obj):

@@ -4,15 +4,12 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --test test/*.test.mjs",
+    "test": "TZ=Asia/Tokyo node --test test/*.test.mjs",
     "serve": "node serve.mjs"
   },
-  "dependencies": {
-    "maplibre-gl": "^5.0.0",
+  "devDependencies": {
+    "esbuild": "^0.25.0",
     "opening_hours": "^3.8.0",
     "pmtiles": "^4.0.0"
-  },
-  "devDependencies": {
-    "esbuild": "^0.25.0"
   }
 }
