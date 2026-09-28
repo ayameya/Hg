@@ -72,9 +72,25 @@
     </div>
   </section>
   <section>
-    <h2>測位</h2>
+    <h2>歩行センサー（PDR）</h2>
+    <label><input type="checkbox" id="pdr-on">加速度・ジャイロで位置を推定する</label>
+    <label>身長 <input type="number" id="height" min="120" max="220" step="1" value="165"> cm</label>
+    <label><input type="checkbox" id="show-particles">推定の候補点を表示</label>
+    <div id="pdr-status" class="muted">停止中</div>
+    <p class="muted">電波で位置が分からない区間は、歩数・歩幅・向きから推定し、通路の形に沿って補正します。階段やエレベーターの動きも手がかりにします。位置がずれたら、地図上の通路や入口をタップして「ここにいる」を選んでください。</p>
+  </section>
+  <section>
+    <h2>センサー記録と学習</h2>
+    <div class="row wrap"><button id="rec">記録開始</button><button id="rec-export" disabled>書き出し</button><button id="rec-train" disabled>この記録で学習</button></div>
+    <div id="rec-labels" class="labels" hidden></div>
+    <div id="rec-status" class="muted"></div>
+    <div class="row wrap"><label class="file">記録を再生<input type="file" id="replay-file" accept="application/json,.json"></label><button id="model-reset">学習をリセット</button></div>
+    <div id="model-status" class="muted"></div>
+  </section>
+  <section>
+    <h2>外部測位</h2>
     <div id="pos-status" class="muted">未取得</div>
-    <p class="muted">外部の測位結果は <code>UGMap.setPosition({lat, lon, level, accuracy})</code> または <code>postMessage({type: "ugmap:position", ...})</code> で渡せます。</p>
+    <p class="muted">無線の測位結果は <code>UGMap.setPosition({lat, lon, level, accuracy})</code>、気圧は <code>UGMap.pushPressure(hPa)</code>、センサー値は <code>UGMap.pushMotion({...})</code> で渡せます（<code>postMessage</code> も可）。</p>
     <button id="export-anchors">測位用アンカー点をCSVで保存</button>
   </section>
   <section class="notes">

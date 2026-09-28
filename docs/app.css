@@ -268,3 +268,15 @@ input[type="date"] { flex: 1; padding: 5px 6px; font: inherit; border: 1px solid
   body:not(.sheet-open) #locate { bottom: 24px; }
   #attrib { display: block; bottom: 2px; }
 }
+
+.row.wrap { flex-wrap: wrap; margin: 4px 0; }
+.labels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 6px 0; }
+.labels button.on { background: var(--accent) !important; color: #fff; border-color: var(--accent) !important; }
+label.file { position: relative; overflow: hidden; padding: 5px 10px; border: 1px solid var(--line); background: #f7f7f5; border-radius: 6px; cursor: pointer; }
+label.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+#height { width: 5em; padding: 3px 6px; font: inherit; border: 1px solid var(--line); border-radius: 6px; }
+.pp-actions button + button { margin-left: 6px; }
+.pp-actions button.secondary { background: #eef3fb; color: var(--accent); }
+.pickmode .map-canvas { cursor: crosshair; }
+.banner { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background: #1f6fd1; color: #fff; padding: 6px 14px; border-radius: 16px; z-index: 6; box-shadow: var(--shadow); }
+.pickpos { width: 100%; margin: 4px 0 2px; padding: 6px; border: 1px dashed var(--accent); background: #f3f7fd; color: var(--accent); border-radius: 8px; }

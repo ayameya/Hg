@@ -3,6 +3,8 @@ import { PMTiles } from "./map/pmtiles.js";
 import { Network, meters } from "./network.js";
 import { Positioning } from "./positioning.js";
 import { describe } from "./schedule.js";
+import { ACTIVITIES } from "./pdr/motion.js";
+import { LABELS, trainFromLogs } from "./pdr/recorder.js";
 import { CAT_COLORS, CAT_LABELS, FACILITY, style } from "./style.js";
 
 const $ = (s) => document.querySelector(s);
@@ -228,7 +230,14 @@ const networkOverlay = {
     }
   },
   drawTop(ctx, view) {
-    const p = pos && pos.raw;
+    if (pos && state.showParticles && pos.filter.active) {
+      ctx.fillStyle = "rgba(200,60,160,0.45)";
+      for (const [lon, lat] of pos.filter.particles()) {
+        const [x, y] = view.toScreen(lon, lat);
+        ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+      }
+    }
+    const p = pos && pos.position;
     if (state.destination) {
       const [x, y] = view.toScreen(state.destination.lon, state.destination.lat);
       ctx.beginPath();
@@ -243,17 +252,19 @@ const networkOverlay = {
       ctx.fill();
     }
     if (!p) return;
-    const [rx, ry] = view.toScreen(p.lon, p.lat);
+    const rawp = pos.raw || p;
+    const [rx, ry] = view.toScreen(rawp.lon, rawp.lat);
     if (p.accuracy) {
+      const [ax, ay] = view.toScreen(p.lon, p.lat);
       const r = (p.accuracy / (156543.03 * Math.cos((p.lat * Math.PI) / 180))) * 2 ** view.zoom * 2;
       ctx.beginPath();
-      ctx.arc(rx, ry, Math.min(r, 400), 0, Math.PI * 2);
+      ctx.arc(ax, ay, Math.min(r, 400), 0, Math.PI * 2);
       ctx.fillStyle = "rgba(31,111,209,0.10)";
       ctx.fill();
     }
-    const at = pos.position;
+    const at = p;
     const [x, y] = view.toScreen(at.lon, at.lat);
-    if (pos.snapped) {
+    if (pos.raw && (pos.snapped || at.source.startsWith("pdr"))) {
       ctx.beginPath();
       ctx.arc(rx, ry, 3, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(90,90,90,0.6)";
@@ -270,7 +281,7 @@ const networkOverlay = {
     }
     ctx.beginPath();
     ctx.arc(x, y, 8, 0, Math.PI * 2);
-    ctx.fillStyle = "#1f6fd1";
+    ctx.fillStyle = at.source.startsWith("pdr") ? "#7a3fc2" : "#1f6fd1";
     ctx.fill();
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#fff";
@@ -315,8 +326,9 @@ function refreshGuide() {
   const ref = referencePoint();
   const date = currentDate();
   const box = $("#guide");
-  const head = ref.real ? (pos.raw.source === "gps" ? "現在地（GPS）" : `現在地（${escapeHtml(pos.raw.source)}）`) : "地図の中心";
-  let html = "";
+  const srcName = { gps: "GPS", pdr: "歩行推定", "pdr-free": "歩行推定・通路外", manual: "手動指定" };
+  const head = ref.real ? `現在地（${escapeHtml(srcName[ref.source] || ref.source)}）` : "地図の中心";
+  let html = ref.real ? "" : '<button class="pickpos" data-act="pick-pos">現在地を地図で指定</button>';
   if (state.destination && state.plan) {
     html += planHtml(ref, date);
   } else if (state.target != null) {
@@ -470,6 +482,7 @@ function edgePopup(i, lngLat) {
       ${e.wheelchair ? `<tr><th>車いす</th><td>${escapeHtml(e.wheelchair)}</td></tr>` : ""}
       <tr><th>延長</th><td>${e.len.toFixed(0)} m</td></tr>
     </table>${warn}
+    <div class="pp-actions"><button class="secondary" data-act="here" data-lon="${lngLat[0]}" data-lat="${lngLat[1]}" data-level="${e.level}">ここにいる</button></div>
     <div class="pp-foot">${e.way ? `<a href="https://www.openstreetmap.org/way/${e.way}" target="_blank" rel="noopener">OSM way/${e.way}</a>` : ""}</div>`);
 }
 
@@ -490,7 +503,7 @@ function entrancePopup(i) {
       ${hours}
       <tr><th>選択時刻</th><td><span class="${usable ? "ok" : "ng"}">${usable ? "利用可" : "利用不可"}</span></td></tr>
     </table>${iso}
-    <div class="pp-actions"><button data-act="guide-ent" data-i="${i}">ここへ案内</button></div>
+    <div class="pp-actions"><button data-act="guide-ent" data-i="${i}">ここへ案内</button><button class="secondary" data-act="here" data-lon="${n.lon}" data-lat="${n.lat}" data-level="0">ここにいる</button></div>
     <div class="pp-foot"><a href="https://www.openstreetmap.org/node/${n.osm_id}" target="_blank" rel="noopener">OSM node/${n.osm_id}</a></div>`);
 }
 
@@ -516,7 +529,7 @@ function featurePopup(f, lngLat) {
     kind = "バス停";
   }
   popupAt(lngLat, `<div class="pp-title">${escapeHtml(title || kind)}</div><div>${kind}</div>${extra.join("")}
-    <div class="pp-actions"><button data-act="go" data-lon="${lngLat[0]}" data-lat="${lngLat[1]}" data-name="${escapeHtml(title || kind)}">ここへ行く（地下優先）</button></div>`);
+    <div class="pp-actions"><button data-act="go" data-lon="${lngLat[0]}" data-lat="${lngLat[1]}" data-name="${escapeHtml(title || kind)}">ここへ行く（地下優先）</button><button class="secondary" data-act="here" data-lon="${lngLat[0]}" data-lat="${lngLat[1]}" data-level="0">ここにいる</button></div>`);
 }
 
 function pickEdge(x, y) {
@@ -531,6 +544,15 @@ function pickEdge(x, y) {
 
 map.on("click", (ev) => {
   if (!net) return;
+  if (state.picking) {
+    state.picking = false;
+    document.body.classList.remove("pickmode");
+    $("#banner")?.remove();
+    const e = pickEdge(ev.x, ev.y);
+    if (e) pos.setPosition({ lat: e.lat, lon: e.lon, level: net.edges[e.edge][net.ef.level], accuracy: 5, source: "manual" });
+    else pos.setPosition({ lat: ev.lngLat[1], lon: ev.lngLat[0], level: 0, accuracy: 10, source: "manual" });
+    return;
+  }
   const hit = map.pickLabel(ev.x, ev.y);
   if (hit && hit.feature && hit.feature.layer === "entrance") return entrancePopup(hit.feature.index);
   const edge = pickEdge(ev.x, ev.y);
@@ -582,6 +604,20 @@ document.addEventListener("click", (ev) => {
     state.plan = null;
     $("#popup").hidden = true;
     document.body.classList.add("sheet-open");
+  }
+  if (act === "here") {
+    $("#popup").hidden = true;
+    pos.setPosition({ lat: Number(t.dataset.lat), lon: Number(t.dataset.lon), level: Number(t.dataset.level), accuracy: 5, source: "manual" });
+  }
+  if (act === "pick-pos") {
+    state.picking = true;
+    document.body.classList.add("pickmode");
+    const b = document.createElement("div");
+    b.id = "banner";
+    b.className = "banner";
+    b.textContent = "いる場所をタップしてください";
+    document.body.appendChild(b);
+    return;
   }
   if (act === "go") {
     $("#popup").hidden = true;
@@ -702,6 +738,105 @@ function setupPanel() {
   });
 }
 
+function download(name, text, type) {
+  const blob = new Blob([text], { type });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function modelStatus() {
+  const m = pos.motion.model;
+  $("#model-status").textContent = m.trained ? `学習済みの判別モデルを使用中（${Object.entries(m.counts || {}).map(([k, v]) => `${LABELS[k] || k} ${v}歩`).join("・")}）` : "既定の判別モデル（未学習・確度低）を使用中";
+}
+
+function pdrStatus() {
+  const p = pos.pdr;
+  const est = pos.estimateCache;
+  const parts = [];
+  if (p.error) parts.push(p.error);
+  parts.push(p.enabled ? `歩数 ${p.steps}・歩幅 ${p.lastLength ? p.lastLength.toFixed(2) : "-"}m・${ACTIVITIES[p.activity] || p.activity}${p.confidence ? `（${Math.round(p.confidence * 100)}%）` : ""}` : "停止中");
+  if (est && est.mode === "network") parts.push(`推定のばらつき ±${est.spread.toFixed(0)}m・歩幅補正 ×${est.stepScale.toFixed(2)}・向き補正 ${est.headingBias >= 0 ? "+" : ""}${est.headingBias.toFixed(0)}°`);
+  if (est && est.mode === "free") parts.push("通路から外れているため、向きと歩数だけで推定中");
+  if (p.events[0]) parts.push(`${p.events[0].type === "elevator" ? "エレベーター" : "気圧"}で ${p.events[0].dz > 0 ? "上" : "下"}へ約${Math.abs(p.events[0].dz).toFixed(1)}m`);
+  if (pos.heading != null) parts.push(`向き ${Math.round(pos.heading)}°`);
+  $("#pdr-status").textContent = parts.join(" / ");
+  if (pos.recorder) $("#rec-status").textContent = `記録中 ${pos.recorder.duration.toFixed(0)}秒・${pos.recorder.log.samples.length}サンプル`;
+}
+
+function setupPdr() {
+  $("#height").value = Math.round(pos.height * 100);
+  $("#height").addEventListener("change", (e) => pos.setHeight(Number(e.target.value) / 100));
+  $("#pdr-on").addEventListener("change", async (e) => {
+    if (e.target.checked) {
+      const ok = await pos.startPdr();
+      if (!ok) e.target.checked = false;
+    } else pos.stopPdr();
+    pdrStatus();
+  });
+  $("#show-particles").addEventListener("change", (e) => {
+    state.showParticles = e.target.checked;
+    map.render();
+  });
+  $("#rec-labels").innerHTML = Object.entries(LABELS).map(([k, v]) => `<button data-label="${k}">${v}</button>`).join("");
+  $("#rec-labels").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-label]");
+    if (!b) return;
+    document.querySelectorAll("#rec-labels button").forEach((x) => x.classList.toggle("on", x === b));
+    pos.label(b.dataset.label);
+  });
+  let lastLog = null;
+  $("#rec").addEventListener("click", async () => {
+    if (pos.recorder) {
+      lastLog = pos.stopRecording();
+      $("#rec").textContent = "記録開始";
+      $("#rec-labels").hidden = true;
+      $("#rec-export").disabled = false;
+      $("#rec-train").disabled = !lastLog.labels.length;
+      $("#rec-status").textContent = `記録 ${(lastLog.samples.length ? (lastLog.samples[lastLog.samples.length - 1][0] - lastLog.samples[0][0]) / 1000 : 0).toFixed(0)}秒・ラベル ${lastLog.labels.length}件`;
+      return;
+    }
+    if (!pos.pdr.enabled) {
+      const ok = await pos.startPdr();
+      $("#pdr-on").checked = ok;
+      if (!ok) return;
+    }
+    pos.startRecording();
+    $("#rec").textContent = "記録停止";
+    $("#rec-labels").hidden = false;
+  });
+  $("#rec-export").addEventListener("click", () => {
+    if (lastLog) download(`ugmap-sensors-${lastLog.started.replace(/[:.]/g, "-")}.json`, JSON.stringify(lastLog), "application/json");
+  });
+  $("#rec-train").addEventListener("click", () => {
+    if (!lastLog) return;
+    const model = trainFromLogs([lastLog], pos.height);
+    pos.setModel(model);
+    modelStatus();
+  });
+  $("#model-reset").addEventListener("click", () => {
+    pos.setModel(null);
+    modelStatus();
+  });
+  $("#replay-file").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const log = JSON.parse(await file.text());
+    if (log.labels && log.labels.length) {
+      lastLog = log;
+      $("#rec-train").disabled = false;
+    }
+    const first = (log.fixes || [])[0];
+    if (first) map.flyTo([first[2], first[1]], 18);
+    await pos.replay(log, { onProgress: (r) => ($("#rec-status").textContent = `再生中 ${Math.round(r * 100)}%`) });
+    $("#rec-status").textContent = "再生完了";
+    e.target.value = "";
+  });
+  modelStatus();
+}
+
 async function init() {
   syncNow();
   setupPanel();
@@ -712,12 +847,14 @@ async function init() {
   net = new Network(raw);
   areas = ar;
   pos = new Positioning(net);
+  setupPdr();
   pos.subscribe(() => {
     const p = pos.position;
     if (p && state.flyOnFix) {
       state.flyOnFix = false;
       map.flyTo([p.lon, p.lat], Math.max(map.zoom, 17));
     }
+    pdrStatus();
     $("#pos-status").textContent = pos.raw ? `${pos.raw.source}・${pos.raw.lat.toFixed(6)}, ${pos.raw.lon.toFixed(6)}${pos.raw.level != null ? `・階層 ${pos.raw.level}` : ""}${pos.snapped ? `・通路に補正（${pos.snapped.dist.toFixed(1)}m）` : ""}` : pos.error ? `エラー: ${pos.error}` : "未取得";
     if (state.destination && Date.now() - (state.lastPlan || 0) > 5000) {
       state.lastPlan = Date.now();
@@ -733,6 +870,14 @@ async function init() {
     onPosition: (fn) => pos.subscribe(() => fn(pos.position)),
     setDestination: (d) => setDestination({ lon: Number(d.lon ?? d.lng), lat: Number(d.lat), name: d.name }),
     snap: (lat, lon, level) => net.snap(lon, lat, { maxMeters: 60, level }),
+    pushMotion: (d) => pos.pushMotion(d),
+    pushPressure: (hPa, t) => pos.pushPressure(hPa, t),
+    pushStep: (d) => pos.pushStep(d),
+    pushEvent: (d) => pos.pushEvent(d),
+    startPdr: () => pos.startPdr(),
+    replay: (log, opts) => pos.replay(log, opts),
+    estimate: () => pos.estimateCache,
+    positioning: pos,
     exportAnchors: () => pos.exportAnchors(),
     network: net,
   };
