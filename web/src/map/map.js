@@ -1,4 +1,4 @@
-import { decodeTile } from "./mvt.js";
+import { Renderer } from "../gl/renderer.js";
 
 const TILE = 512;
 const LOCAL = 2 ** 24;
@@ -31,11 +31,37 @@ export function bearing(a, b) {
   return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
 }
 
+function pointInRing(x, y, ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 2; i < ring.length; j = i, i += 2) {
+    const xi = ring[i];
+    const yi = ring[i + 1];
+    const xj = ring[j];
+    const yj = ring[j + 1];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+function ringDistance(x, y, ring) {
+  let best = Infinity;
+  for (let i = 0, j = ring.length - 2; i < ring.length; j = i, i += 2) {
+    const ax = ring[j];
+    const ay = ring[j + 1];
+    const dx = ring[i] - ax;
+    const dy = ring[i + 1] - ay;
+    const L = dx * dx + dy * dy;
+    const t = L ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L)) : 0;
+    best = Math.min(best, Math.hypot(x - ax - t * dx, y - ay - t * dy));
+  }
+  return best;
+}
+
 export class MapView {
   constructor(container, opts) {
     this.container = container;
-    this.source = opts.source;
     this.style = opts.style;
+    this.layers = opts.layers;
     this.minZoom = opts.minZoom ?? 10;
     this.maxZoom = opts.maxZoom ?? 19;
     this.tileMaxZoom = opts.tileMaxZoom ?? 15;
@@ -45,17 +71,36 @@ export class MapView {
     this.origin = [origin[0] * LOCAL, origin[1] * LOCAL];
     this.canvas = document.createElement("canvas");
     this.canvas.className = "map-canvas";
+    this.labelCanvas = document.createElement("canvas");
+    this.labelCanvas.className = "map-labels";
     container.appendChild(this.canvas);
-    this.ctx = this.canvas.getContext("2d");
+    container.appendChild(this.labelCanvas);
+    this.gl = new Renderer(this.canvas);
+    this.ctx = this.labelCanvas.getContext("2d");
     this.center = lonLatToWorld(...opts.center);
     this.zoom = opts.zoom;
     this.tiles = new Map();
+    this.pending = new Map();
+    this.uploads = [];
     this.overlays = [];
     this.listeners = {};
     this.hidden = new Set();
     this.pointers = new Map();
     this.frame = 0;
     this.labelHits = [];
+    this.textWidths = new Map();
+    this.sprites = new Map();
+    this.stats = { frames: 0, frameMs: 0, maxFrameMs: 0, tilesLoaded: 0, uploadMs: 0, workerMs: 0 };
+    this.nextId = 1;
+    const n = Math.max(2, Math.min(4, (navigator.hardwareConcurrency || 4) - 1));
+    this.workers = Array.from({ length: n }, () => {
+      const w = new Worker(opts.workerUrl);
+      w.postMessage({ type: "init", url: opts.tilesUrl });
+      w.onmessage = (ev) => this.onWorker(ev.data);
+      return w;
+    });
+    this.rr = 0;
+    this.webgl2 = this.gl.webgl2;
     this.resize();
     new ResizeObserver(() => this.resize()).observe(container);
     this.bindEvents();
@@ -73,13 +118,18 @@ export class MapView {
 
   resize() {
     const r = this.container.getBoundingClientRect();
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (this.sprites && dpr !== this.dpr) this.sprites.clear();
+    this.dpr = dpr;
     this.w = r.width;
     this.h = r.height;
-    this.canvas.width = Math.round(r.width * this.dpr);
-    this.canvas.height = Math.round(r.height * this.dpr);
-    this.canvas.style.width = `${r.width}px`;
-    this.canvas.style.height = `${r.height}px`;
+    for (const c of [this.canvas, this.labelCanvas]) {
+      c.width = Math.max(1, Math.round(r.width * this.dpr));
+      c.height = Math.max(1, Math.round(r.height * this.dpr));
+      c.style.width = `${r.width}px`;
+      c.style.height = `${r.height}px`;
+    }
+    this.gl.resize(this.w, this.h, this.dpr);
     this.render();
   }
 
@@ -179,7 +229,7 @@ export class MapView {
   }
 
   bindEvents() {
-    const c = this.canvas;
+    const c = this.labelCanvas;
     c.style.touchAction = "none";
     let down = null;
     c.addEventListener("pointerdown", (e) => {
@@ -237,6 +287,7 @@ export class MapView {
     c.addEventListener("wheel", (e) => {
       e.preventDefault();
       const dz = -e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0022);
+      this.lastWheel = performance.now();
       this.zoomAround(e.offsetX, e.offsetY, Math.max(-1, Math.min(1, dz)));
     }, { passive: false });
   }
@@ -255,66 +306,121 @@ export class MapView {
     const y1 = Math.floor((this.center[1] + this.h / 2 / ws) * n);
     const out = [];
     for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) out.push([z, x, y]);
-    const cx = (this.center[0] * n);
-    const cy = (this.center[1] * n);
+    const cx = this.center[0] * n;
+    const cy = this.center[1] * n;
     out.sort((a, b) => Math.hypot(a[1] + 0.5 - cx, a[2] + 0.5 - cy) - Math.hypot(b[1] + 0.5 - cx, b[2] + 0.5 - cy));
     return out;
   }
 
-  getTile(z, x, y) {
+  request(z, x, y) {
     const key = `${z}/${x}/${y}`;
     let t = this.tiles.get(key);
     if (!t) {
-      t = { key, z, x, y, state: "loading", used: this.frame };
+      const id = this.nextId++;
+      t = { key, z, x, y, id, state: "loading", used: this.frame };
       this.tiles.set(key, t);
-      this.source.tile(z, x, y).then((bytes) => {
-        t.data = bytes ? this.style.prepare(decodeTile(bytes)) : null;
-        t.state = "ready";
-        this.render();
-      }).catch(() => {
-        t.state = "error";
-      });
-      this.prune();
+      this.pending.set(id, t);
+      const w = this.workers[this.rr++ % this.workers.length];
+      t.worker = w;
+      w.postMessage({ type: "tile", id, z, x, y });
     }
     t.used = this.frame;
     return t;
   }
 
-  prune() {
-    if (this.tiles.size < 160) return;
-    const arr = [...this.tiles.values()].filter((t) => t.state !== "loading").sort((a, b) => a.used - b.used);
-    for (const t of arr.slice(0, this.tiles.size - 120)) this.tiles.delete(t.key);
+  onWorker(m) {
+    if (m.type !== "tile") return;
+    const t = this.pending.get(m.id);
+    this.pending.delete(m.id);
+    if (!t || this.tiles.get(t.key) !== t) return;
+    if (m.cancelled) {
+      this.tiles.delete(t.key);
+      return;
+    }
+    if (m.error || !m.data) {
+      t.state = m.error ? "error" : "empty";
+      t.data = null;
+      this.render();
+      return;
+    }
+    this.stats.workerMs += m.data.buildMs || 0;
+    this.uploads.push([t, m.data]);
+    this.render();
   }
 
-  drawableTiles() {
+  processUploads() {
+    const t0 = performance.now();
+    while (this.uploads.length && performance.now() - t0 < 6) {
+      const [t, data] = this.uploads.shift();
+      if (this.tiles.get(t.key) !== t) continue;
+      t.gpu = this.gl.upload(data);
+      t.data = { extent: data.extent, points: data.points, picks: data.picks };
+      t.state = "ready";
+      this.stats.tilesLoaded++;
+    }
+    this.stats.uploadMs += performance.now() - t0;
+    if (this.uploads.length) this.render();
+  }
+
+  prune(visible) {
+    for (const t of this.tiles.values()) {
+      if (t.state === "loading" && !visible.has(t.key) && this.frame - t.used > 2) {
+        t.worker.postMessage({ type: "cancel", id: t.id });
+      }
+    }
+    if (this.tiles.size < 220) return;
+    const arr = [...this.tiles.values()].filter((t) => t.state !== "loading" && !visible.has(t.key)).sort((a, b) => a.used - b.used);
+    for (const t of arr.slice(0, this.tiles.size - 160)) {
+      this.gl.release(t.gpu);
+      this.tiles.delete(t.key);
+    }
+  }
+
+  slots() {
     const list = [];
-    const seen = new Set();
+    const visible = new Set();
+    const ws = this.worldSize;
     for (const [z, x, y] of this.visibleTiles()) {
-      const t = this.getTile(z, x, y);
+      const t = this.request(z, x, y);
+      visible.add(t.key);
+      const n = 2 ** z;
+      const clip = [(x / n - this.center[0]) * ws + this.w / 2, (y / n - this.center[1]) * ws + this.h / 2, ((x + 1) / n - this.center[0]) * ws + this.w / 2, ((y + 1) / n - this.center[1]) * ws + this.h / 2];
       if (t.state === "ready") {
-        if (t.data) list.push(t);
+        list.push({ tile: t, clip });
         continue;
       }
+      if (t.state === "empty" || t.state === "error") continue;
+      let found = false;
       for (let pz = z - 1, px = x >> 1, py = y >> 1; pz >= this.tileMinZoom; pz--, px >>= 1, py >>= 1) {
         const p = this.tiles.get(`${pz}/${px}/${py}`);
-        if (p && p.state === "ready" && p.data) {
-          if (!seen.has(p.key)) {
-            seen.add(p.key);
-            list.unshift(p);
-          }
+        if (p && p.state === "ready") {
           p.used = this.frame;
+          visible.add(p.key);
+          list.unshift({ tile: p, clip });
+          found = true;
           break;
         }
       }
+      if (!found && z + 1 <= this.tileMaxZoom) {
+        for (const [cx, cy] of [[2 * x, 2 * y], [2 * x + 1, 2 * y], [2 * x, 2 * y + 1], [2 * x + 1, 2 * y + 1]]) {
+          const c = this.tiles.get(`${z + 1}/${cx}/${cy}`);
+          if (c && c.state === "ready") {
+            c.used = this.frame;
+            visible.add(c.key);
+            list.unshift({ tile: c, clip });
+          }
+        }
+      }
     }
+    this.prune(visible);
     return list;
   }
 
   render() {
-    if (this.pending) return;
-    this.pending = true;
+    if (this.pendingFrame) return;
+    this.pendingFrame = true;
     requestAnimationFrame(() => {
-      this.pending = false;
+      this.pendingFrame = false;
       this.draw();
     });
   }
@@ -329,85 +435,219 @@ export class MapView {
   }
 
   draw() {
+    const t0 = performance.now();
     this.frame++;
-    const ctx = this.ctx;
-    const dpr = this.dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = this.style.background;
-    ctx.fillRect(0, 0, this.w, this.h);
-    const tiles = this.drawableTiles();
+    this.processUploads();
+    const gl = this.gl;
+    gl.begin(this.style.background);
+    const slots = this.slots();
     const zoom = this.zoom;
-    for (const layer of this.style.layers) {
+    const prepared = slots.map((sl) => {
+      const { s, ox, oy } = this.tileTransform(sl.tile);
+      return { ...sl, s, tf: gl.tf(s, ox, oy) };
+    });
+    for (const layer of this.layers) {
       if (layer.minzoom && zoom < layer.minzoom) continue;
       if (layer.maxzoom && zoom >= layer.maxzoom) continue;
       if (layer.group && this.hidden.has(layer.group)) continue;
-      for (const t of tiles) {
-        const buckets = t.data.paths[layer.source];
-        if (!buckets) continue;
-        const { s, ox, oy } = this.tileTransform(t);
-        ctx.save();
-        const pad = 2 ** t.z === 2 ** this.tileZoom() ? 0 : 0;
-        ctx.beginPath();
-        ctx.rect(ox - pad, oy - pad, s * t.data.extent + pad * 2, s * t.data.extent + pad * 2);
-        ctx.clip();
-        ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * ox, dpr * oy);
-        for (const [bk, path] of buckets) {
-          const st = layer.paint(bk, zoom);
-          if (!st) continue;
-          if (st.fill) {
-            ctx.fillStyle = st.fill;
-            ctx.fill(path);
-          }
-          if (st.stroke) {
-            ctx.strokeStyle = st.stroke;
-            ctx.lineWidth = st.width / s;
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-            ctx.setLineDash(st.dash ? st.dash.map((d) => d / s) : []);
-            ctx.stroke(path);
+      for (const sl of prepared) {
+        const ranges = sl.tile.gpu.ranges[layer.id];
+        if (!ranges) continue;
+        gl.scissor(sl.clip);
+        for (const r of ranges) {
+          const paint = layer.paint(r.key, zoom);
+          if (!paint) continue;
+          if (r.kind === "fill") {
+            if ((paint.opacity ?? 1) <= 0) continue;
+            gl.drawFill(sl.tile.gpu, r, sl.tf, paint.color, paint.opacity ?? 1);
+            if (paint.outline) gl.drawOutline(sl.tile.gpu, r, sl.tf, paint.outline, paint.opacity ?? 1);
+          } else {
+            gl.drawLine(sl.tile.gpu, r, sl.tf, sl.s, paint);
           }
         }
-        ctx.restore();
       }
     }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.setLineDash([]);
+    gl.scissor(null);
+    for (const o of this.overlays) o.gl?.(gl, this);
+    this.stats.glMs = performance.now() - t0;
+    const ctx = this.ctx;
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    ctx.clearRect(0, 0, this.w, this.h);
     for (const o of this.overlays) o.draw?.(ctx, this);
-    this.drawLabels(tiles);
+    const tl = performance.now();
+    this.drawLabels(slots);
+    this.stats.labelMs = performance.now() - tl;
     for (const o of this.overlays) o.drawTop?.(ctx, this);
+    this.lastSlots = slots;
+    const dt = performance.now() - t0;
+    this.stats.frames++;
+    this.stats.frameMs = dt;
+    this.stats.maxFrameMs = Math.max(this.stats.maxFrameMs, dt);
+    this.stats.draws = gl.stats.draws;
+    this.stats.triangles = gl.stats.triangles;
+    this.stats.tiles = slots.length;
     this.emit("render");
   }
 
-  drawLabels(tiles) {
+  pickBuilding(x, y) {
+    if (!this.lastSlots) return null;
+    for (const sl of this.lastSlots) {
+      const c = sl.clip;
+      if (x < c[0] || x > c[2] || y < c[1] || y > c[3]) continue;
+      const t = sl.tile;
+      if (!t.data || !t.data.picks) continue;
+      const { s, ox, oy } = this.tileTransform(t);
+      const ux = (x - ox) / s;
+      const uy = (y - oy) / s;
+      const tol = 6 / s;
+      let near = null;
+      let nearD = tol;
+      for (const p of t.data.picks) {
+        if (pointInRing(ux, uy, p.ring)) return { props: p.props, lngLat: this.fromScreen(ox + p.c[0] * s, oy + p.c[1] * s) };
+        const d = ringDistance(ux, uy, p.ring);
+        if (d < nearD) {
+          nearD = d;
+          near = p;
+        }
+      }
+      if (near) return { props: near.props, lngLat: this.fromScreen(ox + near.c[0] * s, oy + near.c[1] * s) };
+    }
+    return null;
+  }
+
+  measure(ctx, font, text) {
+    let m = this.textWidths.get(font);
+    if (!m) this.textWidths.set(font, (m = new Map()));
+    let w = m.get(text);
+    if (w == null) {
+      ctx.font = font;
+      w = ctx.measureText(text).width;
+      if (m.size > 20000) m.clear();
+      m.set(text, w);
+    }
+    return w;
+  }
+
+  sprite(kind, key, w, h, paint) {
+    const full = kind + key;
+    let sp = this.sprites.get(full);
+    if (sp) return sp;
+    const c = document.createElement("canvas");
+    c.width = Math.ceil(w * this.dpr);
+    c.height = Math.ceil(h * this.dpr);
+    const x = c.getContext("2d");
+    x.scale(this.dpr, this.dpr);
+    paint(x);
+    sp = { c, w, h };
+    this.sprites.set(full, sp);
+    if (this.sprites.size > 4000) this.sprites.clear();
+    return sp;
+  }
+
+  textSprite(c, tw, th) {
+    const key = (c.textKey || `${c.font}|${c.textColor}|${c.halo}|`) + c.text;
+    return this.sprite("t", key, tw + 4, th + 4, (x) => {
+      x.font = c.font;
+      x.textBaseline = "middle";
+      x.lineWidth = 3;
+      x.lineJoin = "round";
+      x.strokeStyle = c.halo || "rgba(255,255,255,0.92)";
+      x.strokeText(c.text, 2, (th + 4) / 2);
+      x.fillStyle = c.textColor || "#222";
+      x.fillText(c.text, 2, (th + 4) / 2);
+    });
+  }
+
+  iconSprite(c) {
+    const r = c.radius;
+    const pad = (c.ringWidth || 1.5) + 1;
+    const size = 2 * (r + pad);
+    const key = c.iconKey || `${r}|${c.color}|${c.ring}|${c.ringWidth}|${c.glyph}|${c.glyphColor}`;
+    return this.sprite("i", key, size, size, (x) => {
+      x.beginPath();
+      x.arc(size / 2, size / 2, r, 0, Math.PI * 2);
+      x.fillStyle = c.color;
+      x.fill();
+      if (c.ring) {
+        x.lineWidth = c.ringWidth || 1.5;
+        x.strokeStyle = c.ring;
+        x.stroke();
+      }
+      if (c.glyph) {
+        x.fillStyle = c.glyphColor || "#fff";
+        x.font = `700 ${Math.round(r * 1.3)}px system-ui, sans-serif`;
+        x.textAlign = "center";
+        x.textBaseline = "middle";
+        x.fillText(c.glyph, size / 2, size / 2 + 0.5);
+      }
+    });
+  }
+
+  drawLabels(slots) {
     const ctx = this.ctx;
     const cands = [];
     for (const o of this.overlays) o.labels?.(this, cands);
-    for (const t of tiles) {
+    const seen = new Set();
+    for (const slot of slots) {
+      const t = slot.tile;
+      if (seen.has(t)) continue;
+      seen.add(t);
       const { s, ox, oy } = this.tileTransform(t);
       for (const p of t.data.points) {
+        const x = ox + p.x * s;
+        const y = oy + p.y * s;
+        if (x < -60 || y < -30 || x > this.w + 60 || y > this.h + 30) continue;
         const rule = this.style.point(p, this.zoom, this.hidden);
         if (!rule) continue;
-        cands.push({ x: ox + p.x * s, y: oy + p.y * s, ...rule, feature: p });
+        rule.x = x;
+        rule.y = y;
+        rule.feature = p;
+        cands.push(rule);
       }
     }
     cands.sort((a, b) => a.priority - b.priority);
-    const placed = [];
-    const hits = [];
+    const CELL = 64;
+    const cols = Math.ceil(this.w / CELL) + 2;
+    const grid = new Map();
     const collide = (r) => {
-      for (const q of placed) if (r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1]) return true;
+      const x0 = Math.floor(r[0] / CELL);
+      const x1 = Math.floor(r[2] / CELL);
+      const y0 = Math.floor(r[1] / CELL);
+      const y1 = Math.floor(r[3] / CELL);
+      for (let gx = x0; gx <= x1; gx++) {
+        for (let gy = y0; gy <= y1; gy++) {
+          const list = grid.get(gy * cols + gx);
+          if (!list) continue;
+          for (const q of list) if (r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1]) return true;
+        }
+      }
       return false;
     };
-    ctx.textBaseline = "middle";
+    const place = (r) => {
+      const x0 = Math.floor(r[0] / CELL);
+      const x1 = Math.floor(r[2] / CELL);
+      const y0 = Math.floor(r[1] / CELL);
+      const y1 = Math.floor(r[3] / CELL);
+      for (let gx = x0; gx <= x1; gx++) {
+        for (let gy = y0; gy <= y1; gy++) {
+          const k = gy * cols + gx;
+          let list = grid.get(k);
+          if (!list) grid.set(k, (list = []));
+          list.push(r);
+        }
+      }
+    };
+    const hits = [];
     for (const c of cands) {
       if (c.x < -50 || c.y < -50 || c.x > this.w + 50 || c.y > this.h + 50) continue;
       const r = c.radius || 0;
       const iconBox = [c.x - r - 1, c.y - r - 1, c.x + r + 1, c.y + r + 1];
       if (!c.force && r && collide(iconBox)) continue;
       let textBox = null;
+      let tw = 0;
+      const th = c.size || 12;
       if (c.text) {
-        ctx.font = c.font;
-        const tw = ctx.measureText(c.text).width;
-        const th = c.size || 12;
+        tw = this.measure(ctx, c.font, c.text);
         const tx = r ? c.x + r + 3 : c.x - tw / 2;
         textBox = [tx - 2, c.y - th / 2 - 1, tx + tw + 2, c.y + th / 2 + 1];
         if (collide(textBox)) {
@@ -416,33 +656,14 @@ export class MapView {
         }
       }
       if (r) {
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = c.color;
-        ctx.fill();
-        if (c.ring) {
-          ctx.lineWidth = c.ringWidth || 1.5;
-          ctx.strokeStyle = c.ring;
-          ctx.stroke();
-        }
-        if (c.glyph) {
-          ctx.fillStyle = c.glyphColor || "#fff";
-          ctx.font = `700 ${Math.round(r * 1.3)}px system-ui, sans-serif`;
-          ctx.textAlign = "center";
-          ctx.fillText(c.glyph, c.x, c.y + 0.5);
-          ctx.textAlign = "left";
-        }
-        placed.push(iconBox);
+        const sp = this.iconSprite(c);
+        ctx.drawImage(sp.c, c.x - sp.w / 2, c.y - sp.h / 2, sp.w, sp.h);
+        place(iconBox);
       }
       if (textBox) {
-        ctx.font = c.font;
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = c.halo || "rgba(255,255,255,0.92)";
-        ctx.lineJoin = "round";
-        ctx.strokeText(c.text, textBox[0] + 2, c.y);
-        ctx.fillStyle = c.textColor || "#222";
-        ctx.fillText(c.text, textBox[0] + 2, c.y);
-        placed.push(textBox);
+        const sp = this.textSprite(c, tw, th);
+        ctx.drawImage(sp.c, textBox[0], c.y - sp.h / 2, sp.w, sp.h);
+        place(textBox);
       }
       if (c.feature) hits.push({ box: textBox ? [Math.min(iconBox[0], textBox[0]), Math.min(iconBox[1], textBox[1]), Math.max(iconBox[2], textBox[2]), Math.max(iconBox[3], textBox[3])] : iconBox, c });
     }

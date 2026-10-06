@@ -1,11 +1,11 @@
-import { MapView, bearing } from "./map/map.js";
-import { PMTiles } from "./map/pmtiles.js";
+import { MapView, bearing, lonLatToWorld } from "./map/map.js";
 import { Network, meters } from "./network.js";
 import { Positioning } from "./positioning.js";
 import { describe } from "./schedule.js";
 import { ACTIVITIES } from "./pdr/motion.js";
 import { LABELS, trainFromLogs } from "./pdr/recorder.js";
-import { CAT_COLORS, CAT_LABELS, FACILITY, style } from "./style.js";
+import { CAT_COLORS, CAT_LABELS, FACILITY, LAYERS, PALETTE, style } from "./style.js";
+import { FillBuilder, LineBuilder } from "./gl/tess.js";
 
 const $ = (s) => document.querySelector(s);
 const WEEK = ["日", "月", "火", "水", "木", "金", "土"];
@@ -29,8 +29,10 @@ const state = {
 };
 
 const map = new MapView($("#map"), {
-  source: new PMTiles(new URL("data/map.pmtiles", base).href),
+  tilesUrl: new URL("data/map.pmtiles", base).href,
+  workerUrl: new URL("worker.js", base).href,
   style,
+  layers: LAYERS,
   center: [139.7671, 35.6812],
   origin: [139.74, 35.68],
   zoom: 15,
@@ -43,6 +45,12 @@ let net = null;
 let pos = null;
 let areas = null;
 let overlayCache = null;
+let entranceCache = null;
+
+function invalidateOverlay() {
+  if (overlayCache) overlayCache.gl.release(overlayCache.geom);
+  overlayCache = null;
+}
 
 function escapeHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -85,7 +93,7 @@ function update() {
   if (!net) return;
   updateTimeLabels();
   const res = net.evaluate(currentDate(), state.mode === "all");
-  overlayCache = null;
+  invalidateOverlay();
   const km = (x) => (x / 1000).toFixed(1);
   $("#stats").innerHTML = state.mode === "all"
     ? `全区間 <b>${km(res.totalLen)} km</b>（時刻を無視）`
@@ -95,12 +103,21 @@ function update() {
   map.render();
 }
 
-function buildOverlayPaths() {
+function buildOverlayGeometry(gl) {
   const { ef } = net;
-  const buckets = new Map();
+  const builders = new Map();
   const get = (k) => {
-    if (!buckets.has(k)) buckets.set(k, new Path2D());
-    return buckets.get(k);
+    if (!builders.has(k)) builders.set(k, new LineBuilder());
+    return builders.get(k);
+  };
+  const local = (cs) => {
+    const out = new Float32Array(cs.length * 2);
+    cs.forEach((c, j) => {
+      const [x, y] = map.toLocal(c[0], c[1]);
+      out[2 * j] = x;
+      out[2 * j + 1] = y;
+    });
+    return out;
   };
   net.edges.forEach((e, i) => {
     const st = net.edgeState[i];
@@ -108,114 +125,107 @@ function buildOverlayPaths() {
     if (st === 2) key = e[ef.highway] === "virtual" ? "virtual" : `open:${e[ef.cat]}`;
     else if (st === 1) key = state.hideIsolated ? null : "isolated";
     else key = state.mode === "closed" ? "closed" : null;
-    if (!key) return;
-    const p = get(key);
-    const cs = e[ef.coords];
-    let [x, y] = map.toLocal(cs[0][0], cs[0][1]);
-    p.moveTo(x, y);
-    for (let j = 1; j < cs.length; j++) {
-      [x, y] = map.toLocal(cs[j][0], cs[j][1]);
-      p.lineTo(x, y);
-    }
+    if (key) get(key).addLine(local(e[ef.coords]));
   });
-  let areaPath = null;
+  if (state.plan && state.plan.underground) {
+    const u = state.plan.underground;
+    get("route").addLine(local(u.line));
+    const entry = net.nodes[u.entry];
+    const exit = net.nodes[u.exit];
+    if (state.plan.from && !u.fromSnap) get("legs").addLine(local([state.plan.from, [entry[0], entry[1]]]));
+    get("legs").addLine(local([[exit[0], exit[1]], [state.destination.lon, state.destination.lat]]));
+  }
+  const fill = new FillBuilder();
   if (areas) {
-    areaPath = new Path2D();
     for (const f of areas.features) {
-      const rings = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
-      for (const poly of rings) for (const ring of poly) {
-        ring.forEach((c, j) => {
-          const [x, y] = map.toLocal(c[0], c[1]);
-          if (j) areaPath.lineTo(x, y);
-          else areaPath.moveTo(x, y);
-        });
-        areaPath.closePath();
-      }
+      const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+      for (const poly of polys) fill.addPolygon(poly.map((ring) => Array.from(local(ring))), false);
     }
   }
-  return { buckets, areaPath };
+  const lineData = new LineBuilder();
+  const ranges = [];
+  for (const [key, b] of builders) {
+    const base = lineData.vertexCount;
+    const start = lineData.idx.length;
+    lineData.v.reserve(b.v.length);
+    lineData.v.data.set(b.v.data.subarray(0, b.v.length), lineData.v.length);
+    lineData.v.length += b.v.length;
+    lineData.idx.reserve(b.idx.length);
+    for (let i = 0; i < b.idx.length; i++) lineData.idx.data[lineData.idx.length++] = b.idx.data[i] + base;
+    ranges.push({ layer: "net", key, start, count: lineData.idx.length - start });
+  }
+  return gl.upload({
+    line: { v: lineData.v.final(), idx: lineData.idx.final(), ranges },
+    fill: { pos: fill.pos.final(), idx: fill.idx.final(), outline: new Uint32Array(0), ranges: [{ layer: "areas", key: "_", start: 0, count: fill.idx.length, ostart: 0, ocount: 0 }] },
+  });
 }
 
 function lineWidth(z) {
   return z < 13 ? 1.2 : z < 15 ? 2 : z < 17 ? 3.2 : z < 18 ? 5 : 7;
 }
 
+const NET_ORDER = ["closed", "isolated", ...Object.keys(CAT_COLORS).map((c) => `casing:${c}`), ...Object.keys(CAT_COLORS).map((c) => `open:${c}`), "virtual", "route", "legs"];
+
 const networkOverlay = {
-  draw(ctx, view) {
+  gl(gl, view) {
     if (!net) return;
-    if (!overlayCache) overlayCache = buildOverlayPaths();
+    if (!overlayCache || overlayCache.gl !== gl) {
+      if (overlayCache) gl.release(overlayCache.geom);
+      overlayCache = { gl, geom: buildOverlayGeometry(gl) };
+    }
+    const g = overlayCache.geom;
     const { s, ox, oy } = view.localTransform();
-    const dpr = view.dpr;
-    ctx.save();
-    ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * ox, dpr * oy);
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    const tf = gl.tf(s, ox, oy);
     const w = lineWidth(view.zoom);
-    if (overlayCache.areaPath && view.zoom >= 15) {
-      ctx.fillStyle = "rgba(109,143,179,0.16)";
-      ctx.fill(overlayCache.areaPath);
+    if (view.zoom >= 15 && g.ranges.areas) gl.drawFill(g, g.ranges.areas[0], tf, "#6d8fb3", 0.16);
+    const byKey = new Map((g.ranges.net || []).map((r) => [r.key, r]));
+    for (const k of NET_ORDER) {
+      const casing = k.startsWith("casing:");
+      const r = byKey.get(casing ? `open:${k.slice(7)}` : k);
+      if (!r) continue;
+      let paint;
+      if (k === "closed") paint = { color: "#c23b3b", opacity: 0.75, width: Math.max(1, w * 0.6), dash: [2, 3] };
+      else if (k === "isolated") paint = { color: "#8c8c8c", opacity: 0.8, width: w };
+      else if (casing) paint = { color: "#ffffff", width: w + 2.4 };
+      else if (k.startsWith("open:")) paint = { color: CAT_COLORS[k.slice(5)], width: w };
+      else if (k === "virtual") paint = { color: "#1f6fd1", opacity: 0.7, width: Math.max(1, w * 0.5), dash: [3, 3] };
+      else if (k === "route") paint = { color: "#ffc400", opacity: 0.9, width: w + 6 };
+      else if (k === "legs") paint = { color: "#5a5a5a", opacity: 0.8, width: 2.5, dash: [2, 5] };
+      gl.drawLine(g, r, tf, s, paint);
     }
-    const stroke = (key, color, width, dash) => {
-      const p = overlayCache.buckets.get(key);
-      if (!p) return;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = width / s;
-      ctx.setLineDash(dash ? dash.map((d) => d / s) : []);
-      ctx.stroke(p);
-    };
-    stroke("closed", "rgba(194,59,59,0.75)", Math.max(1, w * 0.6), [2, 3]);
-    stroke("isolated", "rgba(140,140,140,0.8)", w);
-    for (const cat of Object.keys(CAT_COLORS)) stroke(`open:${cat}`, "#ffffff", w + 2.4);
-    for (const cat of Object.keys(CAT_COLORS)) stroke(`open:${cat}`, CAT_COLORS[cat], w);
-    stroke("virtual", "rgba(31,111,209,0.7)", Math.max(1, w * 0.5), [3, 3]);
-    if (state.plan && state.plan.underground) {
-      const u = state.plan.underground;
-      const route = new Path2D();
-      u.line.forEach((c, j) => {
-        const [x, y] = map.toLocal(c[0], c[1]);
-        if (j) route.lineTo(x, y);
-        else route.moveTo(x, y);
-      });
-      ctx.setLineDash([]);
-      ctx.strokeStyle = "rgba(255,196,0,0.9)";
-      ctx.lineWidth = (w + 6) / s;
-      ctx.stroke(route);
-      const legs = new Path2D();
-      const from = state.plan.from;
-      const entry = net.nodes[u.entry];
-      const exit = net.nodes[u.exit];
-      const to = state.destination;
-      const seg = (a, b) => {
-        const [x1, y1] = map.toLocal(a[0], a[1]);
-        const [x2, y2] = map.toLocal(b[0], b[1]);
-        legs.moveTo(x1, y1);
-        legs.lineTo(x2, y2);
-      };
-      if (from && !u.fromSnap) seg(from, [entry[0], entry[1]]);
-      seg([exit[0], exit[1]], [to.lon, to.lat]);
-      ctx.strokeStyle = "rgba(90,90,90,0.8)";
-      ctx.lineWidth = 2.5 / s;
-      ctx.setLineDash([2 / s, 5 / s]);
-      ctx.stroke(legs);
-    }
-    ctx.restore();
   },
   labels(view, out) {
     if (!net || view.zoom < 14.5) return;
     const { nf } = net;
     const date = currentDate();
+    if (!entranceCache || entranceCache.version !== net.version || entranceCache.mode !== state.mode) {
+      const wx = entranceCache ? entranceCache.wx : new Float64Array(net.nodes.length);
+      const wy = entranceCache ? entranceCache.wy : new Float64Array(net.nodes.length);
+      if (!entranceCache) for (const i of net.entrances) [wx[i], wy[i]] = lonLatToWorld(net.nodes[i][0], net.nodes[i][1]);
+      entranceCache = { version: net.version, mode: state.mode, open: new Uint8Array(net.nodes.length), wx, wy };
+      for (const i of net.entrances) entranceCache.open[i] = state.mode === "all" || net.entranceUsable(i) ? 1 : 0;
+    }
+    const ws = view.worldSize;
+    const cx = view.center[0];
+    const cy = view.center[1];
+    const hw = view.w / 2;
+    const hh = view.h / 2;
+    const big = view.zoom >= 16.5;
     for (const i of net.entrances) {
-      const n = net.nodes[i];
-      const [x, y] = view.toScreen(n[0], n[1]);
+      const x = (entranceCache.wx[i] - cx) * ws + hw;
+      const y = (entranceCache.wy[i] - cy) * ws + hh;
       if (x < -20 || y < -20 || x > view.w + 20 || y > view.h + 20) continue;
-      const open = state.mode === "all" || net.entranceUsable(i);
+      const n = net.nodes[i];
+      const open = entranceCache.open[i] === 1;
       if (!open && state.mode === "open") continue;
       const isTarget = state.target === i || (state.plan?.underground && (state.plan.underground.entry === i || state.plan.underground.exit === i));
       const label = n[nf.ref] || (n[nf.flags] & 4 ? "EV" : "");
       out.push({
         x, y,
         priority: isTarget ? 0 : 2,
-        radius: view.zoom >= 16.5 ? 6 : 4.5,
+        iconKey: `ent:${open ? 1 : 0}:${n[nf.flags] & 8 ? 1 : 0}:${big ? 1 : 0}:${big && !label ? 1 : 0}`,
+        textKey: open ? "ent:1:" : "ent:0:",
+        radius: big ? 6 : 4.5,
         color: open ? (n[nf.flags] & 8 ? "#555" : "#111") : "#fff",
         ring: open ? "#fff" : "#c23b3b",
         ringWidth: 2,
@@ -427,7 +437,7 @@ function replan() {
   const ref = referencePoint();
   const from = [ref.lon, ref.lat];
   state.plan = { from, ...net.plan(from, [state.destination.lon, state.destination.lat], { stepFree: state.stepFree, preferUnderground: state.preferUnderground, fromLevel: ref.level }) };
-  overlayCache = null;
+  invalidateOverlay();
 }
 
 function popupAt(lngLat, html) {
@@ -532,6 +542,15 @@ function featurePopup(f, lngLat) {
     <div class="pp-actions"><button data-act="go" data-lon="${lngLat[0]}" data-lat="${lngLat[1]}" data-name="${escapeHtml(title || kind)}">ここへ行く（地下優先）</button><button class="secondary" data-act="here" data-lon="${lngLat[0]}" data-lat="${lngLat[1]}" data-level="0">ここにいる</button></div>`);
 }
 
+function buildingPopup(b) {
+  const p = b.props;
+  const title = p.n || (p.u ? "地下への入口がある建物" : "建物");
+  const ent = p.u ? '<div class="ent-note"><span class="sw-violet"></span>この建物に地下への入口があります</div>' : "";
+  const osm = p.id ? `<div class="pp-foot"><a href="https://www.openstreetmap.org/${escapeHtml(p.id)}" target="_blank" rel="noopener">OSM ${escapeHtml(p.id)}</a></div>` : "";
+  popupAt(b.lngLat, `<div class="pp-title">${escapeHtml(title)}</div>${ent}
+    <div class="pp-actions"><button data-act="go" data-lon="${b.lngLat[0]}" data-lat="${b.lngLat[1]}" data-name="${escapeHtml(title)}">ここへ行く（地下優先）</button></div>${osm}`);
+}
+
 function pickEdge(x, y) {
   const [lon, lat] = map.fromScreen(x, y);
   const mpp = (156543.03 * Math.cos((lat * Math.PI) / 180)) / 2 ** map.zoom / 2;
@@ -561,6 +580,8 @@ map.on("click", (ev) => {
     return featurePopup(hit.feature, lngLat);
   }
   if (edge) return edgePopup(edge.edge, [edge.lon, edge.lat]);
+  const b = map.pickBuilding(ev.x, ev.y);
+  if (b) return buildingPopup(b);
   $("#popup").hidden = true;
 });
 map.on("move", () => {
@@ -596,7 +617,7 @@ document.addEventListener("click", (ev) => {
   if (act === "clear-dest") {
     state.destination = null;
     state.plan = null;
-    overlayCache = null;
+    invalidateOverlay();
   }
   if (act === "guide-ent") {
     state.target = Number(t.dataset.i);
@@ -695,7 +716,7 @@ function setupPanel() {
   }));
   $("#hide-isolated").addEventListener("change", (e) => {
     state.hideIsolated = e.target.checked;
-    overlayCache = null;
+    invalidateOverlay();
     map.render();
   });
   $("#step-free").addEventListener("change", (e) => {
@@ -720,6 +741,7 @@ function setupPanel() {
   document.querySelectorAll("[data-group], [data-fac]").forEach((el) => el.addEventListener("change", applyLayers));
   applyLayers();
   $("#legend-cats").innerHTML = Object.entries(CAT_LABELS).map(([k, v]) => `<div class="lg"><span class="sw" style="background:${CAT_COLORS[k]}"></span>${v}</div>`).join("")
+    + `<div class="lg"><span class="sw bld" style="background:${PALETTE.entranceBuilding}"></span>地下への入口がある建物</div>`
     + '<div class="lg"><span class="sw" style="background:#8c8c8c"></span>開いているが地上から入れない</div><div class="lg"><span class="sw dashed"></span>閉鎖中（表示時のみ）</div><div class="lg"><span class="pt"></span>入口（灰色は通路データなし）</div><div class="lg"><span class="pt closed"></span>閉鎖中の入口</div>';
   $("#locate").addEventListener("click", async () => {
     pos.startGps();
@@ -878,6 +900,7 @@ async function init() {
     replay: (log, opts) => pos.replay(log, opts),
     estimate: () => pos.estimateCache,
     positioning: pos,
+    map,
     exportAnchors: () => pos.exportAnchors(),
     network: net,
   };

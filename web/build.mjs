@@ -10,10 +10,20 @@ mkdirSync(out, { recursive: true });
 await build({
   entryPoints: [join(here, "src", "app.js")],
   bundle: true,
-  minify: true,
+  minify: process.env.NOMINIFY ? false : true,
   format: "iife",
   target: ["es2020"],
   outfile: join(out, "app.js"),
+  legalComments: "none",
+});
+
+await build({
+  entryPoints: [join(here, "src", "gl", "worker.js")],
+  bundle: true,
+  minify: process.env.NOMINIFY ? false : true,
+  format: "iife",
+  target: ["es2020"],
+  outfile: join(out, "worker.js"),
   legalComments: "none",
 });
 

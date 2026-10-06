@@ -67,7 +67,7 @@ def buildings():
     for f in export("building", ["wr/building"], "polygon"):
         p = f["properties"]
         lv = p.get("building:levels")
-        out.append(with_zoom(feature(f["geometry"], {"levels": int(lv) if lv and lv.isdigit() else None}), 14))
+        out.append(with_zoom(feature(f["geometry"], {"levels": int(lv) if lv and lv.isdigit() else None, "name": p.get("name"), "id": f"{p.get('@type')}/{p.get('@id')}", "b": p.get("building")}), 14))
     n = write_geojsonseq(LAYERS / "building.geojsonseq", out)
     print("building", n)
 

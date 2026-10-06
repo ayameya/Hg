@@ -39,7 +39,7 @@ test("tiles decode with expected layers", async () => {
   assert.ok(bytes && bytes.length > 1000);
   const layers = decodeTile(bytes);
   assert.ok(layers.road.features.length > 100);
-  assert.ok(layers.block.features.length > 100);
+  assert.ok(layers.bld.features.length > 100);
   assert.ok(layers.station.features.some((f) => f.props.n === "東京"));
   const road = layers.road.features.find((f) => f.type === 2);
   assert.ok(road.parts[0].length >= 4);

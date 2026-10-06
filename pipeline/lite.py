@@ -33,7 +33,7 @@ def main():
     counts["water"] = out("water", (f(x["geometry"], {}, 10 if x["properties"].get("kind") == "sea" else 11) for x in read("water")))
     counts["waterway"] = out("waterway", (f(x["geometry"], {"r": 1 if x["properties"].get("kind") in ("river", "canal") else 0}, 11 if x["properties"].get("kind") in ("river", "canal") else 14) for x in read("waterway")))
     counts["park"] = out("park", (f(x["geometry"], {}, 13) for x in read("green") if x["properties"].get("kind") in ("park", "garden", "cemetery", "golf_course", "forest", "wood", "grass", "recreation_ground")))
-    counts["block"] = out("block", (f(x["geometry"], {}, 15) for x in read("block")))
+    counts["bld"] = out("bld", (f(x["geometry"], x["properties"], x["tippecanoe"]["minzoom"]) for x in read("bld")))
     counts["ward"] = out("ward", (f(x["geometry"], {"n": x["properties"]["name"]}, 10) for x in read("ward")))
     counts["wlabel"] = out("wlabel", (f(x["geometry"], {"n": x["properties"]["name"]}, 10) for x in read("ward_label")))
     counts["place"] = out("place", (f(x["geometry"], {"n": x["properties"].get("name"), "k": 1 if x["properties"]["kind"] in ("suburb", "town", "city") else 2}, 13 if x["properties"]["kind"] in ("suburb", "town", "city") else 15) for x in read("place") if x["properties"].get("name")))
@@ -49,7 +49,7 @@ def main():
     counts["facility"] = out("facility", fac)
     print(counts)
     args = ["tippecanoe", "-o", str(ROOT / "docs" / "data" / "map.pmtiles"), "--force", "-Z10", "-z15", f"--clip-bounding-box={CLIP}",
-            "--no-tile-stats", "--simplification=6", "--drop-densest-as-needed", "-q"]
+            "--no-tile-stats", "--simplification=4", "--no-tile-size-limit", "--no-feature-limit", "-q"]
     for name in counts:
         args += ["-L", f"{name}:{OUT / (name + '.geojsonseq')}"]
     subprocess.run(args, check=True)

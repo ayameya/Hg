@@ -11,5 +11,8 @@
     "esbuild": "^0.25.0",
     "opening_hours": "^3.8.0",
     "pmtiles": "^4.0.0"
+  },
+  "dependencies": {
+    "earcut": "^3.2.4"
   }
 }

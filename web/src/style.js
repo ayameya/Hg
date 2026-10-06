@@ -1,8 +1,26 @@
+export const PALETTE = {
+  background: "#fbfaf7",
+  water: "#d3e5f2",
+  waterway: "#bcd6ea",
+  park: "#eef0dc",
+  building: "#e6e2da",
+  buildingLine: "#c9c2b5",
+  entranceBuilding: "#7058a3",
+  entranceBuildingLine: "#4f3d7d",
+  ward: "#a99bbd",
+  bus: "#e08a1e",
+  ferry: "#3a7dc9",
+};
+
+export const RESERVED = {
+  adMint: "#98d6b4",
+};
+
 export const CAT_COLORS = {
   station: "#1f6fd1",
   mall: "#d1491f",
-  building: "#8a4fc9",
-  public: "#1a9e6a",
+  building: "#b8860b",
+  public: "#00838f",
 };
 
 export const CAT_LABELS = {
@@ -25,7 +43,7 @@ export const FACILITY = {
   medical: { label: "病院", color: "#c0392b", glyph: "+", zoom: 15 },
   welfare: { label: "福祉施設・保育所", color: "#9a6aa8", glyph: "福", zoom: 17 },
   toilet: { label: "公衆トイレ", color: "#2d7fa6", glyph: "W", zoom: 16 },
-  park: { label: "公園", color: "#3f8f3f", glyph: "", zoom: 15 },
+  park: { label: "公園", color: "#7c8b2a", glyph: "", zoom: 15 },
   embassy: { label: "大使館・領事館", color: "#9b2335", glyph: "大", zoom: 14 },
   other: { label: "その他の公的機関", color: "#6f6f6f", glyph: "公", zoom: 16 },
 };
@@ -42,7 +60,13 @@ const ROAD_W = {
 };
 const ROAD_C = { 1: "#e9b86a", 2: "#e9c486", 3: "#c9c4b8", 4: "#cfcabe", 5: "#d4d0c6", 6: "#dcd8cf", 7: "#e2dfd8", 8: "#d9d3c8" };
 
-function interp(stops, z) {
+for (const [k, g] of Object.entries(FACILITY)) {
+  g.iconBig = `fac:${k}:1`;
+  g.iconSmall = `fac:${k}:0`;
+  g.textKey = `fac:${k}:`;
+}
+
+export function interp(stops, z) {
   if (z <= stops[0][0]) return stops[0][1];
   for (let i = 1; i < stops.length; i++) {
     if (z <= stops[i][0]) {
@@ -54,100 +78,56 @@ function interp(stops, z) {
   return stops[stops.length - 1][1];
 }
 
-function addParts(p, parts, closed) {
-  for (const ring of parts) {
-    p.moveTo(ring[0], ring[1]);
-    for (let i = 2; i < ring.length; i += 2) p.lineTo(ring[i], ring[i + 1]);
-    if (closed) p.closePath();
-  }
-}
+export const POINT_LAYERS = ["station", "facility", "place", "wlabel", "bstop", "ferry"];
 
-function bucketKey(layer, props) {
-  switch (layer) {
-    case "road":
-      return String(props.c || 6);
-    case "rail":
-      return `${props.c || ""}|${props.t ? 1 : 0}|${props.s ? 1 : 0}`;
-    case "waterway":
-      return props.r ? "r" : "s";
-    case "ferry":
-      return "f";
-    default:
-      return "_";
-  }
-}
-
-const PATH_LAYERS = ["water", "park", "block", "waterway", "road", "rail", "ward", "bus", "ferry"];
-const POINT_LAYERS = ["station", "facility", "place", "wlabel", "bstop", "ferry"];
+export const LAYERS = [
+  { id: "water", source: "water", type: "fill", bucket: () => "_", paint: () => ({ color: PALETTE.water }) },
+  { id: "park", source: "park", type: "fill", minzoom: 13, bucket: () => "_", paint: () => ({ color: PALETTE.park }) },
+  {
+    id: "waterway", source: "waterway", type: "line", bucket: (p) => (p.r ? "r" : "s"),
+    paint: (k, z) => ({ color: PALETTE.waterway, width: k === "r" ? interp([[11, 1], [16, 4], [19, 10]], z) : 0.8 }),
+  },
+  {
+    id: "road", source: "road", type: "line", bucket: (p) => String(p.c || 6), order: ["8", "7", "6", "5", "4", "3", "2", "1"],
+    paint: (k, z) => (z < ROAD_W[k][0][0] ? null : { color: ROAD_C[k], width: interp(ROAD_W[k], z), dash: k === "8" ? [2, 2] : null }),
+  },
+  {
+    id: "building", source: "bld", type: "fill", outline: true, minzoom: 14, group: "building", bucket: (p) => (p.u ? "u" : "b"), order: ["b", "u"],
+    paint: (k, z) => (k === "u"
+      ? { color: PALETTE.entranceBuilding, outline: PALETTE.entranceBuildingLine, opacity: z < 14.5 ? (z - 14) * 2 : 1 }
+      : { color: PALETTE.building, outline: z >= 15.5 ? PALETTE.buildingLine : null, opacity: z < 14.5 ? (z - 14) * 2 : 1 }),
+  },
+  { id: "ward", source: "ward", type: "line", bucket: () => "_", paint: (k, z) => ({ color: PALETTE.ward, width: z < 13 ? 1 : 1.6, dash: [5, 3] }) },
+  { id: "bus", source: "bus", type: "line", group: "bus", bucket: () => "_", paint: (k, z) => ({ color: PALETTE.bus, opacity: 0.55, width: z < 15 ? 1.2 : 2.4 }) },
+  { id: "ferry", source: "ferry", type: "line", group: "ferry", bucket: () => "_", paint: () => ({ color: PALETTE.ferry, width: 1.4, dash: [5, 4] }) },
+  {
+    id: "rail", source: "rail", type: "line", group: "rail", bucket: (p) => `${p.c || ""}|${p.t ? 1 : 0}|${p.s ? 1 : 0}`,
+    paint: (k, z) => {
+      const [c, t, s] = k.split("|");
+      const w = interp([[10, s === "1" ? 0.5 : 1.2], [16, s === "1" ? 1 : 3], [19, s === "1" ? 2 : 6]], z);
+      if (t === "1") return { color: c || "#9a9a9a", opacity: 0.5, width: w, dash: [4, 3] };
+      return { color: c || "#6d6d6d", width: w };
+    },
+  },
+];
 
 export const style = {
-  background: "#fbfaf7",
-  prepare(layers) {
-    const paths = {};
-    const points = [];
-    let extent = 4096;
-    for (const name of PATH_LAYERS) {
-      const l = layers[name];
-      if (!l) continue;
-      extent = l.extent;
-      const groups = new Map();
-      for (const f of l.features) {
-        if (f.type === 1) continue;
-        const k = bucketKey(name, f.props);
-        if (!groups.has(k)) groups.set(k, []);
-        groups.get(k).push(f);
-      }
-      const buckets = [];
-      for (const [k, fs] of groups) {
-        const p = new Path2D();
-        for (const f of fs) addParts(p, f.parts, f.type === 3);
-        buckets.push([k, p]);
-      }
-      if (name === "road") buckets.sort((a, b) => Number(b[0]) - Number(a[0]));
-      paths[name] = buckets;
-    }
-    for (const name of POINT_LAYERS) {
-      const l = layers[name];
-      if (!l) continue;
-      for (const f of l.features) {
-        if (f.type !== 1) continue;
-        for (const part of f.parts) points.push({ layer: name, x: part[0], y: part[1], props: f.props });
-      }
-    }
-    return { extent, paths, points };
-  },
-  layers: [
-    { source: "water", paint: () => ({ fill: "#d3e5f2" }) },
-    { source: "park", minzoom: 13, paint: () => ({ fill: "#e8f0df" }) },
-    { source: "block", minzoom: 15, group: "building", paint: (k, z) => ({ fill: "#f0ede7", stroke: "#cbc5ba", width: z < 16 ? 0.4 : 0.7 }) },
-    { source: "waterway", paint: (k, z) => ({ stroke: "#bcd6ea", width: k === "r" ? interp([[11, 1], [16, 4]], z) : 0.8 }) },
-    { source: "road", paint: (k, z) => (z < ROAD_W[k][0][0] ? null : { stroke: ROAD_C[k], width: interp(ROAD_W[k], z), dash: k === "8" ? [2, 2] : null }) },
-    { source: "ward", paint: (k, z) => ({ stroke: "#a99bbd", width: z < 13 ? 1 : 1.6, dash: [5, 3] }) },
-    { source: "bus", group: "bus", paint: (k, z) => ({ stroke: "rgba(224,138,30,0.55)", width: z < 15 ? 1.2 : 2.4 }) },
-    { source: "ferry", group: "ferry", paint: () => ({ stroke: "#3a7dc9", width: 1.4, dash: [5, 4] }) },
-    {
-      source: "rail",
-      group: "rail",
-      paint: (k, z) => {
-        const [c, t, s] = k.split("|");
-        const w = interp([[10, s === "1" ? 0.5 : 1.2], [16, s === "1" ? 1 : 3], [19, s === "1" ? 2 : 6]], z);
-        if (t === "1") return { stroke: c ? `${c}80` : "#9a9a9a80", width: w, dash: [4, 3] };
-        return { stroke: c || "#6d6d6d", width: w };
-      },
-    },
-  ],
+  background: PALETTE.background,
   point(p, z, hidden) {
     const pr = p.props;
     switch (p.layer) {
       case "wlabel":
         if (z >= 14) return null;
         return { priority: 40, text: pr.n, font: "700 15px system-ui, sans-serif", size: 15, textColor: "#6d5f86", textRequired: true };
+      case "building":
+        if (hidden.has("building") || z < (pr.u ? 16 : 17.5)) return null;
+        return { priority: pr.u ? 25 : 65, text: pr.n, font: `${pr.u ? "700 " : ""}11px system-ui, sans-serif`, size: 11, textColor: pr.u ? PALETTE.entranceBuildingLine : "#7a756b", textRequired: true };
       case "place":
         if (z < (pr.k === 1 ? 14 : 16)) return null;
         return { priority: 60, text: pr.n, font: "12px system-ui, sans-serif", size: 12, textColor: "#8a8478", textRequired: true };
       case "station":
         if (hidden.has("station") || z < 11) return null;
-        return { priority: 10, radius: z < 14 ? 3 : 5, color: "#fff", ring: "#222", ringWidth: 2, text: z >= 12.5 ? pr.n : null, font: "700 13px system-ui, sans-serif", size: 13, textColor: "#111" };
+        return { priority: 10, iconKey: z < 14 ? "st:3" : "st:5", textKey: "st:", radius: z < 14 ? 3 : 5, color: "#fff", ring: "#222", ringWidth: 2, text: z >= 12.5 ? pr.n : null, font: "700 13px system-ui, sans-serif", size: 13, textColor: "#111" };
       case "bstop":
         if (hidden.has("bus") || z < 17) return null;
         return { priority: 70, radius: 3, color: "#fff", ring: "#e08a1e", text: z >= 18 ? pr.n : null, font: "11px system-ui, sans-serif", size: 11, textColor: "#a2600f" };
@@ -164,6 +144,8 @@ export const style = {
         const big = z >= minz + 1.5 && g.glyph;
         return {
           priority: 30 + Object.keys(FACILITY).indexOf(pr.g),
+          iconKey: big ? g.iconBig : g.iconSmall,
+          textKey: g.textKey,
           radius: big ? 7 : 3.5,
           color: g.color,
           ring: "#fff",

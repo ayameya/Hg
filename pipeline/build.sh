@@ -16,10 +16,10 @@ cd "$HERE"
 "$PY" layers.py
 "$PY" ksj.py
 "$PY" facilities.py
-"$PY" blocks.py
 if [ "${SKIP_EKITAN:-0}" != "1" ]; then "$PY" ekitan.py; fi
 "$PY" underground.py
 node "$ROOT/web/tools/compile-hours.mjs" "$ROOT/docs/data/network.json"
+"$PY" buildings.py
 "$PY" lite.py
 "$PY" search_index.py
 
