@@ -13,6 +13,14 @@ function u64(view, off) {
   return view.getUint32(off + 4, true) * 4294967296 + view.getUint32(off, true);
 }
 
+function decodeBase64(text) {
+  if (Uint8Array.fromBase64) return Uint8Array.fromBase64(text);
+  const bin = atob(text);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
 async function gunzip(bytes) {
   const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
   return new Uint8Array(await new Response(stream).arrayBuffer());
@@ -81,14 +89,82 @@ function findEntry(entries, tileId) {
 }
 
 export class PMTiles {
-  constructor(url) {
+  constructor(url, parts = null) {
     this.url = url;
+    this.parts = parts;
+    this.whole = new Map();
+    this.noRange = false;
     this.dirCache = new Map();
     this.ready = this.init();
   }
 
   async range(offset, length) {
-    const res = await fetch(this.url, { headers: { Range: `bytes=${offset}-${offset + length - 1}` } });
+    if (!this.parts) return this.fetchRange(this.url, offset, length);
+    const size = this.parts.size;
+    const first = Math.floor(offset / size);
+    const last = Math.floor((offset + length - 1) / size);
+    if (first === last) return this.partRange(first, offset - first * size, length);
+    const out = new Uint8Array(length);
+    for (let k = first; k <= last; k++) {
+      const a = Math.max(offset, k * size);
+      const b = Math.min(offset + length, (k + 1) * size);
+      out.set(await this.partRange(k, a - k * size, b - a), a - offset);
+    }
+    return out;
+  }
+
+  partUrl(k) {
+    return this.parts.url + String(k).padStart(3, "0") + (this.parts.suffix || "");
+  }
+
+  async body(res) {
+    if (!this.parts.base64) return new Uint8Array(await res.arrayBuffer());
+    return decodeBase64((await res.text()).trim());
+  }
+
+  async partRange(k, offset, length) {
+    if (this.noRange || this.whole.has(k)) {
+      const buf = await this.wholePart(k);
+      return buf.subarray(offset, offset + length);
+    }
+    const b64 = this.parts.base64;
+    const lo = b64 ? Math.floor(offset / 3) * 4 : offset;
+    const hi = b64 ? Math.ceil((offset + length) / 3) * 4 : offset + length;
+    const res = await fetch(this.partUrl(k), { headers: { Range: `bytes=${lo}-${hi - 1}` } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const buf = await this.body(res);
+    if (res.status === 206) {
+      const skip = b64 ? offset % 3 : 0;
+      return buf.subarray(skip, skip + length);
+    }
+    this.noRange = true;
+    this.keep(k, Promise.resolve(buf));
+    return buf.subarray(offset, offset + length);
+  }
+
+  wholePart(k) {
+    let p = this.whole.get(k);
+    if (p) {
+      this.whole.delete(k);
+      this.whole.set(k, p);
+      return p;
+    }
+    p = fetch(this.partUrl(k)).then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return this.body(res);
+    });
+    p.catch(() => this.whole.delete(k));
+    this.keep(k, p);
+    return p;
+  }
+
+  keep(k, p) {
+    this.whole.set(k, p);
+    while (this.whole.size > (this.parts.cache || 16)) this.whole.delete(this.whole.keys().next().value);
+  }
+
+  async fetchRange(url, offset, length) {
+    const res = await fetch(url, { headers: { Range: `bytes=${offset}-${offset + length - 1}` } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const buf = new Uint8Array(await res.arrayBuffer());
     return buf.length > length ? buf.subarray(offset, offset + length) : buf;

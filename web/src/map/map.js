@@ -95,7 +95,7 @@ export class MapView {
     const n = Math.max(2, Math.min(4, (navigator.hardwareConcurrency || 4) - 1));
     this.workers = Array.from({ length: n }, () => {
       const w = new Worker(opts.workerUrl);
-      w.postMessage({ type: "init", url: opts.tilesUrl });
+      w.postMessage({ type: "init", url: opts.tilesUrl, parts: opts.tileParts || null });
       w.onmessage = (ev) => this.onWorker(ev.data);
       return w;
     });
@@ -225,7 +225,12 @@ export class MapView {
   writeHash() {
     const [lon, lat] = this.getCenter();
     const h = `#map=${this.zoom.toFixed(2)}/${lat.toFixed(5)}/${lon.toFixed(5)}`;
-    if (location.hash !== h) history.replaceState(null, "", h);
+    if (location.hash === h) return;
+    try {
+      history.replaceState(null, "", h);
+    } catch (e) {
+      return;
+    }
   }
 
   bindEvents() {

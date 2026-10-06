@@ -30,6 +30,7 @@ const state = {
 
 const map = new MapView($("#map"), {
   tilesUrl: new URL("data/map.pmtiles", base).href,
+  tileParts: self.UGMAP_TILE_PARTS ? { ...self.UGMAP_TILE_PARTS, url: new URL(self.UGMAP_TILE_PARTS.url, base).href } : null,
   workerUrl: new URL("worker.js", base).href,
   style,
   layers: LAYERS,

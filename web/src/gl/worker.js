@@ -8,7 +8,7 @@ const cancelled = new Set();
 self.onmessage = async (ev) => {
   const m = ev.data;
   if (m.type === "init") {
-    source = new PMTiles(m.url);
+    source = new PMTiles(m.url, m.parts);
     return;
   }
   if (m.type === "cancel") {
